@@ -1,1 +1,1 @@
-#asfdasdfasdf
+print("hello world")
