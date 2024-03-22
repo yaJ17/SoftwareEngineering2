@@ -1,2 +1,2 @@
-def PrintFunction() -> str: 
-  print("Ticket 5")
+def printingFunction():
+  print("Hello world!")
