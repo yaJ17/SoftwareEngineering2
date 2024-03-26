@@ -1,53 +1,77 @@
 from datetime import datetime
 
 class Deadline:
-    #Initializing the Deadline class
+    # counter for id
+    id_counter = 0
+
+    # Initializing the Deadline class
     def __init__(self):
         self.deadline = None 
         self.reminder = ""
         self.title = ""
-        self.id = 1
-    
-    def setDeadline(self, year, month, day, hour=0, minute=0, second=0,  reminder="", title=""):
-        self.id = self.id + 1
+        self.id = None
+
+    # setting the deadline
+    # year, month, day are required
+    # setting the default time to 11:59:59 pm
+    # reminder & title default to blank
+    def createDeadline(self, year, month, day, hour=23, minute=59, second=59,  reminder="", title=""):
+        self.id = Deadline.id_counter
         self.deadline = datetime(year, month, day, hour, minute, second)
         self.reminder = reminder
         self.title = title
-    
-    def has_passed(self):
+
+
+    #check if the current deadline has passed
+    def isOverdue(self):
         return datetime.now() > self.deadline
 
-    def deadline_is_past(self, other):
-        return self.deadline < other.deadline
-
-    def deadline_is_equal(self, other):
+    #check if current deadline is equal to another deadline
+    def isEqual(self, other):
         return self.deadline == other.deadline
 
+    #default format of printing the deadline class
     def __str__(self):
         if self.deadline is not None:
             return self.deadline.strftime("%Y-%m-%d %H:%M:%S")
         return ("No Deadline Yet")
     
-    def get_reminder(self):
-        return self.reminder
     
-    def set_reminder(self, reminder):
+    #setting the individual attributes
+    def setDeadline(self, id, year, month, day, hour=11, minutes=59, second=59):
+        if (self.id == id):
+            self.deadline = datetime(year, month, day, hour, minutes, second)
+        else:
+            return "ID is nout found"
+
+    def setReminder(self, reminder):
         self.reminder = reminder
 
-    def get_title(self):
+    def setTitle(self, title):
+        self.title = title
+
+    #getting the individual attributes
+    def getReminder(self):
+        return self.reminder
+
+    def getTitle(self):
         return self.title
     
-    def set_title(self, title):
-        self.title = title
+    def getID(self):
+        return self.id
+
+
 
 class DeadlineManager:
     def __init__(self) -> None:
-        self.deadlines = []
+        self.deadlines = {}
+        self.next_id = 1
     
     def add_deadline(self, year, month, day, hour=0, minute=0, second=0,  reminder="", title=""):
         deadline = Deadline()
-        deadline.setDeadline(year, month, day, hour, minute, second, reminder, title)
-        self.deadlines.append(deadline)
+        deadline.createDeadline(year, month, day, hour, minute, second, reminder, title)
+        self.deadlines[self.next_id] = deadline
+        self.next_id +=1
 
     def delete_deadline(self, deadline_id):
         for deadline in self.deadlines:
@@ -56,7 +80,7 @@ class DeadlineManager:
     
     def __str__(self):
         output = ""
-        for deadline in self.deadlines:
-            output += f"ID: {deadline.id}, Deadline: {str(deadline)}, Reminder: {deadline.reminder}, Title: {deadline.title}\n"
+        for deadline_id, deadline in self.deadlines.items():
+            output += f"ID: {deadline_id}, Deadline: {str(deadline)}, Reminder: {deadline.reminder}, Title: {deadline.title}\n"
         return output
 
