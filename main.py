@@ -1,5 +1,5 @@
-from connect import DatabaseManager
-
+from databases.connect import DatabaseManager
+from logic.login_module import run_login
 def main():
 
     host = 'localhost'
@@ -20,4 +20,4 @@ def main():
     db_manager.close_connection()
 
 if __name__ == "__main__":
-    main()
+    run_login()
