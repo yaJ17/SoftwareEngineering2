@@ -1,23 +1,9 @@
-from connect import DatabaseManager
+from Classes.deadline import DeadlineManager
 
-def main():
+dlm = DeadlineManager()
+dlm.add_deadline(2024, 12, 12, 11,59,59)
+dlm.add_deadline(2025, 6, 17, 11,59,59)
 
-    host = 'localhost'
-    user = 'root'
-    password = 'admin'
-    database = 'rexie'
 
-    db_manager = DatabaseManager(host, user, password,)
-    
-    # Connect to MySQL server (without specifying a database)
-    db_manager.connect_to_database(database)
-    
-    # Create schema and insert data
-    db_manager.create_schema()
-    db_manager.print()
-    # Close the connection
+print(dlm)
 
-    db_manager.close_connection()
-
-if __name__ == "__main__":
-    main()
