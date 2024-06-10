@@ -1,23 +1,9 @@
 from databases.connect import DatabaseManager
 from logic.login_module import run_login
-def main():
-
-    host = 'localhost'
-    user = 'root'
-    password = 'admin'
-    database = 'rexie'
-
-    db_manager = DatabaseManager(host, user, password,)
-    
-    # Connect to MySQL server (without specifying a database)
-    db_manager.connect_to_database(database)
-    
-    # Create schema and insert data
-    db_manager.create_schema()
-    db_manager.print()
-    # Close the connection
-
-    db_manager.close_connection()
-
+# Usage example
 if __name__ == "__main__":
-    run_login()
+    db_manager = DatabaseManager('localhost', 'root', 'admin')
+    db_manager.connect_to_database()
+    db_manager.create_schema()
+    db_manager.add_dummy_data()
+    db_manager.close_connection()

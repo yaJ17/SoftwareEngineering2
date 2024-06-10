@@ -12,5 +12,3 @@ def run_login():
   db.connect_to_database(database)
 
   db.check_account_login(username, password)
-
-run_login()

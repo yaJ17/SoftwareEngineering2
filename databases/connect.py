@@ -1,16 +1,13 @@
 import mysql.connector
 from mysql.connector import Error
-
 class DatabaseManager:
     def __init__(self, host, user, password):
-        
         self.host = host
         self.user = user
         self.password = password
         self.connection = None
 
     def connect_to_database(self, database=None):
-        #Connect to MySQL database and set the connection object
         try:
             if database:
                 self.connection = mysql.connector.connect(
@@ -25,7 +22,6 @@ class DatabaseManager:
                     user=self.user,
                     password=self.password
                 )
-
             if self.connection.is_connected():
                 print("Connected to the database")
         except Error as e:
@@ -33,18 +29,15 @@ class DatabaseManager:
             self.connection = None
 
     def create_schema(self):
-        #Create a schema and insert dummy data
         if self.connection is None:
             print("No connection to the database.")
             return
 
         try:
             cursor = self.connection.cursor()
-            # cursor.execute("DROP DATABASE IF EXISTS rexie")
-            #cursor.execute("CREATE DATABASE rexie")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS rexie")
             cursor.execute("USE rexie")
 
-            # SQL script to create schema
             sql_script = '''
             CREATE TABLE IF NOT EXISTS SUPPLIER (
                 supplier_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -124,100 +117,151 @@ class DatabaseManager:
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL
             );
-
             '''
+            for statement in sql_script.split(';'):
+                if statement.strip():
+                    cursor.execute(statement)
+            self.connection.commit()
+            print("Schema created successfully.")
         except Error as e:
             print(f"Error: {e}")
+
     def add_dummy_data(self):
-        cursor = self.connection.cursor()
-        
-        sql_script = '''
-        INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+
+        try:
+            cursor = self.connection.cursor()
+            
+            # Insert into SUPPLIER
+            supplier_sql = '''
+            INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
             VALUES
             ('Supplier A', 'Location A', 'Contact A'),
             ('Supplier B', 'Location B', 'Contact B');
-
+            '''
+            cursor.execute(supplier_sql)
+            self.connection.commit()
+            
+            # Insert into RAW_MATERIAL
+            raw_material_sql = '''
             INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id)
             VALUES
             ('Material A', 100, 'Type A', 'Color A', 50, 200, 20, 1),
             ('Material B', 200, 'Type B', 'Color B', 60, 300, 30, 2);
-
+            '''
+            cursor.execute(raw_material_sql)
+            self.connection.commit()
+            
+            # Insert into CLIENT
+            client_sql = '''
             INSERT INTO CLIENT (client_name, client_loc, client_contact)
             VALUES
             ('Client A', 'Location A', 'Contact A'),
             ('Client B', 'Location B', 'Contact B');
-
+            '''
+            cursor.execute(client_sql)
+            self.connection.commit()
+            
+            # Insert into DEADLINE
+            deadline_sql = '''
             INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date)
             VALUES
             ('Deadline A', 'Details A', '2024-12-31'),
             ('Deadline B', 'Details B', '2025-01-31');
-
+            '''
+            cursor.execute(deadline_sql)
+            self.connection.commit()
+            
+            # Insert into ORDERS
+            orders_sql = '''
             INSERT INTO ORDERS (client_id, deadline_id, order_quantity, order_progress, labor_allocation, order_style)
             VALUES
             (1, 1, 100, 0, 10, 'Style A'),
             (2, 2, 200, 50, 20, 'Style B');
-
+            '''
+            cursor.execute(orders_sql)
+            self.connection.commit()
+            
+            # Insert into PRODUCT
+            product_sql = '''
             INSERT INTO PRODUCT (order_id, product_quantity, product_style, product_defectives, product_cost)
             VALUES
             (1, '100', 'Style A', 5, 500),
             (2, '200', 'Style B', 10, 1000);
-
+            '''
+            cursor.execute(product_sql)
+            self.connection.commit()
+            
+            # Insert into SUBCONTRACTOR
+            subcontractor_sql = '''
             INSERT INTO SUBCONTRACTOR (order_id, order_quantity, product_style)
             VALUES
             (1, '100', 'Style A'),
             (2, '200', 'Style B');
-
+            '''
+            cursor.execute(subcontractor_sql)
+            self.connection.commit()
+            
+            # Insert into USER_LOGS
+            user_logs_sql = '''
             INSERT INTO USER_LOGS (user_id, action)
             VALUES
             (1, 'Created order'),
             (2, 'Updated product');
-
-
+            '''
+            cursor.execute(user_logs_sql)
+            self.connection.commit()
+            
+            # Insert into ACCOUNTS
+            accounts_sql = '''
             INSERT INTO ACCOUNTS (username, password)
             VALUES
-            (admin,admin)
+            ('admin', 'admin');
+            '''
+            cursor.execute(accounts_sql)
+            self.connection.commit()
             
-        '''
-        cursor.execute(sql_script)
-    def print(self):
-    
-        table = "ACCOUNTS"
+            print("Dummy data added successfully.")
+        except Error as e:
+            print(f"Error: {e}")
+
+
+
+    def print_accounts(self):
         if self.connection is None:
-            print("No connection")
+            print("No connection to the database.")
             return
+
         try:
             cursor = self.connection.cursor()
-            sql_script1 = f'''
-            SELECT * FROM {table}
-            '''
-            sql_script2= '''
-            
-            INSERT INTO ACCOUNTS (username, password)
-            VALUES
-            ("admin","admin")
-            '''
-            cursor.execute(sql_script2)
-            self.connection.commit()
-            cursor.execute(sql_script1)
+            cursor.execute("SELECT * FROM ACCOUNTS")
             rows = cursor.fetchall()
             for row in rows:
                 print(row)
         except Error as e:
-            print(e)
+            print(f"Error: {e}")
+
     def check_account_login(self, username, password):
-        cursor = self.connection.cursor()
-        sql_script = """
-        SELECT username, password FROM accounts WHERE username = %s AND password = %s
-        """
-        cursor.execute(sql_script, (username, password))
-        result = cursor.fetchone()
-        if result:
-            print("nice")
-        else:
-            print("baad")
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+
+        try:
+            cursor = self.connection.cursor()
+            sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
+            cursor.execute(sql_script, (username, password))
+            result = cursor.fetchone()
+            if result:
+                print("Login successful")
+            else:
+                print("Invalid credentials")
+        except Error as e:
+            print(f"Error: {e}")
+
     def close_connection(self):
-        """Close the database connection."""
-        if self.connection.is_connected():
+        if self.connection and self.connection.is_connected():
+            self.connection.commit()
             self.connection.close()
             print("Database connection closed")
-
