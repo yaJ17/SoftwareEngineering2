@@ -7,6 +7,7 @@ class DatabaseManager:
         self.password = password
         self.connection = None
 
+    # CONNECTING TO THE DATABASE WITH OR WITHOUT THE GIVEN DATABASE NAME 
     def connect_to_database(self, database=None):
         try:
             if database:
@@ -27,8 +28,8 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
             self.connection = None
-
-    def create_schema(self):
+    # CREATING SCHEMA IF NOT EXIST IT INCLUDES SCHEMA AND TABLES
+    def create_schema_and_tables(self):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -148,7 +149,7 @@ class DatabaseManager:
             raw_material_sql = '''
             INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id)
             VALUES
-            ('Material A', 100, 'Type A', 'Color A', 50, 200, 20, 1),
+            ('Material A', 100, 'Type A', 'Color A', 50, 200, 20, 11),
             ('Material B', 200, 'Type B', 'Color B', 60, 300, 30, 2);
             '''
             cursor.execute(raw_material_sql)
