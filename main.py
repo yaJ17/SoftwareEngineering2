@@ -7,4 +7,5 @@ if __name__ == "__main__":
     db_manager.create_schema_and_tables()
     #db_manager.add_dummy_data()
     db_manager.check_account_login('admin', 'admin')
+    db_manager.set_account_password('admin', 'admin','newpass', 'newpass')
     db_manager.close_connection()

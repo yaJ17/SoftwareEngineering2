@@ -7,7 +7,7 @@ class DatabaseManager:
         self.password = password
         self.connection = None
 
-    # CONNECTING TO THE DATABASE WITH OR WITHOUT THE GIVEN DATABASE NAME 
+    # Connect to the database with or without the database 
     def connect_to_database(self, database=None):
         try:
             if database:
@@ -28,7 +28,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
             self.connection = None
-    # CREATING SCHEMA IF NOT EXIST IT INCLUDES SCHEMA AND TABLES
+    # Creating the schema and table if not exist yet 
     def create_schema_and_tables(self):
         if self.connection is None:
             print("No connection to the database.")
@@ -127,6 +127,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
+    # Adding the data for testing purposes only 
     def add_dummy_data(self):
         if self.connection is None:
             print("No connection to the database.")
@@ -229,8 +230,29 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
+    # Account verification if valid
+    def check_account_login(self, username, password) -> bool:
+        if self.connection is None:
+            print("No connection to the database.")
+            return
 
-    def print_accounts(self):
+        try:
+            cursor = self.connection.cursor()
+            sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
+            cursor.execute(sql_script, (username, password))
+            result = cursor.fetchone()
+            if result:
+                print("Login successful")
+                return True
+            else:
+                print("Invalid credentials")
+                return False
+        except Error as e:
+            print(f"Error: {e}")
+
+    # populating the accounts from the database,
+    # No return yet, whether string or dictionary or array idk
+    def populate_accounts(self):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -243,24 +265,33 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
+    # getting the username and password of an account
 
-    def check_account_login(self, username, password):
+
+    # Updating password for the account
+    def set_account_password(self, username, password, new_password, confirm_password):
         if self.connection is None:
             print("No connection to the database.")
             return
 
         try:
             cursor = self.connection.cursor()
-            sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
-            cursor.execute(sql_script, (username, password))
+            
+            # Ensure the old password matches and the new passwords match each other
+            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s AND password = %s", (username, password))
             result = cursor.fetchone()
-            if result:
-                print("Login successful")
+            if result and new_password == confirm_password:
+                sql_script = "UPDATE ACCOUNTS SET password = %s WHERE username = %s"
+                cursor.execute(sql_script, (new_password, username))
+                self.connection.commit()
+                print("Password updated successfully.")
             else:
-                print("Invalid credentials")
+                print("Invalid credentials or passwords do not match.")
         except Error as e:
-            print(f"Error: {e}")
+            print(e)
 
+
+    # Disconnect from the SQL 
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()
