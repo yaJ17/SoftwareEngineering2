@@ -168,9 +168,6 @@ class DatabaseManager:
             encrypted_deadline_details_1 = 'First batch of orders'
             encrypted_deadline_details_2 = 'Second batch of orders'
 
-            encrypted_bag_type_1 = 'Casual'
-            encrypted_bag_type_2 = 'Sporty'
-
             encrypted_product_style_1 = 'Casual'
             encrypted_product_style_2 = 'Sporty'
 
@@ -187,7 +184,8 @@ class DatabaseManager:
             INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
             VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(supplier_sql, (encrypted_supplier_name_1, encrypted_supplier_loc_1, encrypted_supplier_contact_1, encrypted_supplier_name_2, encrypted_supplier_loc_2, encrypted_supplier_contact_2))
+            cursor.execute(supplier_sql, (encrypted_supplier_name_1, encrypted_supplier_loc_1, encrypted_supplier_contact_1, 
+                                          encrypted_supplier_name_2, encrypted_supplier_loc_2, encrypted_supplier_contact_2))
 
             # Insert into RAW_MATERIAL
             raw_material_sql = '''
@@ -203,20 +201,21 @@ class DatabaseManager:
             INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date)
             VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-31', encrypted_deadline_name_2, encrypted_deadline_details_2, '2025-01-31'))
+            cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-31', 
+                                          encrypted_deadline_name_2, encrypted_deadline_details_2, '2025-01-31'))
 
-            # Insert into CLIENT
            # Insert into CLIENT
             client_sql = '''
             INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id)
             VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
-            cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2))
+            cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 
+                                        encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2))
             # Insert into ORDERS
             # Insert into ORDERS
             orders_sql = '''
             INSERT INTO ORDERS (client_id, deadline_id, order_quantity, order_progress, labor_allocation, bag_type)
-            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
+            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
             '''
             cursor.execute(orders_sql, (1, 1, 100, 50, 10, 'A' , 1, 1, 150, 75, 15, 'B'))
 
