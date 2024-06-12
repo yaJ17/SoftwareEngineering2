@@ -68,7 +68,9 @@ class DatabaseManager:
                 client_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_name VARCHAR(256) NOT NULL,
                 client_loc VARCHAR(256) NOT NULL,
-                client_contact VARCHAR(256) NOT NULL
+                client_contact VARCHAR(256) NOT NULL,
+                deadline_id INT NOT NULL,
+                FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id)
             );
 
             CREATE TABLE IF NOT EXISTS DEADLINE (
@@ -85,7 +87,7 @@ class DatabaseManager:
                 order_quantity INT NOT NULL,
                 order_progress INT NOT NULL,
                 labor_allocation INT NOT NULL,
-                order_style VARCHAR(256) NOT NULL,
+                bag_type VARCHAR(256) NOT NULL,
                 FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
                 FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id)
             );
@@ -138,52 +140,48 @@ class DatabaseManager:
 
         try:
             cursor = self.connection.cursor()
-
             # Encrypting the data before insertion
-            encrypted_supplier_name_1 = self.cipher.encrypt('Supplier A')
-            encrypted_supplier_name_2 = self.cipher.encrypt('Supplier B')
-            encrypted_supplier_loc_1 = self.cipher.encrypt('Location A')
-            encrypted_supplier_loc_2 = self.cipher.encrypt('Location B')
-            encrypted_supplier_contact_1 = self.cipher.encrypt('Contact A')
-            encrypted_supplier_contact_2 = self.cipher.encrypt('Contact B')
+            #EXAMPLE ONLY
+            encrypted_supplier_name_1 = self.cipher.encrypt('Supplier One')
+            encrypted_supplier_name_2 = 'Supplier Two'
+            encrypted_supplier_loc_1 = '123 Supply St'
+            encrypted_supplier_loc_2 = '456 Supply Ave'
+            encrypted_supplier_contact_1 = '555-1111'
+            encrypted_supplier_contact_2 = '555-2222'
 
-            encrypted_material_name_1 = self.cipher.encrypt('Material A')
-            encrypted_material_name_2 = self.cipher.encrypt('Material B')
-            encrypted_material_type_1 = self.cipher.encrypt('Type A')
-            encrypted_material_type_2 = self.cipher.encrypt('Type B')
-            encrypted_material_color_1 = self.cipher.encrypt('Color A')
-            encrypted_material_color_2 = self.cipher.encrypt('Color B')
+            encrypted_material_name_1 = 'Leather'
+            encrypted_material_name_2 = 'Cotton'
+            encrypted_material_type_1 = 'Animal'
+            encrypted_material_type_2 = 'Plant'
+            encrypted_material_color_1 = 'Black'
+            encrypted_material_color_2 = 'White'
 
-            encrypted_client_name_1 = self.cipher.encrypt('Client A')
-            encrypted_client_name_2 = self.cipher.encrypt('Client B')
-            encrypted_client_loc_1 = self.cipher.encrypt('Client Location A')
-            encrypted_client_loc_2 = self.cipher.encrypt('Client Location B')
-            encrypted_client_contact_1 = self.cipher.encrypt('Client Contact A')
-            encrypted_client_contact_2 = self.cipher.encrypt('Client Contact B')
+            encrypted_client_name_1 = 'John Doe'
+            encrypted_client_name_2 = 'Jane Smith'
+            encrypted_client_loc_1 = '123 Elm St'
+            encrypted_client_loc_2 = '456 Oak St'
+            encrypted_client_contact_1 = '555-1234'
+            encrypted_client_contact_2 = '555-5678'
 
-            encrypted_deadline_name_1 = self.cipher.encrypt('Deadline A')
-            encrypted_deadline_name_2 = self.cipher.encrypt('Deadline B')
-            encrypted_deadline_details_1 = self.cipher.encrypt('Details A')
-            encrypted_deadline_details_2 = self.cipher.encrypt('Details B')
+            encrypted_deadline_name_1 = 'Initial Order'
+            encrypted_deadline_name_2 = 'Second Order'
+            encrypted_deadline_details_1 = 'First batch of orders'
+            encrypted_deadline_details_2 = 'Second batch of orders'
 
-            encrypted_order_style_1 = self.cipher.encrypt('Style A')
-            encrypted_order_style_2 = self.cipher.encrypt('Style B')
+            encrypted_bag_type_1 = 'Casual'
+            encrypted_bag_type_2 = 'Sporty'
 
-            encrypted_product_quantity_1 = self.cipher.encrypt('100')
-            encrypted_product_quantity_2 = self.cipher.encrypt('200')
-            encrypted_product_style_1 = self.cipher.encrypt('Product Style A')
-            encrypted_product_style_2 = self.cipher.encrypt('Product Style B')
+            encrypted_product_style_1 = 'Casual'
+            encrypted_product_style_2 = 'Sporty'
 
-            encrypted_order_quantity_1 = self.cipher.encrypt('Order Quantity A')
-            encrypted_order_quantity_2 = self.cipher.encrypt('Order Quantity B')
+            encrypted_user_action_1 = 'Created order'
+            encrypted_user_action_2 = 'Updated order'
 
-            encrypted_user_action_1 = self.cipher.encrypt('Created order')
-            encrypted_user_action_2 = self.cipher.encrypt('Updated product')
+            encrypted_username = 'user1'
+            encrypted_password = 'password1'
+            encrypted_username1 = 'user2'
+            encrypted_password1 = 'password2'
 
-            encrypted_username = self.cipher.encrypt('admin')
-            encrypted_password = self.cipher.encrypt('password')
-            encrypted_username1 = self.cipher.encrypt('admin1')
-            encrypted_password1 = self.cipher.encrypt('password1')
             # Insert into SUPPLIER
             supplier_sql = '''
             INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
@@ -196,14 +194,9 @@ class DatabaseManager:
             INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s, %s);
             '''
-            cursor.execute(raw_material_sql, (encrypted_material_name_1, 100, encrypted_material_type_1, encrypted_material_color_1, 50, 200, 20, 1, encrypted_material_name_2, 200, encrypted_material_type_2, encrypted_material_color_2, 60, 300, 30, 2))
-
-            # Insert into CLIENT
-            client_sql = '''
-            INSERT INTO CLIENT (client_name, client_loc, client_contact)
-            VALUES (%s, %s, %s), (%s, %s, %s);
-            '''
-            cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2))
+            cursor.execute(raw_material_sql, 
+                           (encrypted_material_name_1, 1, encrypted_material_type_1, encrypted_material_color_1, 500, 1000, 200, 1, 
+                            encrypted_material_name_2, 1, encrypted_material_type_2, encrypted_material_color_2, 200, 1500, 300, 2))
 
             # Insert into DEADLINE
             deadline_sql = '''
@@ -212,26 +205,34 @@ class DatabaseManager:
             '''
             cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-31', encrypted_deadline_name_2, encrypted_deadline_details_2, '2025-01-31'))
 
+            # Insert into CLIENT
+           # Insert into CLIENT
+            client_sql = '''
+            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id)
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+            '''
+            cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2))
+            # Insert into ORDERS
             # Insert into ORDERS
             orders_sql = '''
-            INSERT INTO ORDERS (client_id, deadline_id, order_quantity, order_progress, labor_allocation, order_style)
-            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
+            INSERT INTO ORDERS (client_id, deadline_id, order_quantity, order_progress, labor_allocation, bag_type)
+            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
             '''
-            cursor.execute(orders_sql, (1, 1, 10, 0, 10, encrypted_order_style_1, 2, 2, 5, 50, 20, encrypted_order_style_2))
+            cursor.execute(orders_sql, (1, 1, 100, 50, 10, 'A' , 1, 1, 150, 75, 15, 'B'))
 
             # Insert into PRODUCT
             product_sql = '''
             INSERT INTO PRODUCT (order_id, product_quantity, product_style, product_defectives, product_cost)
             VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
             '''
-            cursor.execute(product_sql, (1, 5, encrypted_product_style_1, 5, 500, 2, 5, encrypted_product_style_2, 10, 1000))
+            cursor.execute(product_sql, (1, 100, encrypted_product_style_1, 5, 1000, 2, 150, encrypted_product_style_2, 10, 1500))
 
             # Insert into SUBCONTRACTOR
             subcontractor_sql = '''
             INSERT INTO SUBCONTRACTOR (order_id, order_quantity, product_style)
             VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(subcontractor_sql, (1, 1, encrypted_product_style_1, 2,1, encrypted_product_style_2))
+            cursor.execute(subcontractor_sql, (1, 50, encrypted_product_style_1, 2, 75, encrypted_product_style_2))
 
             # Insert into USER_LOGS
             user_logs_sql = '''
@@ -248,7 +249,6 @@ class DatabaseManager:
             cursor.execute(accounts_sql, (encrypted_username, encrypted_password, encrypted_username1, encrypted_password1))
 
             self.connection.commit()
-            print("Dummy data added successfully.")
         except Error as e:
             print(f"Error: {e}")
 
@@ -327,6 +327,7 @@ class DatabaseManager:
         except Error as e:
             print(e)
     
+    #kulang pa to ng result
     def populate_client(self):
         if self.connection is None:
             print("No connection to the database.")
@@ -359,6 +360,19 @@ class DatabaseManager:
                 print(decrypted_row)
         except Error as e:
             print(f"Error: {e}")
+
+    def display_client_list(self) -> None:
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT C.client_name, ")
+            rows = cursor.fetchall()
+        except Error as e:
+            print(f"Error: {e}")
+
+    
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()
