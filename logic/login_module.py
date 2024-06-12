@@ -1,4 +1,4 @@
-from databases.connect import DatabaseManager
+from databases.database import DatabaseManager
 
 def run_login():
   username = "admins"

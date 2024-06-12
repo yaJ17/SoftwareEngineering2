@@ -182,7 +182,8 @@ class DatabaseManager:
 
             encrypted_username = self.cipher.encrypt('admin')
             encrypted_password = self.cipher.encrypt('password')
-
+            encrypted_username1 = self.cipher.encrypt('admin1')
+            encrypted_password1 = self.cipher.encrypt('password1')
             # Insert into SUPPLIER
             supplier_sql = '''
             INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
@@ -242,9 +243,9 @@ class DatabaseManager:
             # Insert into ACCOUNTS
             accounts_sql = '''
             INSERT INTO ACCOUNTS (username, password)
-            VALUES (%s, %s);
+            VALUES (%s, %s), (%s, %s);
             '''
-            cursor.execute(accounts_sql, (encrypted_username, encrypted_password))
+            cursor.execute(accounts_sql, (encrypted_username, encrypted_password, encrypted_username1, encrypted_password1))
 
             self.connection.commit()
             print("Dummy data added successfully.")
@@ -275,17 +276,33 @@ class DatabaseManager:
             print(f"Error: {e}")
             return False
 
-    def populate_accounts(self):
+    def populate_accounts(self) -> None:
         if self.connection is None:
             print("No connection to the database.")
             return
-
+        
         try:
             cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM ACCOUNTS")
             rows = cursor.fetchall()
+
             for row in rows:
-                print(row)
+                
+                encrypted_username = row[1]
+                encrypted_password = row[2]
+                
+                # Decrypt the encrypted columns
+                decrypted_username = self.cipher.decrypt(encrypted_username)
+                decrypted_password = self.cipher.decrypt(encrypted_password)
+                
+                # Create a dictionary for better readability
+                decrypted_row = {
+                    'username': decrypted_username,
+                    'password': decrypted_password
+                }
+                
+                # Print the decrypted row
+                print(decrypted_row)
         except Error as e:
             print(f"Error: {e}")
 
@@ -309,7 +326,39 @@ class DatabaseManager:
                 print("Invalid credentials or passwords do not match.")
         except Error as e:
             print(e)
+    
+    def populate_client(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM CLIENT")
+            rows = cursor.fetchall()
 
+            for row in rows:
+                
+                encrypted_name = row[1]
+                encrypted_loc = row[2]
+                encrypted_contact = row[3]
+                
+                # Decrypt the encrypted columns
+                decrypted_name = self.cipher.decrypt(encrypted_name)
+                decrypted_loc = self.cipher.decrypt(encrypted_loc)
+                decrypted_contact = self.cipher.decrypt(encrypted_contact)
+                
+                
+                # Create a dictionary for better readability
+                decrypted_row = {
+                    'name': decrypted_name,
+                    'location': decrypted_loc,
+                    'contact': decrypted_contact
+                }
+                
+                # Print the decrypted row
+                print(decrypted_row)
+        except Error as e:
+            print(f"Error: {e}")
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()

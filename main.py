@@ -1,4 +1,4 @@
-from databases.connect import DatabaseManager
+from databases.database import DatabaseManager
 from logic.login_module import run_login
 from Crypto.Random import get_random_bytes
 
@@ -9,6 +9,7 @@ if __name__ == "__main__":
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
     #db_manager.add_dummy_data()
-    #db_manager.check_account_login('admin', 'password')
+    # db_manager.check_account_login('admin', 'password')
+    db_manager.populate_client()
     #db_manager.set_account_password('admin', 'password','newpass', 'newpass')
     db_manager.close_connection()
