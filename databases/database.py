@@ -61,7 +61,8 @@ class DatabaseManager:
                 material_stock INT NOT NULL,
                 material_safety_stock INT NOT NULL,
                 supplier_id INT NOT NULL,
-                FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id)
+                FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS DEADLINE (
@@ -69,7 +70,8 @@ class DatabaseManager:
                 deadline_name VARCHAR(256) NOT NULL,
                 deadline_details VARCHAR(256) NOT NULL,
                 deadline_date DATE NOT NULL,
-                deadline_status BOOL NOT NULL DEFAULT 0
+                deadline_status BOOL NOT NULL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS CLIENT (
@@ -78,7 +80,8 @@ class DatabaseManager:
                 client_loc VARCHAR(256) NOT NULL,
                 client_contact VARCHAR(256) NOT NULL,
                 deadline_id INT NOT NULL,
-                FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id)
+                FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS ORDERS (
@@ -87,7 +90,8 @@ class DatabaseManager:
                 order_quantity INT NOT NULL,
                 order_progress INT NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
-                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id)
+                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS BAG_COMPONENT (
@@ -97,7 +101,8 @@ class DatabaseManager:
                 progress VARCHAR(256) NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
                 client_id INT NOT NULL,
-                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id)
+                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS PRODUCT (
@@ -108,7 +113,8 @@ class DatabaseManager:
                 product_defectives INT NOT NULL,
                 product_cost INT NOT NULL,
                 product_price INT NOT NULL,
-                FOREIGN KEY (order_id) REFERENCES ORDERS(order_id)
+                FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS SUBCONTRACTOR (
@@ -116,7 +122,8 @@ class DatabaseManager:
                 order_id INT NOT NULL,
                 order_quantity INT NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
-                FOREIGN KEY (order_id) REFERENCES ORDERS(order_id)
+                FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS USER_LOGS (
@@ -124,13 +131,15 @@ class DatabaseManager:
                 user_id INT NOT NULL,
                 action VARCHAR(256) NOT NULL,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES CLIENT(client_id)
+                FOREIGN KEY (user_id) REFERENCES CLIENT(client_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS ACCOUNTS (
                 account_id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(256) NOT NULL,
-                password VARCHAR(256) NOT NULL
+                password VARCHAR(256) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             '''
             for statement in sql_script.split(';'):
