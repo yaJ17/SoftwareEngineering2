@@ -104,9 +104,10 @@ class DatabaseManager:
                 product_id INT AUTO_INCREMENT PRIMARY KEY,
                 order_id INT NOT NULL,
                 product_quantity INT NOT NULL,
-                product_style VARCHAR(256) NOT NULL,
+                bag_type VARCHAR(256) NOT NULL,
                 product_defectives INT NOT NULL,
                 product_cost INT NOT NULL,
+                product_price INT NOT NULL,
                 FOREIGN KEY (order_id) REFERENCES ORDERS(order_id)
             );
 
@@ -114,7 +115,7 @@ class DatabaseManager:
                 subcon_id INT AUTO_INCREMENT PRIMARY KEY,
                 order_id INT NOT NULL,
                 order_quantity INT NOT NULL,
-                product_style VARCHAR(256) NOT NULL,
+                bag_type VARCHAR(256) NOT NULL,
                 FOREIGN KEY (order_id) REFERENCES ORDERS(order_id)
             );
 
@@ -176,8 +177,8 @@ class DatabaseManager:
             encrypted_deadline_details_1 = 'First batch of orders'
             encrypted_deadline_details_2 = 'Second batch of orders'
 
-            encrypted_product_style_1 = 'Casual'
-            encrypted_product_style_2 = 'Sporty'
+            encrypted_bag_type_1 = 'Casual'
+            encrypted_bag_type_2 = 'Sporty'
 
             encrypted_user_action_1 = 'Created order'
             encrypted_user_action_2 = 'Updated order'
@@ -239,17 +240,18 @@ class DatabaseManager:
                                                'HandlesB', 'Sub 2', 'In Progress','B', 1,))
             # Insert into PRODUCT
             product_sql = '''
-            INSERT INTO PRODUCT (order_id, product_quantity, product_style, product_defectives, product_cost)
-            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
+            INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price)
+            VALUES (%s, %s, %s, %s, %s,%s), (%s,%s, %s, %s, %s, %s);
             '''
-            cursor.execute(product_sql, (1, 100, encrypted_product_style_1, 5, 1000, 2, 150, encrypted_product_style_2, 10, 1500))
+            cursor.execute(product_sql, (1, 100, encrypted_bag_type_1, 5, 300, 400, 
+                                         2, 150, encrypted_bag_type_2, 10, 432, 570))
 
             # Insert into SUBCONTRACTOR
             subcontractor_sql = '''
-            INSERT INTO SUBCONTRACTOR (order_id, order_quantity, product_style)
+            INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type)
             VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(subcontractor_sql, (1, 50, encrypted_product_style_1, 2, 75, encrypted_product_style_2))
+            cursor.execute(subcontractor_sql, (1, 50, encrypted_bag_type_1, 2, 75, encrypted_bag_type_2))
 
             # Insert into USER_LOGS
             user_logs_sql = '''
@@ -465,29 +467,6 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    ''' 
-            UPDATE BAG COMPONENT ORDER
-                                                    '''   
-    def set_bag_component(self,bag_component_id, bag_component, labor_allocation, progress, bag_type):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute('''
-                SELECT bag_component_id FROM bag_component WHERE bag_component_id = %s
-            ''', (bag_component_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == bag_component_id:
-                    cursor.execute("UPDATE bag_component SET bag_component =%s, labor_allocation =%s,progress =%s, bag_type =%s WHERE bag_component_id = %s",
-                                    (bag_component,labor_allocation,progress,bag_type, bag_component_id ))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
-
-        except Error as e:
-            print(f"Error: {e}")
     '''
         POPULATE THE BAG COMPONENTS ACCORDING TO BAG TYPE
         O.bag_type is for testing purposes only -> can be excluded
@@ -518,6 +497,32 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
+
+
+    ''' 
+            UPDATE BAG COMPONENT ORDER
+                                                    '''   
+    def set_bag_component(self,bag_component_id, bag_component, labor_allocation, progress, bag_type):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT bag_component_id FROM bag_component WHERE bag_component_id = %s
+            ''', (bag_component_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == bag_component_id:
+                    cursor.execute("UPDATE bag_component SET bag_component =%s, labor_allocation =%s,progress =%s, bag_type =%s WHERE bag_component_id = %s",
+                                    (bag_component,labor_allocation,progress,bag_type, bag_component_id ))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+    
     '''
     MONTH AND YEAR DEFAULT BY 2024 and January for testing purposes
     '''
@@ -546,6 +551,28 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
+    #FOR EDITING THE DEADLINE NAME, DETAIL, DATE, STATUS
+    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_status):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT deadline_id FROM deadline WHERE deadline_id = %s
+            ''', (deadline_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == deadline_id:
+                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s, deadline_status=%s WHERE deadline_id =%s",
+                                    (deadline_name, deadline_details, deadline_date, deadline_status, deadline_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+
     def populate_deadline_by_week(self, start_date, end_date):
         if self.connection is None:
             print("No connection to the database.")
@@ -569,7 +596,134 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
+    '''
+                    POPULATE raw material INVENTORY
+                                                                '''
+    def populate_raw_materials(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT
+                R.material_name,
+                R.material_stock,
+                R.material_safety_stock,
+                R.material_cost,
+                S.supplier_name,
+                S.supplier_contact
+            FROM 
+                RAW_MATERIAL R
+            JOIN 
+                SUPPLIER S ON R.supplier_id = S.supplier_id;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
 
+    def set_raw_material(self, material_id, name,stock, safety_stock, cost, supplier_name, supplier_contact):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT material_id FROM raw_material WHERE material_id = %s
+            ''', (material_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == material_id:
+                    sql_script = '''
+                    UPDATE RAW_MATERIAL SET
+                        material_name = %s,
+                        material_stock =%s,
+                        material_safety_stock = %s,
+                        material_cost = %s
+                    WHERE material_id = %s;
+
+                    '''
+                    cursor.execute(sql_script, 
+                    (name,stock,safety_stock,cost,material_id))
+                    sql_script = '''
+                    UPDATE SUPPLIER SET
+                        supplier_name = %s,
+                        supplier_contact =%s
+                    WHERE supplier_id = (SELECT supplier_id FROM raw_material WHERE material_id = %s);
+                    '''
+                    cursor.execute(sql_script, (supplier_name,supplier_contact, material_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+
+    '''
+                    POPULATE PRODUCT INVENTORY
+                                                                '''
+    def populate_product(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT
+                    bag_type,
+                    product_quantity,
+                    product_defectives,
+                    product_cost,
+                    product_price,
+                    (product_price- product_cost) as profit
+                FROM 
+                    PRODUCT;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
+    
+    '''
+                    UPDATE PRODUCT INVENTORY
+                                                                '''
+    def update_product(self, product_id, bag_type, quantity, defective, cost, price):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT product_id FROM product WHERE product_id = %s
+            ''', (product_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == product_id:
+                    sql_script = '''
+                    UPDATE product SET
+                        bag_type = %s,
+                        product_quantity= %s,
+                        product_defectives= %s,
+                        product_cost= %s,
+                        product_price= %s
+                    WHERE 
+                        product_id = %s;
+
+                    '''
+                    cursor.execute(sql_script, (bag_type, quantity,defective,cost,price,product_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
     
     def close_connection(self):
         if self.connection and self.connection.is_connected():
