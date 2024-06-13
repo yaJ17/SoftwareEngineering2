@@ -64,6 +64,14 @@ class DatabaseManager:
                 FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id)
             );
 
+            CREATE TABLE IF NOT EXISTS DEADLINE (
+                deadline_id INT AUTO_INCREMENT PRIMARY KEY,
+                deadline_name VARCHAR(256) NOT NULL,
+                deadline_details VARCHAR(256) NOT NULL,
+                deadline_date DATE NOT NULL,
+                deadline_status BOOL NOT NULL DEFAULT 0
+            );
+
             CREATE TABLE IF NOT EXISTS CLIENT (
                 client_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_name VARCHAR(256) NOT NULL,
@@ -73,23 +81,23 @@ class DatabaseManager:
                 FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id)
             );
 
-            CREATE TABLE IF NOT EXISTS DEADLINE (
-                deadline_id INT AUTO_INCREMENT PRIMARY KEY,
-                deadline_name VARCHAR(256) NOT NULL,
-                deadline_details VARCHAR(256) NOT NULL,
-                deadline_date DATE NOT NULL
-            );
-
             CREATE TABLE IF NOT EXISTS ORDERS (
                 order_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_id INT NOT NULL,
-                deadline_id INT NOT NULL,
                 order_quantity INT NOT NULL,
                 order_progress INT NOT NULL,
-                labor_allocation INT NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
-                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
-                FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id)
+                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id)
+            );
+
+            CREATE TABLE IF NOT EXISTS BAG_COMPONENT (
+                bag_component_id INT AUTO_INCREMENT PRIMARY KEY,
+                bag_component VARCHAR(256) NOT NULL,
+                labor_allocation VARCHAR(256) NOT NULL,
+                progress VARCHAR(256) NOT NULL,
+                bag_type VARCHAR(256) NOT NULL,
+                client_id INT NOT NULL,
+                FOREIGN KEY (client_id) REFERENCES CLIENT(client_id)
             );
 
             CREATE TABLE IF NOT EXISTS PRODUCT (
@@ -174,10 +182,10 @@ class DatabaseManager:
             encrypted_user_action_1 = 'Created order'
             encrypted_user_action_2 = 'Updated order'
 
-            encrypted_username = 'user1'
-            encrypted_password = 'password1'
-            encrypted_username1 = 'user2'
-            encrypted_password1 = 'password2'
+            encrypted_username = self.cipher.encrypt('user1')
+            encrypted_password = self.cipher.encrypt('password1')
+            encrypted_username1 = self.cipher.encrypt('user2')
+            encrypted_password1 = self.cipher.encrypt('password2')
 
             # Insert into SUPPLIER
             supplier_sql = '''
@@ -201,8 +209,8 @@ class DatabaseManager:
             INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date)
             VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-31', 
-                                          encrypted_deadline_name_2, encrypted_deadline_details_2, '2025-01-31'))
+            cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-21', 
+                                          encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30'))
 
            # Insert into CLIENT
             client_sql = '''
@@ -212,13 +220,23 @@ class DatabaseManager:
             cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 
                                         encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2))
             # Insert into ORDERS
-            # Insert into ORDERS
             orders_sql = '''
-            INSERT INTO ORDERS (client_id, deadline_id, order_quantity, order_progress, labor_allocation, bag_type)
-            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
+            INSERT INTO ORDERS (client_id, order_quantity, order_progress,  bag_type)
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
-            cursor.execute(orders_sql, (1, 1, 100, 50, 10, 'A' , 1, 1, 150, 75, 15, 'B'))
+            cursor.execute(orders_sql, (1, 100, 50, 'A' , 1,  150, 75, 'B'))
 
+            #Insert into  Bag Components
+            bag_component_sql = '''
+            
+            INSERT INTO BAG_COMPONENT (bag_component, labor_allocation,progress,bag_type, client_id)
+            VALUES (%s,%s,%s,%s,%s) , (%s,%s,%s,%s,%s), (%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s);
+            '''
+
+            cursor.execute(bag_component_sql, ('ZipperA', 'Sub 1', 'In Progress','A', 1, 
+                                               'HandlesA', 'Main', 'Done','A', 1,
+                                               'ZipperB', 'Main', 'Done','B', 1,
+                                               'HandlesB', 'Sub 2', 'In Progress','B', 1,))
             # Insert into PRODUCT
             product_sql = '''
             INSERT INTO PRODUCT (order_id, product_quantity, product_style, product_defectives, product_cost)
@@ -316,13 +334,14 @@ class DatabaseManager:
             enc_password = self.cipher.encrypt(password)
             cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s AND password = %s", (enc_username, enc_password))
             result = cursor.fetchone()
-            if result and new_password == confirm_password:
-                sql_script = "UPDATE ACCOUNTS SET password = %s WHERE username = %s"
-                cursor.execute(sql_script, (self.cipher.encrypt(new_password), enc_username))
-                self.connection.commit()
-                print("Password updated successfully.")
-            else:
-                print("Invalid credentials or passwords do not match.")
+            print(result)
+            if result:
+                if new_password == confirm_password:
+                    sql_script = "UPDATE ACCOUNTS SET password = %s WHERE username = %s"
+                    cursor.execute(sql_script, (self.cipher.encrypt(new_password), enc_username))
+                    print("Password updated successfully.")
+                else:
+                    print("Invalid credentials or passwords do not match.")
         except Error as e:
             print(e)
     
@@ -333,26 +352,42 @@ class DatabaseManager:
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM CLIENT")
+            cursor.execute("""
+            SELECT 
+                C.client_name,
+                GROUP_CONCAT(O.bag_type SEPARATOR ', ') AS all_bag_styles,
+                D.deadline_date,
+                AVG(O.order_progress) AS average_order_progress
+            FROM 
+                CLIENT C
+            JOIN 
+                ORDERS O ON C.client_id = O.client_id
+            JOIN
+                DEADLINE D ON C.deadline_id = D.deadline_id
+            GROUP BY 
+                C.client_name, D.deadline_date;
+            """)
             rows = cursor.fetchall()
 
             for row in rows:
                 
-                encrypted_name = row[1]
-                encrypted_loc = row[2]
-                encrypted_contact = row[3]
+                client_name = row[0]
+                bag_types = row[1]
+                deadline = row[2]
+                progress = row[3]
                 
                 # Decrypt the encrypted columns
-                decrypted_name = self.cipher.decrypt(encrypted_name)
-                decrypted_loc = self.cipher.decrypt(encrypted_loc)
-                decrypted_contact = self.cipher.decrypt(encrypted_contact)
+                # decrypted_name = self.cipher.decrypt(encrypted_name)
+                # decrypted_loc = self.cipher.decrypt(encrypted_loc)
+                # decrypted_contact = self.cipher.decrypt(encrypted_contact)
                 
                 
                 # Create a dictionary for better readability
                 decrypted_row = {
-                    'name': decrypted_name,
-                    'location': decrypted_loc,
-                    'contact': decrypted_contact
+                    'name': client_name,
+                    'bag types': bag_types,
+                    'deadline': deadline,
+                    'progress': progress
                 }
                 
                 # Print the decrypted row
@@ -360,14 +395,178 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def display_client_list(self) -> None:
+    #EDIT CLIENT DETAILS
+    def set_account_detail(self, client_id, name, loc,contact):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT C.client_name, ")
+            cursor.execute('''
+                SELECT client_id FROM client WHERE client_id = %s;
+            ''',(client_id,))
+            result = cursor.fetchone()
+            print(result)
+            if result:
+                if  result[0] == client_id:
+                    sql_script = "UPDATE CLIENT SET client_name=%s, client_loc=%s, client_contact=%s WHERE client_id = %s"
+                    cursor.execute(sql_script, (name,loc,contact,client_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid client_id.")
+        except Error as e:
+            print(f"Error: {e}")
+
+    '''
+    # POPULATING ORDER ID, BAG TYPE, AND COMPLETION FOR LABELS
+    '''
+    def populate_orders(self) -> None:
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                O.order_id,
+                O.bag_type,
+                O.order_progress
+            FROM 
+                ORDERS O
+            '''
+            )
             rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
+    ''' 
+            UPDATE CLIENT ORDER
+                                                    '''   
+    def set_order(self, order_id, quantity, progress, bag_type):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT order_id FROM orders WHERE order_id = %s
+            ''', (order_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == order_id:
+                    cursor.execute("UPDATE ORDERs SET order_quantity=%s, order_progress =%s, bag_type =%s WHERE order_id = %s",
+                                    (quantity,progress,bag_type,order_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+
+    ''' 
+            UPDATE BAG COMPONENT ORDER
+                                                    '''   
+    def set_bag_component(self,bag_component_id, bag_component, labor_allocation, progress, bag_type):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT bag_component_id FROM bag_component WHERE bag_component_id = %s
+            ''', (bag_component_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == bag_component_id:
+                    cursor.execute("UPDATE bag_component SET bag_component =%s, labor_allocation =%s,progress =%s, bag_type =%s WHERE bag_component_id = %s",
+                                    (bag_component,labor_allocation,progress,bag_type, bag_component_id ))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+    '''
+        POPULATE THE BAG COMPONENTS ACCORDING TO BAG TYPE
+        O.bag_type is for testing purposes only -> can be excluded
+    '''
+    def populate_bag_components(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                B.bag_component,
+                B.labor_allocation,
+                B.progress,
+                O.bag_type
+            FROM 
+                BAG_COMPONENT B
+            JOIN 
+                ORDERS O ON O.client_id = B.client_id
+            WHERE
+                O.bag_type = B.bag_type;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
+    '''
+    MONTH AND YEAR DEFAULT BY 2024 and January for testing purposes
+    '''
+    def populate_deadline_by_month(self, month=12, year=2024):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                deadline_name,
+                deadline_date
+            FROM
+                deadline
+            WHERE
+                MONTH(deadline_date) = %s
+                AND YEAR(deadline_date) = %s;
+            ''',
+            (month, year)
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
+
+    def populate_deadline_by_week(self, start_date, end_date):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                deadline_name,
+                deadline_date
+            FROM
+                deadline
+            WHERE
+                deadline_date BETWEEN %s AND %s;
+            ''',
+            (start_date, end_date)
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
         except Error as e:
             print(f"Error: {e}")
 
