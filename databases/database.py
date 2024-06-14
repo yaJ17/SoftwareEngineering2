@@ -18,13 +18,15 @@ class DatabaseManager:
                     host=self.host,
                     database=database,
                     user=self.user,
-                    password=self.password
+                    password=self.password,
+                    auth_plugin='mysql_native_password'
                 )
             else:
                 self.connection = mysql.connector.connect(
                     host=self.host,
                     user=self.user,
-                    password=self.password
+                    password=self.password,
+                    auth_plugin='mysql_native_password'
                 )
             if self.connection.is_connected():
                 print("Connected to the database")
