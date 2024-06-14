@@ -409,7 +409,7 @@ class DatabaseManager:
             print(f"Error: {e}")
 
     #EDIT CLIENT DETAILS
-    def set_account_detail(self, client_id, name, loc,contact):
+    def set_client_detail(self, client_id, name, loc,contact):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -430,6 +430,30 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
+    '''
+        ADDITION OF CLIENT
+    '''
+    def add_client(self, name, loc, contact, deadline_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            INSERT INTO CLIENT(
+                client_name,
+                client_loc,
+                client_contact,
+                deadline_id
+                )
+            VALUES 
+            (%s,%s,%s,%s);
+            '''
+            ,(name, loc, contact, deadline_id))
+        except Error as e:
+            print(f"Error: {e}")
+    
     '''
     # POPULATING ORDER ID, BAG TYPE, AND COMPLETION FOR LABELS
     '''
@@ -475,6 +499,24 @@ class DatabaseManager:
                 else:
                     print("Invalid order.")
 
+        except Error as e:
+            print(f"Error: {e}")
+
+    def add_order(self, client_id, order_quantity, order_progress, bag_type):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                INSERT INTO ORDERS(
+                client_id,
+                order_quantity, 
+                order_progress, 
+                bag_type
+                )
+                VALUES (%s,%s,%s,%s)
+            ''', (client_id, order_quantity, order_progress, bag_type))
         except Error as e:
             print(f"Error: {e}")
 
@@ -673,7 +715,31 @@ class DatabaseManager:
 
         except Error as e:
             print(f"Error: {e}")
-
+    def add_raw_material(self, name,stock,available,materialtype, safety_stock, cost, supplier_id, color):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            INSERT INTO raw_material(
+                material_name,
+                material_available,
+                material_type,
+                material_color,
+                material_cost,
+                material_stock,
+                material_safety_stock,
+                supplier_id
+                )
+            VALUES 
+            (%s,%s,%s,%s,%s,%s,%s,%s);
+            '''
+            ,(name,available,materialtype, color, cost, stock, safety_stock,supplier_id))
+        except Error as e:
+            print(f"Error: {e}")
+    
     '''
                     POPULATE PRODUCT INVENTORY
                                                                 '''
@@ -705,7 +771,7 @@ class DatabaseManager:
     '''
                     UPDATE PRODUCT INVENTORY
                                                                 '''
-    def update_product(self, product_id, bag_type, quantity, defective, cost, price):
+    def set_product(self, product_id, bag_type, quantity, defective, cost, price):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -733,6 +799,28 @@ class DatabaseManager:
                 else:
                     print("Invalid order.")
 
+        except Error as e:
+            print(f"Error: {e}")
+    def add_product(self, order_id, product_quantity, bag_type,product_defectives,product_cost,product_price):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            INSERT INTO product(
+            order_id, 
+            product_quantity, 
+            bag_type,
+            product_defectives,
+            product_cost,
+            product_price
+                )
+            VALUES 
+            (%s,%s,%s,%s,%s,%s);
+            '''
+            ,(order_id, product_quantity, bag_type,product_defectives,product_cost,product_price))
         except Error as e:
             print(f"Error: {e}")
     
