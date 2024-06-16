@@ -1,4 +1,5 @@
 import mysql.connector
+import re
 from mysql.connector import Error
 from databases.encrypt import DatabaseAES
 
@@ -50,6 +51,7 @@ class DatabaseManager:
                 supplier_name VARCHAR(256) NOT NULL,
                 supplier_loc VARCHAR(256) NOT NULL,
                 supplier_contact VARCHAR(256) NOT NULL,
+                supplier_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -64,6 +66,7 @@ class DatabaseManager:
                 material_safety_stock INT NOT NULL,
                 supplier_id INT NOT NULL,
                 FOREIGN KEY (supplier_id) REFERENCES SUPPLIER(supplier_id),
+                raw_material_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -73,19 +76,20 @@ class DatabaseManager:
                 deadline_details VARCHAR(256) NOT NULL,
                 deadline_date DATE NOT NULL,
                 deadline_status BOOL NOT NULL DEFAULT 0,
+                deadline_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE IF NOT EXISTS CLIENT (
+           CREATE TABLE IF NOT EXISTS CLIENT (
                 client_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_name VARCHAR(256) NOT NULL,
                 client_loc VARCHAR(256) NOT NULL,
                 client_contact VARCHAR(256) NOT NULL,
                 deadline_id INT NOT NULL,
+                client_active BOOL DEFAULT 1,
                 FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-
             CREATE TABLE IF NOT EXISTS ORDERS (
                 order_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_id INT NOT NULL,
@@ -93,6 +97,7 @@ class DatabaseManager:
                 order_progress INT NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
                 FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
+                orders_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -104,6 +109,7 @@ class DatabaseManager:
                 bag_type VARCHAR(256) NOT NULL,
                 client_id INT NOT NULL,
                 FOREIGN KEY (client_id) REFERENCES CLIENT(client_id),
+                bag_component_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -116,6 +122,7 @@ class DatabaseManager:
                 product_cost INT NOT NULL,
                 product_price INT NOT NULL,
                 FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+                product_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -125,6 +132,7 @@ class DatabaseManager:
                 order_quantity INT NOT NULL,
                 bag_type VARCHAR(256) NOT NULL,
                 FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+                subcontractor_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -139,10 +147,16 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS ACCOUNTS (
                 account_id INT AUTO_INCREMENT PRIMARY KEY,
+                username_id VARCHAR(256) NOT NULL,
                 username VARCHAR(256) NOT NULL,
                 password VARCHAR(256) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                secret_question VARCHAR(256) NOT NULL,
+                secret_answer VARCHAR(256) NOT NULL,
+                accounts_active BOOL DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY (username_id)
             );
+
             '''
             for statement in sql_script.split(';'):
                 if statement.strip():
@@ -201,82 +215,105 @@ class DatabaseManager:
 
             # Insert into SUPPLIER
             supplier_sql = '''
-            INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact)
-            VALUES (%s, %s, %s), (%s, %s, %s);
+            INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact, supplier_active)
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
-            cursor.execute(supplier_sql, (encrypted_supplier_name_1, encrypted_supplier_loc_1, encrypted_supplier_contact_1, 
-                                          encrypted_supplier_name_2, encrypted_supplier_loc_2, encrypted_supplier_contact_2))
+            cursor.execute(supplier_sql, (
+                encrypted_supplier_name_1, encrypted_supplier_loc_1, encrypted_supplier_contact_1, 1,
+                encrypted_supplier_name_2, encrypted_supplier_loc_2, encrypted_supplier_contact_2, 1
+            ))
 
-            # Insert into RAW_MATERIAL
             raw_material_sql = '''
-            INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s, %s);
+            INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id, raw_material_active)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s, %s, %s);
             '''
-            cursor.execute(raw_material_sql, 
-                           (encrypted_material_name_1, 1, encrypted_material_type_1, encrypted_material_color_1, 500, 1000, 200, 1, 
-                            encrypted_material_name_2, 1, encrypted_material_type_2, encrypted_material_color_2, 200, 1500, 300, 2))
+            cursor.execute(raw_material_sql, (
+                encrypted_material_name_1, 1, encrypted_material_type_1, encrypted_material_color_1, 500, 1000, 200, 1, 1,
+                encrypted_material_name_2, 1, encrypted_material_type_2, encrypted_material_color_2, 200, 1500, 300, 2, 1
+            ))
 
             # Insert into DEADLINE
             deadline_sql = '''
-            INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date)
-            VALUES (%s, %s, %s), (%s, %s, %s);
+            INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date, deadline_active)
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
-            cursor.execute(deadline_sql, (encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-21', 
-                                          encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30'))
+            cursor.execute(deadline_sql, (
+                encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-21', 1, 
+                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30', 1
+            ))
 
            # Insert into CLIENT
             client_sql = '''
-            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_active)
+            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
             '''
-            cursor.execute(client_sql, (encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 
-                                        encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2))
+            cursor.execute(client_sql, (
+                encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 1,
+                encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2, 1
+            ))
+
             # Insert into ORDERS
             orders_sql = '''
-            INSERT INTO ORDERS (client_id, order_quantity, order_progress,  bag_type)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+            INSERT INTO ORDERS (client_id, order_quantity, order_progress, bag_type, orders_active)
+            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
             '''
-            cursor.execute(orders_sql, (1, 100, 50, 'A' , 1,  150, 75, 'B'))
+            cursor.execute(orders_sql, (
+                1, 100, 50, 'A', 1,
+                1, 150, 75, 'B', 1
+            ))
 
             #Insert into  Bag Components
             bag_component_sql = '''
-            
-            INSERT INTO BAG_COMPONENT (bag_component, labor_allocation,progress,bag_type, client_id)
-            VALUES (%s,%s,%s,%s,%s) , (%s,%s,%s,%s,%s), (%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s);
+            INSERT INTO BAG_COMPONENT (bag_component, labor_allocation, progress, bag_type, client_id, bag_component_active)
+            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
             '''
+            cursor.execute(bag_component_sql, (
+                'ZipperA', 'Sub 1', 'In Progress', 'A', 1, 1,
+                'HandlesA', 'Main', 'Done', 'A', 1, 1,
+                'ZipperB', 'Main', 'Done', 'B', 1, 1,
+                'HandlesB', 'Sub 2', 'In Progress', 'B', 1, 1
+            ))
 
-            cursor.execute(bag_component_sql, ('ZipperA', 'Sub 1', 'In Progress','A', 1, 
-                                               'HandlesA', 'Main', 'Done','A', 1,
-                                               'ZipperB', 'Main', 'Done','B', 1,
-                                               'HandlesB', 'Sub 2', 'In Progress','B', 1,))
             # Insert into PRODUCT
             product_sql = '''
-            INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price)
-            VALUES (%s, %s, %s, %s, %s,%s), (%s,%s, %s, %s, %s, %s);
+            INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price, product_active)
+            VALUES (%s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s);
             '''
-            cursor.execute(product_sql, (1, 100, encrypted_bag_type_1, 5, 300, 400, 
-                                         2, 150, encrypted_bag_type_2, 10, 432, 570))
+            cursor.execute(product_sql, (
+                1, 100, encrypted_bag_type_1, 5, 300, 400, 1,
+                2, 150, encrypted_bag_type_2, 10, 432, 570, 1
+            ))
+
 
             # Insert into SUBCONTRACTOR
             subcontractor_sql = '''
-            INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type)
-            VALUES (%s, %s, %s), (%s, %s, %s);
+            INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type, subcontractor_active)
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
-            cursor.execute(subcontractor_sql, (1, 50, encrypted_bag_type_1, 2, 75, encrypted_bag_type_2))
+            cursor.execute(subcontractor_sql, (
+                1, 50, encrypted_bag_type_1, 1,
+                2, 75, encrypted_bag_type_2, 1
+            ))
 
-            # Insert into USER_LOGS
+
             user_logs_sql = '''
             INSERT INTO USER_LOGS (user_id, action)
             VALUES (%s, %s), (%s, %s);
             '''
-            cursor.execute(user_logs_sql, (1, encrypted_user_action_1, 2, encrypted_user_action_2))
+            cursor.execute(user_logs_sql, (
+                1, encrypted_user_action_1, 
+                2, encrypted_user_action_2
+            ))
 
             # Insert into ACCOUNTS
             accounts_sql = '''
-            INSERT INTO ACCOUNTS (username, password)
-            VALUES (%s, %s), (%s, %s);
+            INSERT INTO ACCOUNTS (username, password, accounts_active)
+            VALUES (%s, %s, %s), (%s, %s, %s);
             '''
-            cursor.execute(accounts_sql, (encrypted_username, encrypted_password, encrypted_username1, encrypted_password1))
+            cursor.execute(accounts_sql, (
+                encrypted_username, encrypted_password, 1,
+                encrypted_username1, encrypted_password1, 1
+            ))
 
             self.connection.commit()
         except Error as e:
@@ -366,7 +403,7 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor()
             cursor.execute("""
-            SELECT 
+           SELECT 
                 C.client_name,
                 GROUP_CONCAT(O.bag_type SEPARATOR ', ') AS all_bag_styles,
                 D.deadline_date,
@@ -377,8 +414,11 @@ class DatabaseManager:
                 ORDERS O ON C.client_id = O.client_id
             JOIN
                 DEADLINE D ON C.deadline_id = D.deadline_id
+            WHERE 
+                C.client_active = 1
             GROUP BY 
                 C.client_name, D.deadline_date;
+              
             """)
             rows = cursor.fetchall()
 
@@ -454,6 +494,25 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
     
+
+    '''
+        DELETING CLIENTS OR RESTORE CLIENT
+    '''
+    def void_client(self, client_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT client_active FROM CLIENT WHERE client_id = %s", (client_id,))
+            result = cursor.fetchone()
+            if result is not None:
+                client_active = result[0]  
+                reversed_client_active = 0 if client_active == 1 else 1 
+                sql_script = "UPDATE CLIENT SET client_active = %s WHERE client_id = %s"
+                cursor.execute(sql_script, (reversed_client_active, client_id))
+        except Error as e:
+            print(f"Error: {e}")
     '''
     # POPULATING ORDER ID, BAG TYPE, AND COMPLETION FOR LABELS
     '''
@@ -823,6 +882,31 @@ class DatabaseManager:
             ,(order_id, product_quantity, bag_type,product_defectives,product_cost,product_price))
         except Error as e:
             print(f"Error: {e}")
+    
+
+    def add_account(self, username, password, question, answer):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT RIGHT(MAX(username_id), LENGTH(MAX(username_id)) - 4) FROM ACCOUNTS")
+            last_id = cursor.fetchone()[0]
+            if last_id:
+                new_id = "RXAC"+ str(int(last_id) + 1)
+            else:
+                new_id = "RXAC1"
+            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username,))
+            username_exist = cursor.fetchone()
+            if username_exist is None:
+                #r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$" -> to remove 8 char long
+                if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+                    cursor.execute("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);", (new_id, username, password,question,answer))
+                else:
+                    print("wrong password")
+        except Error as e:
+            print(f"Error: {e}")
+    
     
     def close_connection(self):
         if self.connection and self.connection.is_connected():

@@ -23,12 +23,13 @@ if __name__ == "__main__":
     # db_manager.add_client('marx', 'taytay', '111', 2)
     # db_manager.set_client_detail(7, 'Karren', '3333', 2)
     #db_manager.add_raw_material('NGIin', 25, 15, 'leather', 144, 50, 1, 'red')
-    db_manager.set_product(4, "123", 123, 123123,12312,12312312)
+    #db_manager.set_product(4, "123", 123, 123123,12312,12312312)
     #db_manager.add_order(1, 234, 30, 'A')
     # db_manager.set_order(1, 1222, 70, 'F')
     #db_manager.set_raw_material(5, 'NGasdasdIin', 255, 366, 788, 'marx', '123123123')
 
     """ DEMONSTRATION """
-    #db_manager.add_client('Teleperformance', 'Quezon City', '0931239222', 2)
-    #db_manager.set_client_detail(8, 'New New Client', 'Bulacan', '123123' )
+    #db_manager.populate_orders()
+    #db_manager.populate_bag_components()
+    db_manager.add_account('sssssss', 'Pass!aaaaa123123', 'asda','asd')
     db_manager.close_connection()
