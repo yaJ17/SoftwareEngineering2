@@ -75,7 +75,6 @@ class DatabaseManager:
                 deadline_name VARCHAR(256) NOT NULL,
                 deadline_details VARCHAR(256) NOT NULL,
                 deadline_date DATE NOT NULL,
-                deadline_status BOOL NOT NULL DEFAULT 0,
                 deadline_active BOOL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
@@ -307,12 +306,12 @@ class DatabaseManager:
 
             # Insert into ACCOUNTS
             accounts_sql = '''
-            INSERT INTO ACCOUNTS (username, password, accounts_active)
-            VALUES (%s, %s, %s), (%s, %s, %s);
+            INSERT INTO ACCOUNTS (username_id,username, password, secret_question,secret_answer)
+            VALUES (%s, %s, %s,%s,%s), (%s,%s,%s, %s, %s);
             '''
             cursor.execute(accounts_sql, (
-                encrypted_username, encrypted_password, 1,
-                encrypted_username1, encrypted_password1, 1
+                'RXAC1',encrypted_username, encrypted_password, 'asdas','asdasd',
+                'RXAC2' ,encrypted_username1, encrypted_password1,  'asdas','asdasd'
             ))
 
             self.connection.commit()
@@ -664,26 +663,6 @@ class DatabaseManager:
             print(f"Error: {e}")
 
     #FOR EDITING THE DEADLINE NAME, DETAIL, DATE, STATUS
-    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_status):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute('''
-                SELECT deadline_id FROM deadline WHERE deadline_id = %s
-            ''', (deadline_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == deadline_id:
-                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s, deadline_status=%s WHERE deadline_id =%s",
-                                    (deadline_name, deadline_details, deadline_date, deadline_status, deadline_id))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
-
-        except Error as e:
-            print(f"Error: {e}")
 
     def populate_deadline_by_week(self, start_date, end_date):
         if self.connection is None:
@@ -708,9 +687,56 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
+
+    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_active):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute('''
+                SELECT deadline_id FROM deadline WHERE deadline_id = %s
+            ''', (deadline_id,))
+            result = cursor.fetchone()
+            if result:
+                if result[0] == deadline_id:
+                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s, deadline_active=%s WHERE deadline_id =%s",
+                                    (deadline_name, deadline_details, deadline_date, deadline_active, deadline_id))
+                    print("Details updated successfully.")
+                else:
+                    print("Invalid order.")
+
+        except Error as e:
+            print(f"Error: {e}")
+    '''
+                    ADD DEADLINE
+                                                                '''
+    def add_deadline(self, name, details, date):
+        if self.connection is None:
+            print("No connection to database")
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("INSERT INTO deadline(deadline_name, deadline_details, deadline_date) VALUES(%s,%s,%s)", (name,details,date))
+        except Error as e:
+            print(f"Error: {e}")
     '''
                     POPULATE raw material INVENTORY
                                                                 '''
+    def void_deadline(self, deadline_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT deadline_active FROM deadline WHERE deadline_id = %s", (deadline_id,))
+            result = cursor.fetchone()
+            if result is not None:
+                deadline_active = result[0]  
+                reversed_deadline_active = 0 if deadline_active == 1 else 1 
+                sql_script = "UPDATE deadline SET deadline_active = %s WHERE deadline_id = %s"
+                cursor.execute(sql_script, (reversed_deadline_active, deadline_id))
+        except Error as e:
+            print(f"Error: {e}")
     def populate_raw_materials(self):
         if self.connection is None:
             print("No connection to the database.")
@@ -799,6 +825,22 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
     
+    def void_raw_material(self, material_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT  raw_material_active FROM raw_material WHERE material_id = %s", (material_id,))
+            result = cursor.fetchone()
+            if result is not None:
+                material_active = result[0]  
+                reversed_raw_material_active = 0 if material_active == 1 else 1 
+                sql_script = "UPDATE RAW_MATERIAL SET  raw_material_active = %s WHERE material_id = %s"
+                cursor.execute(sql_script, (reversed_raw_material_active, material_id))
+        except Error as e:
+            print(f"Error: {e}")
+
     '''
                     POPULATE PRODUCT INVENTORY
                                                                 '''
@@ -883,6 +925,21 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
     
+    def void_product(self, product_id):
+        if self.connection is None:   
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT  product_active FROM product WHERE product_id = %s", (product_id,))
+            result = cursor.fetchone()
+            if result is not None:
+                material_active = result[0]  
+                reversed_product_active = 0 if material_active == 1 else 1 
+                sql_script = "UPDATE product SET  product_active = %s WHERE product_id = %s"
+                cursor.execute(sql_script, (reversed_product_active, product_id))
+        except Error as e:
+            print(f"Error: {e}")
 
     def add_account(self, username, password, question, answer):
         if self.connection is None:
