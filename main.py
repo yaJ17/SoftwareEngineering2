@@ -31,7 +31,7 @@ if __name__ == "__main__":
     """ DEMONSTRATION """
     #db_manager.populate_orders()
     #db_manager.populate_bag_components()
-    # db_manager.add_account('sssssss', 'Pass!aaaaa123123', 'asda','asd')
+    db_manager.add_account('sssssss', 'Pass!aaaaa123123', 'asda','asd')
     # db_manager.add_deadline('new dedline', 'asdasdas', '2024-12-15')
     #db_manager.set_deadline(1,'jay','asd','2025-12-12',1)
     # db_manager.void_deadline(1)

@@ -79,12 +79,13 @@ class DatabaseManager:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-           CREATE TABLE IF NOT EXISTS CLIENT (
+            CREATE TABLE IF NOT EXISTS CLIENT (
                 client_id INT AUTO_INCREMENT PRIMARY KEY,
                 client_name VARCHAR(256) NOT NULL,
                 client_loc VARCHAR(256) NOT NULL,
                 client_contact VARCHAR(256) NOT NULL,
                 deadline_id INT NOT NULL,
+                client_priority INT NOT NULL,
                 client_active BOOL DEFAULT 1,
                 FOREIGN KEY (deadline_id) REFERENCES DEADLINE(deadline_id),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -234,21 +235,24 @@ class DatabaseManager:
             # Insert into DEADLINE
             deadline_sql = '''
             INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date, deadline_active)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
+            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s);
             '''
             cursor.execute(deadline_sql, (
                 encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-21', 1, 
-                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30', 1
+                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30', 1,
+                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-15', 1
+
             ))
 
            # Insert into CLIENT
             client_sql = '''
-            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_active)
-            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
+            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_priority,client_active)
+            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
             '''
             cursor.execute(client_sql, (
-                encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 1,
-                encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2, 1
+                encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 1, 1,
+                encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2, 2, 1,
+                'MARX', 'Taytay', '09123123', 3,1,1
             ))
 
             # Insert into ORDERS
@@ -307,7 +311,7 @@ class DatabaseManager:
             # Insert into ACCOUNTS
             accounts_sql = '''
             INSERT INTO ACCOUNTS (username_id,username, password, secret_question,secret_answer)
-            VALUES (%s, %s, %s,%s,%s), (%s,%s,%s, %s, %s);
+            VALUES (%s, %s, %s,%s,%s), (%s,%s, %s, %s, %s);
             '''
             cursor.execute(accounts_sql, (
                 'RXAC1',encrypted_username, encrypted_password, 'asdas','asdasd',
