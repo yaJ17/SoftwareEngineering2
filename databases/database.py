@@ -322,7 +322,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-
+    #validate login
     def check_account_login(self, username, password) -> bool:
         if self.connection is None:
             print("No connection to the database.")
