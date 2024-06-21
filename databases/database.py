@@ -190,39 +190,39 @@ class DatabaseManager:
             suppliers = [
                 ("Bitoy Supplier", "Pasay City", "09512949230"),
                 ("Sweedny Silk Manufacturer", "Marikina", "09232592341"),
-                ("Supplier C", "Location C", "09123784821"),
-                ("Supplier D", "Location D", "09281283121"),
-                ("Supplier E", "Location E", "Contact E")
+                ("Kindey Manufacturer", "Paranaque City", "09123784821"),
+                ("BigBoy Buttons", "Makati", "09281283121"),
+                ("Angel's Zipper", "Pasig", "09234678231")
             ]
             cursor.executemany("INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact) VALUES (%s, %s, %s)", suppliers)
 
             # Insert dummy data for RAW_MATERIAL
             raw_materials = [
-                ("Material A", 100, "Type A", "Color A", 50, 200, 20, 1),
-                ("Material B", 200, "Type B", "Color B", 60, 300, 30, 2),
-                ("Material C", 150, "Type C", "Color C", 70, 250, 25, 3),
-                ("Material D", 180, "Type D", "Color D", 80, 280, 28, 4),
-                ("Material E", 220, "Type E", "Color E", 90, 320, 32, 5)
+                ("Denim", 100, "Type A", "Black", 50, 200, 20, 1),
+                ("Denim", 200, "Type B", "White", 60, 300, 30, 2),
+                ("Mesh", 150, "Type B", "Black", 70, 250, 25, 3),
+                ("Mesh", 180, "Type B", "White", 80, 280, 28, 4),
+                ("Silk", 220, "Type A", "Black", 90, 320, 32, 5)
             ]
             cursor.executemany("INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", raw_materials)
 
             # Insert dummy data for DEADLINE
             deadlines = [
-                ("Deadline A", "Details A", "2024-12-31"),
-                ("Deadline B", "Details B", "2024-11-30"),
-                ("Deadline C", "Details C", "2024-10-31"),
-                ("Deadline D", "Details D", "2024-09-30"),
-                ("Deadline E", "Details E", "2024-08-31")
+                ("Meeting with Bitoy", "Details A", "2024-12-31"),
+                ("Bag A for Angel", "Details B", "2024-11-30"),
+                ("Bag B for Sweedny", "Details C", "2024-10-31"),
+                ("Shipment for Bigboy", "Details D", "2024-09-30"),
+                ("Kindey Shipment", "Details E", "2024-08-31")
             ]
             cursor.executemany("INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date) VALUES (%s, %s, %s)", deadlines)
 
             # Insert dummy data for CLIENT
             clients = [
-                ("Client A", "Location A", "Contact A", 1, 1),
-                ("Client B", "Location B", "Contact B", 2, 2),
-                ("Client C", "Location C", "Contact C", 3, 3),
-                ("Client D", "Location D", "Contact D", 4, 4),
-                ("Client E", "Location E", "Contact E", 5, 5)
+                ("Straightforward", "Marikina", "09313992912", 1, 1),
+                ("Nikey", "Marikina", "09237817271", 2, 2),
+                ("Adibas", "Pasig", "09381233458", 3, 3),
+                ("Celline", "Pasay", "09812877167", 4, 4),
+                ("Hermand", "Quezon", "09271827161", 5, 5)
             ]
             cursor.executemany("INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_priority) VALUES (%s, %s, %s, %s, %s)", clients)
 
