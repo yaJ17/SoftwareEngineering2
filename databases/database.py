@@ -510,9 +510,10 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT 
-                O.order_id,
-                O.bag_type,
-                O.order_progress
+        
+            order_quantity,
+            bag_type,
+            order_progress
             FROM 
                 ORDERS O
             '''

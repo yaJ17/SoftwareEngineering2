@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainOWiOGh.ui'
+## Form generated from reading UI file 'ui_mainvBlfgi.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -18,7 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QMainWindow,
     QPushButton, QSizePolicy, QStackedWidget, QStatusBar,
-    QTableView, QVBoxLayout, QWidget)
+    QTableView, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -43,7 +44,7 @@ class Ui_MainWindow(object):
         self.menu_label.setTextFormat(Qt.TextFormat.AutoText)
         self.search_label = QLabel(self.centralwidget)
         self.search_label.setObjectName(u"search_label")
-        self.search_label.setGeometry(QRect(341, 20, 91, 51))
+        self.search_label.setGeometry(QRect(241, 20, 51, 51))
         self.search_label.setFont(font)
         self.search_label.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.search_label.setTextFormat(Qt.TextFormat.AutoText)
@@ -54,7 +55,7 @@ class Ui_MainWindow(object):
         self.line.setFrameShadow(QFrame.Shadow.Sunken)
         self.search_bar = QLineEdit(self.centralwidget)
         self.search_bar.setObjectName(u"search_bar")
-        self.search_bar.setGeometry(QRect(440, 30, 241, 31))
+        self.search_bar.setGeometry(QRect(300, 30, 251, 31))
         font1 = QFont()
         font1.setFamilies([u"Segoe UI"])
         font1.setPointSize(9)
@@ -62,12 +63,6 @@ class Ui_MainWindow(object):
         font1.setItalic(False)
         self.search_bar.setFont(font1)
         self.search_bar.setStyleSheet(u"font: 9pt \"Segoe UI\";")
-        self.dashboard_label = QLabel(self.centralwidget)
-        self.dashboard_label.setObjectName(u"dashboard_label")
-        self.dashboard_label.setGeometry(QRect(250, 20, 91, 51))
-        self.dashboard_label.setFont(font)
-        self.dashboard_label.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
-        self.dashboard_label.setTextFormat(Qt.TextFormat.AutoText)
         self.username = QLabel(self.centralwidget)
         self.username.setObjectName(u"username")
         self.username.setGeometry(QRect(710, 20, 161, 51))
@@ -184,9 +179,6 @@ class Ui_MainWindow(object):
         self.label_22.setFont(font)
         self.label_22.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.label_22.setTextFormat(Qt.TextFormat.AutoText)
-        self.prod_table = QTableView(self.dashBoard)
-        self.prod_table.setObjectName(u"prod_table")
-        self.prod_table.setGeometry(QRect(10, 240, 501, 111))
         self.line_5 = QFrame(self.dashBoard)
         self.line_5.setObjectName(u"line_5")
         self.line_5.setGeometry(QRect(510, 10, 20, 371))
@@ -204,10 +196,27 @@ class Ui_MainWindow(object):
         self.logout_button = QPushButton(self.dashBoard)
         self.logout_button.setObjectName(u"logout_button")
         self.logout_button.setGeometry(QRect(560, 330, 75, 24))
+        self.dashboard_label = QLabel(self.dashBoard)
+        self.dashboard_label.setObjectName(u"dashboard_label")
+        self.dashboard_label.setGeometry(QRect(430, 10, 91, 41))
+        self.dashboard_label.setFont(font)
+        self.dashboard_label.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
+        self.dashboard_label.setTextFormat(Qt.TextFormat.AutoText)
+        self.prod_table = QTableView(self.dashBoard)
+        self.prod_table.setObjectName(u"prod_table")
+        self.prod_table.setGeometry(QRect(10, 240, 501, 111))
         self.stackedWidget.addWidget(self.dashBoard)
-        self.production = QWidget()
-        self.production.setObjectName(u"production")
-        self.stackedWidget.addWidget(self.production)
+        self.Inventory = QWidget()
+        self.Inventory.setObjectName(u"Inventory")
+        self.inventory_table = QTableWidget(self.Inventory)
+        self.inventory_table.setObjectName(u"inventory_table")
+        self.inventory_table.setGeometry(QRect(50, 60, 571, 271))
+        self.welcome_label_2 = QLabel(self.Inventory)
+        self.welcome_label_2.setObjectName(u"welcome_label_2")
+        self.welcome_label_2.setGeometry(QRect(60, 20, 351, 31))
+        self.welcome_label_2.setFont(font)
+        self.welcome_label_2.setTextFormat(Qt.TextFormat.AutoText)
+        self.stackedWidget.addWidget(self.Inventory)
         self.transac = QWidget()
         self.transac.setObjectName(u"transac")
         self.stackedWidget.addWidget(self.transac)
@@ -249,6 +258,14 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.maintenance)
         self.prod = QWidget()
         self.prod.setObjectName(u"prod")
+        self.welcome_label_3 = QLabel(self.prod)
+        self.welcome_label_3.setObjectName(u"welcome_label_3")
+        self.welcome_label_3.setGeometry(QRect(60, 20, 351, 31))
+        self.welcome_label_3.setFont(font)
+        self.welcome_label_3.setTextFormat(Qt.TextFormat.AutoText)
+        self.product_table = QTableView(self.prod)
+        self.product_table.setObjectName(u"product_table")
+        self.product_table.setGeometry(QRect(50, 60, 571, 271))
         self.stackedWidget.addWidget(self.prod)
         self.sched = QWidget()
         self.sched.setObjectName(u"sched")
@@ -392,7 +409,6 @@ class Ui_MainWindow(object):
         self.menu_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:8pt; font-weight:400;\">Menu Bar</span></p></body></html>", None))
         self.search_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Search</span></p></body></html>", None))
         self.search_bar.setText("")
-        self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
         self.username.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-size:11pt; font-style:italic;\">Maris Pascual</span></p><p align=\"right\"><span style=\" font-size:9pt; font-style:italic; vertical-align:super;\">(Administrator)</span></p></body></html>", None))
         self.welcome_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">WELCOME, Maris Pascual!</span></p></body></html>", None))
         self.quick_raw.setText(QCoreApplication.translate("MainWindow", u"Add Raw Material", None))
@@ -412,6 +428,8 @@ class Ui_MainWindow(object):
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">History</span></p></body></html>", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
         self.logout_button.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
+        self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
+        self.welcome_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Inventory</span></p></body></html>", None))
         self.label_30.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -447,6 +465,7 @@ class Ui_MainWindow(object):
         self.update_button.setText(QCoreApplication.translate("MainWindow", u"Update", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
         self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
+        self.welcome_label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Production</span></p></body></html>", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>About</p></body></html>", None))
         self.label_29.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"

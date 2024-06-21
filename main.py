@@ -31,9 +31,10 @@ class MainWindow(QMainWindow):
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
-        
+        self.ui.prod_button.clicked.connect(self.show_production)
+
         # Populate the product table before showing the window
-        self.populate_product_table()
+        self.populate_deadline_table()
 
         # Show the window after populating the table
         self.show()
@@ -42,19 +43,20 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
 
     def show_production(self):
-        self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.stackedWidget.setCurrentIndex(5)
+        self.populate_orders()
 
     def show_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(2)
 
     def show_inventory(self):
-        self.ui.stackedWidget.setCurrentIndex(6)
+        self.ui.stackedWidget.setCurrentIndex(1)
 
     def show_reports(self):
         self.ui.stackedWidget.setCurrentIndex(8)
 
     def show_transaction(self):
-        self.ui.stackedWidget.setCurrentIndex(5)
+        self.ui.stackedWidget.setCurrentIndex(6)
 
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(3)
@@ -69,7 +71,7 @@ class MainWindow(QMainWindow):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.close()
 
-    def populate_product_table(self):
+    def populate_deadline_table(self):
         # Call the populate_deadline function from database module
         deadline = self.db_manager.populate_deadline()
         print("hello")
@@ -96,6 +98,29 @@ class MainWindow(QMainWindow):
         self.ui.prod_table.setEditTriggers(QTableView.NoEditTriggers)
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+    def populate_orders(self):
+        # Call populate_orders from DatabasecManager to fetch orders data
+        orders = self.db_manager.populate_orders()
+
+        # Define headers for the table
+        headers = [ 'Quantity', 'Bag Type', 'Progress']
+
+        # Create a QStandardItemModel and set headers
+        model = QStandardItemModel(len(orders), len(headers))
+        model.setHorizontalHeaderLabels(headers)
+
+        # Populate the model with fetched data
+        for row_index, row_data in enumerate(orders):
+            for column_index, data in enumerate(row_data):
+                item = QStandardItem(str(data))
+                model.setItem(row_index, column_index, item)
+
+        # Set the model to the prod_table in UI
+        self.ui.product_table.setModel(model)
+        self.ui.product_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Resize columns to fit content
+        self.ui.product_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
 
 if __name__ == "__main__":
