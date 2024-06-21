@@ -136,15 +136,6 @@ class DatabaseManager:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE IF NOT EXISTS USER_LOGS (
-                log_id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
-                action VARCHAR(256) NOT NULL,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES CLIENT(client_id),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-
             CREATE TABLE IF NOT EXISTS ACCOUNTS (
                 account_id INT AUTO_INCREMENT PRIMARY KEY,
                 username_id VARCHAR(256) NOT NULL,
@@ -156,6 +147,26 @@ class DatabaseManager:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE KEY (username_id)
             );
+
+            CREATE TABLE IF NOT EXISTS USER_LOGS (
+                log_id INT AUTO_INCREMENT PRIMARY KEY,
+                account_id INT NOT NULL,
+                action VARCHAR(256) NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (account_id) REFERENCES accounts(account_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+
+            CREATE TABLE IF NOT EXISTS TRANSACTION_HISTORY (
+                transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+                account_id INT NOT NULL,
+                action VARCHAR(256) NOT NULL,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (account_id) REFERENCES accounts(account_id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
 
             '''
             for statement in sql_script.split(';'):
