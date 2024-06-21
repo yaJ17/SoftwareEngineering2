@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'ui_mainBBjdRe.ui'
-##
-## Created by: Qt User Interface Compiler version 6.7.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -255,6 +246,7 @@ class Ui_MainWindow(object):
         self.version_label.setFont(font2)
         self.update_button = QPushButton(self.maintenance)
         self.update_button.setObjectName(u"update_button")
+        self.update_button.setEnabled(False)
         self.update_button.setGeometry(QRect(90, 180, 75, 24))
         self.backup_button = QPushButton(self.maintenance)
         self.backup_button.setObjectName(u"backup_button")
