@@ -2,7 +2,9 @@ import mysql.connector
 import re
 from mysql.connector import Error
 from databases.encrypt import DatabaseAES
-
+import pandas as pd
+import numpy as np
+import openpyxl
 class DatabaseManager:
     def __init__(self, host, user, password, encryption_key):
         self.host = host
@@ -742,10 +744,9 @@ class DatabaseManager:
             SELECT
                 R.material_name,
                 R.material_stock,
-                R.material_safety_stock,
-                R.material_cost,
-                S.supplier_name,
-                S.supplier_contact
+              
+                R.material_cost
+      
             FROM 
                 RAW_MATERIAL R
             JOIN 
@@ -754,6 +755,7 @@ class DatabaseManager:
             )
             rows = cursor.fetchall()
             for row in rows:
+                return rows
                 print(row)
         except Error as e:
             print(f"Error: {e}")
@@ -849,16 +851,16 @@ class DatabaseManager:
             SELECT
                     bag_type,
                     product_quantity,
-                    product_defectives,
-                    product_cost,
-                    product_price,
-                    (product_price- product_cost) as profit
+                  
+                    product_price
+        
                 FROM 
                     PRODUCT;
             '''
             )
             rows = cursor.fetchall()
             for row in rows:
+                return rows
                 print(row)
         except Error as e:
             print(f"Error: {e}")
@@ -957,8 +959,145 @@ class DatabaseManager:
                     print("wrong password")
         except Error as e:
             print(f"Error: {e}")
-    
-    
+
+
+
+    def get_table_creation_order(self):
+        # Order the tables based on foreign key dependencies
+        return [
+            "supplier",
+            "raw_material",
+            "deadline",
+            "client",
+            "orders",
+            "bag_component",
+            "product",
+            "subcontractor",
+            "accounts",
+            "user_logs",
+            "transaction_history"
+        ]
+
+
+    def fetch_table_data(self, table_name):
+        try:
+            query = f"SELECT * FROM {table_name}"
+            df = pd.read_sql(query, self.connection)
+            return df
+        except Error as e:
+            print(f"Error fetching data from {table_name}: {e}")
+            return None
+
+    def backup_database_to_excel(self, output_file):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+
+        try:
+            # Fetch all table names
+            cursor = self.connection.cursor()
+            cursor.execute("SHOW TABLES")
+            tables = cursor.fetchall()
+            cursor.close()
+
+            # Create a writer object
+            with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+                for (table_name,) in tables:
+                    df = self.fetch_table_data(table_name)
+                    if df is not None:
+                        df.to_excel(writer, sheet_name=table_name, index=False)
+
+            print(f"Database backup completed. Saved to {output_file}")
+
+        except Error as e:
+            print(f"Error during database backup: {e}")
+
+
+    def get_sql_type(self, dtype):
+        if pd.api.types.is_integer_dtype(dtype):
+            return "INT"
+        elif pd.api.types.is_float_dtype(dtype):
+            return "FLOAT"
+        elif pd.api.types.is_bool_dtype(dtype):
+            return "BOOL"
+        elif pd.api.types.is_datetime64_any_dtype(dtype):
+            return "DATETIME"
+        else:
+            return "VARCHAR(255)"
+    def restore_database_from_excel(self, input_file):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+
+        try:
+            xls = pd.ExcelFile(input_file)
+            cursor = self.connection.cursor()
+
+            # List of table names in the order of insertion
+            table_names = xls.sheet_names
+            table_creation_order = self.get_table_creation_order()
+
+            # Drop all tables
+            for table_name in reversed(table_creation_order):
+                cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+                print(f"Dropped table: {table_name}")
+
+            # Create tables in the correct order
+            for table_name in table_creation_order:
+                if table_name in table_names:
+
+                    df = pd.read_excel(xls, sheet_name=table_name)
+                    print(df)
+                    # Convert timestamps to strings
+                    for col in df.columns:
+                        print(col)
+                        if np.issubdtype(df[col].dtype, np.datetime64):
+                            df[col] = df[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+
+                    create_table_query = self.generate_create_table_query(table_name, df)
+                    cursor.execute(create_table_query)
+                    print(f"Created table: {table_name}")
+
+            # Insert data in the correct order
+            # Insert data in the correct order
+            for table_name in table_creation_order:
+                if table_name in table_names:
+                    df = pd.read_excel(xls, sheet_name=table_name)
+
+                    for row in df.itertuples(index=False, name=None):
+                        placeholders = ', '.join(['%s'] * len(row))
+                        columns = ', '.join(df.columns)
+
+                        # Convert timestamp columns to MySQL-compatible format
+                        row = list(row)
+                        for i, value in enumerate(row):
+                            if isinstance(value, pd.Timestamp):
+                                row[i] = value.strftime('%Y-%m-%d %H:%M:%S')
+
+                        insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                        cursor.execute(insert_query, row)
+
+            self.connection.commit()
+            cursor.close()
+            print(f"Database restored from {input_file}")
+
+        except Error as e:
+            print(f"Error during database restore: {e}")
+
+
+
+    def generate_create_table_query(self, table_name, df):
+        columns = []
+        for column_name, dtype in zip(df.columns, df.dtypes):
+            sql_type = self.get_sql_type(dtype)
+            columns.append(f"{column_name} {sql_type}")
+
+        columns_query = ", ".join(columns)
+        create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_query})"
+        return create_table_query
+
+
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()

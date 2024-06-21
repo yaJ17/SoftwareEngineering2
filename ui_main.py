@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainvBlfgi.ui'
+## Form generated from reading UI file 'ui_mainBBjdRe.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -18,8 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QMainWindow,
     QPushButton, QSizePolicy, QStackedWidget, QStatusBar,
-    QTableView, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QTableView, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -208,14 +207,22 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
-        self.inventory_table = QTableWidget(self.Inventory)
-        self.inventory_table.setObjectName(u"inventory_table")
-        self.inventory_table.setGeometry(QRect(50, 60, 571, 271))
+        self.product_inventory_table = QTableView(self.Inventory)
+        self.product_inventory_table.setObjectName(u"product_inventory_table")
+        self.product_inventory_table.setGeometry(QRect(50, 60, 281, 271))
         self.welcome_label_2 = QLabel(self.Inventory)
         self.welcome_label_2.setObjectName(u"welcome_label_2")
-        self.welcome_label_2.setGeometry(QRect(60, 20, 351, 31))
+        self.welcome_label_2.setGeometry(QRect(60, 20, 191, 31))
         self.welcome_label_2.setFont(font)
         self.welcome_label_2.setTextFormat(Qt.TextFormat.AutoText)
+        self.raw_inventory_table = QTableView(self.Inventory)
+        self.raw_inventory_table.setObjectName(u"raw_inventory_table")
+        self.raw_inventory_table.setGeometry(QRect(340, 60, 281, 271))
+        self.welcome_label_4 = QLabel(self.Inventory)
+        self.welcome_label_4.setObjectName(u"welcome_label_4")
+        self.welcome_label_4.setGeometry(QRect(350, 20, 191, 31))
+        self.welcome_label_4.setFont(font)
+        self.welcome_label_4.setTextFormat(Qt.TextFormat.AutoText)
         self.stackedWidget.addWidget(self.Inventory)
         self.transac = QWidget()
         self.transac.setObjectName(u"transac")
@@ -429,7 +436,8 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
         self.logout_button.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
-        self.welcome_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Inventory</span></p></body></html>", None))
+        self.welcome_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Finish Product Inventory</span></p></body></html>", None))
+        self.welcome_label_4.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Raw Material Inventory</span></p></body></html>", None))
         self.label_30.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
