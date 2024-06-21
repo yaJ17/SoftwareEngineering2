@@ -1,11 +1,12 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
+from PySide6 import QtWidgets
+from PySide6.QtGui import QStandardItemModel, QStandardItem
+
+from PySide6.QtCore import Qt
 from PySide6.QtCore import QSize
 from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual filename of your UI code
-
-
-
-# import database
+from databases.database import DatabaseManager
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,6 +27,16 @@ class MainWindow(QMainWindow):
         self.ui.maintenance_button.clicked.connect(self.show_maintenance)
         self.ui.logout_button.clicked.connect(self.logout)
 
+        key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
+        self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
+        self.db_manager.connect_to_database()
+        self.db_manager.create_schema_and_tables()
+        
+        # Populate the product table before showing the window
+        self.populate_product_table()
+
+        # Show the window after populating the table
+        self.show()
 
     def show_dashboard(self):
         self.ui.stackedWidget.setCurrentIndex(0)
@@ -57,27 +68,37 @@ class MainWindow(QMainWindow):
     def logout(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.close()
-'''
+
     def populate_product_table(self):
-        # Call the populate_product function from database module
-        product_data = database.populate_product()
-
-        # Assuming product_data is a list of tuples or lists where each tuple/list is a row of data
-        self.ui.prod_table.setRowCount(len(product_data))
-
-        for row_index, row_data in enumerate(product_data):
+        # Call the populate_deadline function from database module
+        deadline = self.db_manager.populate_deadline()
+        print("hello")
+        for row in deadline:
+            print(row)
+        
+        # Define headers for the table
+        headers = ['Name', 'Details', 'Date']
+        
+        # Create a QStandardItemModel and set headers
+        model = QStandardItemModel(len(deadline), len(headers))
+        model.setHorizontalHeaderLabels(headers)
+        
+        # Assuming deadline is a list of tuples or lists where each tuple/list is a row of data
+        for row_index, row_data in enumerate(deadline):
             for column_index, data in enumerate(row_data):
-                item = QTableWidgetItem(str(data))  # Convert data to string if necessary
-                self.ui.prod_table.setItem(row_index, column_index, item)
-'''
+                item = QStandardItem(str(data))
+                model.setItem(row_index, column_index, item)
+        
+        # Set the model to the table view
+        self.ui.prod_table.setModel(model)
 
 
-
-
+        self.ui.prod_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Resize columns to fit content
+        self.ui.prod_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
     sys.exit(app.exec())

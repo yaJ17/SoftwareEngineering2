@@ -8,7 +8,7 @@ if __name__ == "__main__":
     db_manager = DatabaseManager('localhost', 'root', 'admin', key)
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
-    #db_manager.add_dummy_data()
+    db_manager.add_dummy_data()
     
 
     # db_manager.populate_accounts()

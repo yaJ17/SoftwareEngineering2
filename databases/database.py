@@ -185,153 +185,124 @@ class DatabaseManager:
 
         try:
             cursor = self.connection.cursor()
-            # Encrypting the data before insertion
-            #EXAMPLE ONLY
-            encrypted_supplier_name_1 = self.cipher.encrypt('Supplier One')
-            encrypted_supplier_name_2 = 'Supplier Two'
-            encrypted_supplier_loc_1 = '123 Supply St'
-            encrypted_supplier_loc_2 = '456 Supply Ave'
-            encrypted_supplier_contact_1 = '555-1111'
-            encrypted_supplier_contact_2 = '555-2222'
 
-            encrypted_material_name_1 = 'Leather'
-            encrypted_material_name_2 = 'Cotton'
-            encrypted_material_type_1 = 'Animal'
-            encrypted_material_type_2 = 'Plant'
-            encrypted_material_color_1 = 'Black'
-            encrypted_material_color_2 = 'White'
+            # Insert dummy data for SUPPLIER
+            suppliers = [
+                ("Bitoy Supplier", "Pasay City", "09512949230"),
+                ("Sweedny Silk Manufacturer", "Marikina", "09232592341"),
+                ("Supplier C", "Location C", "09123784821"),
+                ("Supplier D", "Location D", "09281283121"),
+                ("Supplier E", "Location E", "Contact E")
+            ]
+            cursor.executemany("INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact) VALUES (%s, %s, %s)", suppliers)
 
-            encrypted_client_name_1 = 'John Doe'
-            encrypted_client_name_2 = 'Jane Smith'
-            encrypted_client_loc_1 = '123 Elm St'
-            encrypted_client_loc_2 = '456 Oak St'
-            encrypted_client_contact_1 = '555-1234'
-            encrypted_client_contact_2 = '555-5678'
+            # Insert dummy data for RAW_MATERIAL
+            raw_materials = [
+                ("Material A", 100, "Type A", "Color A", 50, 200, 20, 1),
+                ("Material B", 200, "Type B", "Color B", 60, 300, 30, 2),
+                ("Material C", 150, "Type C", "Color C", 70, 250, 25, 3),
+                ("Material D", 180, "Type D", "Color D", 80, 280, 28, 4),
+                ("Material E", 220, "Type E", "Color E", 90, 320, 32, 5)
+            ]
+            cursor.executemany("INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", raw_materials)
 
-            encrypted_deadline_name_1 = 'Initial Order'
-            encrypted_deadline_name_2 = 'Second Order'
-            encrypted_deadline_details_1 = 'First batch of orders'
-            encrypted_deadline_details_2 = 'Second batch of orders'
+            # Insert dummy data for DEADLINE
+            deadlines = [
+                ("Deadline A", "Details A", "2024-12-31"),
+                ("Deadline B", "Details B", "2024-11-30"),
+                ("Deadline C", "Details C", "2024-10-31"),
+                ("Deadline D", "Details D", "2024-09-30"),
+                ("Deadline E", "Details E", "2024-08-31")
+            ]
+            cursor.executemany("INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date) VALUES (%s, %s, %s)", deadlines)
 
-            encrypted_bag_type_1 = 'Casual'
-            encrypted_bag_type_2 = 'Sporty'
+            # Insert dummy data for CLIENT
+            clients = [
+                ("Client A", "Location A", "Contact A", 1, 1),
+                ("Client B", "Location B", "Contact B", 2, 2),
+                ("Client C", "Location C", "Contact C", 3, 3),
+                ("Client D", "Location D", "Contact D", 4, 4),
+                ("Client E", "Location E", "Contact E", 5, 5)
+            ]
+            cursor.executemany("INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_priority) VALUES (%s, %s, %s, %s, %s)", clients)
 
-            encrypted_user_action_1 = 'Created order'
-            encrypted_user_action_2 = 'Updated order'
+            # Insert dummy data for ORDERS
+            orders = [
+                (1, 100, 0, "Bag Type A"),
+                (2, 200, 10, "Bag Type B"),
+                (3, 150, 20, "Bag Type C"),
+                (4, 180, 30, "Bag Type D"),
+                (5, 220, 40, "Bag Type E")
+            ]
+            cursor.executemany("INSERT INTO ORDERS (client_id, order_quantity, order_progress, bag_type) VALUES (%s, %s, %s, %s)", orders)
 
-            encrypted_username = self.cipher.encrypt('user1')
-            encrypted_password = self.cipher.encrypt('password1')
-            encrypted_username1 = self.cipher.encrypt('user2')
-            encrypted_password1 = self.cipher.encrypt('password2')
+            # Insert dummy data for BAG_COMPONENT
+            bag_components = [
+                ("Component A", "Labor A", "In Progress", "Bag Type A", 1),
+                ("Component B", "Labor B", "Completed", "Bag Type B", 2),
+                ("Component C", "Labor C", "Not Started", "Bag Type C", 3),
+                ("Component D", "Labor D", "In Progress", "Bag Type D", 4),
+                ("Component E", "Labor E", "Completed", "Bag Type E", 5)
+            ]
+            cursor.executemany("INSERT INTO BAG_COMPONENT (bag_component, labor_allocation, progress, bag_type, client_id) VALUES (%s, %s, %s, %s, %s)", bag_components)
 
-            # Insert into SUPPLIER
-            supplier_sql = '''
-            INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact, supplier_active)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
-            '''
-            cursor.execute(supplier_sql, (
-                encrypted_supplier_name_1, encrypted_supplier_loc_1, encrypted_supplier_contact_1, 1,
-                encrypted_supplier_name_2, encrypted_supplier_loc_2, encrypted_supplier_contact_2, 1
-            ))
+            # Insert dummy data for PRODUCT
+            products = [
+                (1, 100, "Bag Type A", 0, 500, 700),
+                (2, 200, "Bag Type B", 5, 600, 800),
+                (3, 150, "Bag Type C", 10, 550, 750),
+                (4, 180, "Bag Type D", 2, 580, 780),
+                (5, 220, "Bag Type E", 3, 620, 820)
+            ]
+            cursor.executemany("INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price) VALUES (%s, %s, %s, %s, %s, %s)", products)
 
-            raw_material_sql = '''
-            INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id, raw_material_active)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s, %s, %s);
-            '''
-            cursor.execute(raw_material_sql, (
-                encrypted_material_name_1, 1, encrypted_material_type_1, encrypted_material_color_1, 500, 1000, 200, 1, 1,
-                encrypted_material_name_2, 1, encrypted_material_type_2, encrypted_material_color_2, 200, 1500, 300, 2, 1
-            ))
+            # Insert dummy data for SUBCONTRACTOR
+            subcontractors = [
+                (1, 50, "Bag Type A"),
+                (2, 60, "Bag Type B"),
+                (3, 70, "Bag Type C"),
+                (4, 80, "Bag Type D"),
+                (5, 90, "Bag Type E")
+            ]
+            cursor.executemany("INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type) VALUES (%s, %s, %s)", subcontractors)
 
-            # Insert into DEADLINE
-            deadline_sql = '''
-            INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date, deadline_active)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s), (%s, %s, %s, %s);
-            '''
-            cursor.execute(deadline_sql, (
-                encrypted_deadline_name_1, encrypted_deadline_details_1, '2024-12-21', 1, 
-                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-30', 1,
-                encrypted_deadline_name_2, encrypted_deadline_details_2, '2024-12-15', 1
+            # Insert dummy data for ACCOUNTS
+            accounts = [
+                ("user1", "username1", "password1", "Question 1", "Answer 1"),
+                ("user2", "username2", "password2", "Question 2", "Answer 2"),
+                ("user3", "username3", "password3", "Question 3", "Answer 3"),
+                ("user4", "username4", "password4", "Question 4", "Answer 4"),
+                ("user5", "username5", "password5", "Question 5", "Answer 5")
+            ]
+            cursor.executemany("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s, %s, %s, %s, %s)", accounts)
 
-            ))
+            # Insert dummy data for USER_LOGS
+            user_logs = [
+                (1, "Login"),
+                (2, "Logout"),
+                (3, "Login"),
+                (4, "Logout"),
+                (5, "Login")
+            ]
+            cursor.executemany("INSERT INTO USER_LOGS (account_id, action) VALUES (%s, %s)", user_logs)
 
-           # Insert into CLIENT
-            client_sql = '''
-            INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_priority,client_active)
-            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
-            '''
-            cursor.execute(client_sql, (
-                encrypted_client_name_1, encrypted_client_loc_1, encrypted_client_contact_1, 1, 1, 1,
-                encrypted_client_name_2, encrypted_client_loc_2, encrypted_client_contact_2, 2, 2, 1,
-                'MARX', 'Taytay', '09123123', 3,1,1
-            ))
-
-            # Insert into ORDERS
-            orders_sql = '''
-            INSERT INTO ORDERS (client_id, order_quantity, order_progress, bag_type, orders_active)
-            VALUES (%s, %s, %s, %s, %s), (%s, %s, %s, %s, %s);
-            '''
-            cursor.execute(orders_sql, (
-                1, 100, 50, 'A', 1,
-                1, 150, 75, 'B', 1
-            ))
-
-            #Insert into  Bag Components
-            bag_component_sql = '''
-            INSERT INTO BAG_COMPONENT (bag_component, labor_allocation, progress, bag_type, client_id, bag_component_active)
-            VALUES (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s);
-            '''
-            cursor.execute(bag_component_sql, (
-                'ZipperA', 'Sub 1', 'In Progress', 'A', 1, 1,
-                'HandlesA', 'Main', 'Done', 'A', 1, 1,
-                'ZipperB', 'Main', 'Done', 'B', 1, 1,
-                'HandlesB', 'Sub 2', 'In Progress', 'B', 1, 1
-            ))
-
-            # Insert into PRODUCT
-            product_sql = '''
-            INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price, product_active)
-            VALUES (%s, %s, %s, %s, %s, %s, %s), (%s, %s, %s, %s, %s, %s, %s);
-            '''
-            cursor.execute(product_sql, (
-                1, 100, encrypted_bag_type_1, 5, 300, 400, 1,
-                2, 150, encrypted_bag_type_2, 10, 432, 570, 1
-            ))
-
-
-            # Insert into SUBCONTRACTOR
-            subcontractor_sql = '''
-            INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type, subcontractor_active)
-            VALUES (%s, %s, %s, %s), (%s, %s, %s, %s);
-            '''
-            cursor.execute(subcontractor_sql, (
-                1, 50, encrypted_bag_type_1, 1,
-                2, 75, encrypted_bag_type_2, 1
-            ))
-
-
-            user_logs_sql = '''
-            INSERT INTO USER_LOGS (user_id, action)
-            VALUES (%s, %s), (%s, %s);
-            '''
-            cursor.execute(user_logs_sql, (
-                1, encrypted_user_action_1, 
-                2, encrypted_user_action_2
-            ))
-
-            # Insert into ACCOUNTS
-            accounts_sql = '''
-            INSERT INTO ACCOUNTS (username_id,username, password, secret_question,secret_answer)
-            VALUES (%s, %s, %s,%s,%s), (%s,%s, %s, %s, %s);
-            '''
-            cursor.execute(accounts_sql, (
-                'RXAC1',encrypted_username, encrypted_password, 'asdas','asdasd',
-                'RXAC2' ,encrypted_username1, encrypted_password1,  'asdas','asdasd'
-            ))
+            # Insert dummy data for TRANSACTION_HISTORY
+            transaction_history = [
+                (1, "Transaction A"),
+                (2, "Transaction B"),
+                (3, "Transaction C"),
+                (4, "Transaction D"),
+                (5, "Transaction E")
+            ]
+            cursor.executemany("INSERT INTO TRANSACTION_HISTORY (account_id, action) VALUES (%s, %s)", transaction_history)
 
             self.connection.commit()
+            print("Dummy data inserted successfully.")
         except Error as e:
             print(f"Error: {e}")
+
+
+    
 
     #validate login
     def check_account_login(self, username, password) -> bool:
@@ -530,7 +501,7 @@ class DatabaseManager:
     '''
     # POPULATING ORDER ID, BAG TYPE, AND COMPLETION FOR LABELS
     '''
-    def populate_orders(self) -> None:
+    def populate_orders(self) -> tuple:
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -549,6 +520,7 @@ class DatabaseManager:
             rows = cursor.fetchall()
             for row in rows:
                 print(row)
+            return rows
         except Error as e:
             print(f"Error: {e}")
     ''' 
@@ -702,7 +674,13 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
-
+    def populate_deadline(self) -> tuple:
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date >=CURDATE() ORDER BY deadline_date ASC")
+        rows = cursor.fetchall()
+        for row in rows:
+            print(row)
+        return rows
     def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_active):
         if self.connection is None:
             print("No connection to the database.")
