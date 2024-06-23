@@ -509,5 +509,7 @@ class Ui_MainWindow(object):
         self.help_button.setText(QCoreApplication.translate("MainWindow", u"Help", None))
         self.about_button.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.maintenance_button.setText(QCoreApplication.translate("MainWindow", u"Maintenance", None))
+
+
     # retranslateUi
 

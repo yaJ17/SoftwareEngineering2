@@ -1,12 +1,13 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
-from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush
 import os
 from PySide6.QtCore import Qt
 from PySide6.QtCore import QSize
 from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual filename of your UI code
 from databases.database import DatabaseManager
+import difflib
 
 import xlwt
 
@@ -35,7 +36,7 @@ class MainWindow(QMainWindow):
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
         self.ui.prod_button.clicked.connect(self.show_production)
-
+        self.ui.search_bar.returnPressed.connect(self.perform_search)
         # Populate the product table before showing the window
         self.populate_deadline_table()
 
@@ -185,17 +186,74 @@ class MainWindow(QMainWindow):
         self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
 
+    def ratcliff_obershelp_similarity(self, str1, str2):
+       return difflib.SequenceMatcher(None, str1, str2).ratio()
+    
+   
+
+    def search_in_table(self, search_term, table):
+        model = table.model()
+        first_exact_match = None
+        search_term_lower = search_term.lower()
+        matched_perfect = False  # Convert search term to lowercase
+        matching = []
+
+        for row in range(model.rowCount()):
+            for column in range(model.columnCount()):
+                item = model.item(row, column)
+                item.setBackground(QBrush(Qt.transparent))  # Reset background color
+                item.setForeground(QBrush(QColor(Qt.white)))  # Reset text color
+
+        for row in range(model.rowCount()):
+            for column in range(model.columnCount()):
+                item = model.item(row, column)
+                item_text = item.text().lower()
+                if  item_text == search_term_lower:
+                    matched_perfect = True
+                    matching.append(item)
+        for row in range(model.rowCount()):
+            for column in range(model.columnCount()):
+                item = model.item(row, column)
+                item_text = item.text().lower()  # Convert item text to lowercase for comparison
+                if matched_perfect and item in matching:
+                    print(f"Item Text: {item_text}: search term: {search_term_lower}")
+                    highlight_color = QColor(255, 255, 255, 128)  # RGBA color with 50% opacity (128/255)
+                    item.setBackground(QBrush(highlight_color))
+                    item.setForeground(QBrush(QColor("black")))
+                    if first_exact_match is None:
+                        first_exact_match = table.model().index(row, column)
+                elif self.ratcliff_obershelp_similarity(item_text, search_term_lower) >= 0.45 and matched_perfect is False:
+                    print(f"ratio: {self.ratcliff_obershelp_similarity(item_text, search_term_lower)} item searched: {search_term_lower}, text: {item_text}")
+                    highlight_color = QColor(255, 255, 255, 128)  # RGBA color with 50% opacity (128/255)
+                    item.setBackground(QBrush(highlight_color))
+                    item.setForeground(QBrush(QColor("black")))
+                    if first_exact_match is None:
+                        first_exact_match = table.model().index(row, column)
+                else:
+                    item.setBackground(QBrush(Qt.transparent))  # Retain original background color
+                    item.setForeground(QBrush(QColor(Qt.black)))  # Retain original text color
+                
+            if first_exact_match is not None:
+                # Scroll to the first exact match
+                table.scrollTo(first_exact_match, QtWidgets.QAbstractItemView.PositionAtCenter)
 
 
 
 
 
 
+    def perform_search(self):
+        search_term = self.ui.search_bar.text()
+        current_index = self.ui.stackedWidget.currentIndex()
 
-
-
-
-
+        if current_index == 0:
+            self.search_in_table(search_term, self.ui.prod_table)
+        elif current_index == 1:
+            self.search_in_table(search_term, self.ui.product_inventory_table)
+            self.search_in_table(search_term, self.ui.raw_inventory_table)
+        elif current_index == 5:
+            self.search_in_table(search_term, self.ui.product_table)
+        # Add more conditions if there are more tables to search in
 
 
 if __name__ == "__main__":
