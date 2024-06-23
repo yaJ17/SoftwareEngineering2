@@ -8,7 +8,7 @@ if __name__ == "__main__":
     db_manager = DatabaseManager('localhost', 'root', 'admin', key)
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
-    db_manager.add_dummy_data()
+    # db_manager.add_dummy_data()
     
 
     # db_manager.populate_accounts()
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     """ DEMONSTRATION """
     #db_manager.populate_orders()
     #db_manager.populate_bag_components()
-    db_manager.add_account('sssssss', 'Pass!aaaaa123123', 'asda','asd')
+    # db_manager.add_account('sssssss', 'Pass!aaaaa123123', 'asda','asd')
     # db_manager.add_deadline('new dedline', 'asdasdas', '2024-12-15')
     #db_manager.set_deadline(1,'jay','asd','2025-12-12',1)
     # db_manager.void_deadline(1)
@@ -40,5 +40,7 @@ if __name__ == "__main__":
     # db_manager.add_product(1, 123123,'b',12312,123,11111)
     # db_manager.set_product(7, 'Running',123,123123,1231231,123123)
     # db_manager.populate_product()
-    db_manager.void_product(1)
+    # db_manager.void_product(1)
+    db_manager.add_transaction(1, "transaction c")
+    db_manager.populate_transaction()
     db_manager.close_connection()

@@ -1103,3 +1103,41 @@ class DatabaseManager:
             self.connection.commit()
             self.connection.close()
             print("Database connection closed")
+
+
+
+    def add_transaction(self, account_id, action):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            INSERT INTO TRANSACTION_HISTORY(
+                account_id, 
+                action
+                )
+            VALUES 
+            (%s,%s);
+            '''
+            ,(account_id, action))
+        except Error as e:
+            print(f"Error: {e}")
+
+    def populate_transaction(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT account_id, action, timestamp FROM transaction_history order by timestamp desc;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except Error as e:
+            print(f"Error: {e}")
