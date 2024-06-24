@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButto
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QDate
 
-
+import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
@@ -14,6 +14,14 @@ from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual file
 from databases.database import DatabaseManager
 import difflib
 from PySide6.QtWidgets import QPushButton
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import Table, TableStyle
 
 import xlwt
 
@@ -52,6 +60,11 @@ class MainWindow(QMainWindow):
         self.ui.cancel_add_raw.clicked.connect(self.show_inventory)
 
 
+        self.ui.prod_report_btn.clicked.connect(self.generate_product_pdf_clicked)
+        self.ui.stocks_report_btn.clicked.connect(self.generate_stock_pdf_clicked)
+        self.ui.inventory_report_btn.clicked.connect(self.generate_inventory_pdf_clicked)
+        self.ui.sales_report_btn.clicked.connect(self.generate_sales_pdf_clicked)
+
         self.ui.save_add_order.clicked.connect(self.save_add_production_action)
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
@@ -89,7 +102,7 @@ class MainWindow(QMainWindow):
     def show_daily_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(14)
 
-
+    
     def show_inventory(self):
         self.ui.stackedWidget.setCurrentIndex(1)
         self.populate_product_invent()
@@ -116,8 +129,7 @@ class MainWindow(QMainWindow):
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(7)
 
-
-
+   
     def show_about(self):
         self.ui.stackedWidget.setCurrentIndex(15)
 
@@ -343,7 +355,134 @@ class MainWindow(QMainWindow):
 
 
 
+    def fetch_data(self, query):
+        return pd.read_sql(query, self.db_manager.connection)
 
+    def generate_pdf(self, report_data, report_title, file_name):
+        c = canvas.Canvas(file_name, pagesize=letter)
+        width, height = letter
+
+        # Header
+        c.setFont('Helvetica-Bold', 16)
+        c.drawCentredString(width / 2, height - 50, "Rexie Maris Bag Enterprise")
+        c.setFont('Helvetica', 12)
+        c.drawCentredString(width / 2, height - 70, "58 Gen. Ordoñez St, Marikina, 1800 Metro Manila")
+        c.drawCentredString(width / 2, height - 90, "0908 450 6694")
+        
+        # Type of Report and Date Created
+        c.setFont('Helvetica-Bold', 12)
+        c.drawString(30, height - 120, "Type of Report: " + report_title)
+        c.drawString(30, height - 140, "Generated on: " +  pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
+        
+        
+        # Data Table
+        data = report_data.values.tolist()
+        colnames = report_data.columns.tolist()
+
+        table_data = [colnames] + data
+
+        table = Table(table_data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+
+        table_width, table_height = table.wrapOn(c, width, height)
+        if table_width > width:
+            table_width = width
+        table.wrapOn(c, table_width, height)
+        table.drawOn(c, (width - table_width) / 2, height - 200 - table_height)
+
+        c.save()
+
+    def generate_product_pdf_clicked(self):
+        sql_script = """
+        SELECT  
+                C.client_name "Name", 
+                P.product_quantity "Quantity", 
+                P.product_defectives "Defectives", 
+                P.product_cost "Cost", 
+                P.product_price "Price", 
+                P.created_at "Date"
+            FROM 
+                PRODUCT P
+            JOIN 
+                ORDERS O ON P.order_id = O.order_id
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                P.product_active = 1
+            ORDER BY 
+                P.created_at DESC;
+        """
+        production_data = self.fetch_data(sql_script)
+        self.generate_pdf(production_data,"Production Report", "production_report.pdf")
+
+    def generate_stock_pdf_clicked(self):
+        sql_script = """
+        SELECT 
+                material_name "Name", 
+                material_type "Type",  
+                material_cost "Cost", 
+                material_stock "Stock", 
+                material_safety_stock "Safety Stock", 
+                created_at "Date"
+            FROM 
+                RAW_MATERIAL
+            WHERE 
+                raw_material_active = 1
+            ORDER BY 
+                created_at DESC;
+        """
+        stock_data = self.fetch_data(sql_script)
+        self.generate_pdf(stock_data,"Stock Report", "stock_report.pdf")
+
+    def generate_inventory_pdf_clicked(self):
+        sql = """
+             SELECT 
+                RM.material_name "Name", 
+                RM.material_type "Type" ,  
+                RM.material_cost "Cost", 
+                RM.material_stock "Stock", 
+                RM.material_safety_stock "Safety Stock", 
+                S.supplier_name "Supplier",  
+                RM.created_at "Date"
+            FROM 
+                RAW_MATERIAL RM
+            JOIN 
+                SUPPLIER S ON RM.supplier_id = S.supplier_id
+            WHERE 
+                RM.raw_material_active = 1
+            ORDER BY 
+                RM.created_at DESC;
+        """
+        invent_data = self.fetch_data(sql)
+        self.generate_pdf(invent_data,"Invetory Report", "invetory_report.pdf")
+
+    def generate_sales_pdf_clicked(self):
+            sql = """
+                SELECT 
+                C.client_name "Client", 
+                O.order_quantity "Order", 
+                O.order_progress "Progress", 
+                O.bag_type "Type", 
+                O.created_at "Date"
+            FROM 
+                ORDERS O
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                O.orders_active = 1
+            ORDER BY 
+                O.created_at DESC;
+            """
+            sales_data = self.fetch_data(sql)
+            self.generate_pdf(sales_data,"Sales Report", "sales_report.pdf")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
