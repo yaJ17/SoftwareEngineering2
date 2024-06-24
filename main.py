@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
+        # self.db_manager.add_dummy_data()
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         # Populate the product table before showing the window
@@ -429,8 +430,14 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 P.created_at DESC;
         """
+        # Fetch data
+        df = self.fetch_data(sql_script)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
         reports = [
-                (self.fetch_data(sql_script), "Product Report")
+                (df, "Product Report")
             ]
         self.generate_pdf(reports, "production_report.pdf")
 
@@ -450,14 +457,20 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 created_at DESC;
         """
+        # Fetch data
+        df = self.fetch_data(sql_script)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
         reports = [
-                (self.fetch_data(sql_script), "Stock Report")
+                (df, "Stock Report")
             ]
         self.generate_pdf(reports, "stock_report.pdf")
 
     def generate_inventory_pdf_clicked(self):
         sql = """
-             SELECT 
+            SELECT 
                 RM.material_name "Name", 
                 RM.material_type "Type" ,  
                 RM.material_cost "Cost", 
@@ -474,56 +487,64 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 RM.created_at DESC;
         """
+        # Fetch data
+        df = self.fetch_data(sql)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
         reports = [
-                (self.fetch_data(sql), "Inventory Report")
+                (df, "Inventory Report")
             ]
-        self.generate_pdf(reports, "invetory_report.pdf")
+        self.generate_pdf(reports, "inventory_report.pdf")
 
     def generate_sales_pdf_clicked(self):
-            total_bag_sql = """
-                SELECT
-                    p.bag_type,
-                    SUM(p.product_quantity * p.product_price) AS total_earnings
-                FROM
-                    PRODUCT p
-                GROUP BY
-                    p.bag_type;
-            """
-            total_client_sql = '''
-                SELECT
-                    c.client_name,
-                    SUM(p.product_quantity * p.product_price) AS total_sales
-                FROM
-                    CLIENT c
-                JOIN
-                    ORDERS o ON c.client_id = o.client_id
-                JOIN
-                    PRODUCT p ON o.order_id = p.order_id
-                GROUP BY
-                    c.client_name;
-            '''
-            financial_summary = '''
-                SELECT
-                    SUM(p.product_quantity * p.product_price) AS total_revenue,
-                    SUM(rm.material_cost * p.product_quantity) AS total_cost,
-                    SUM(p.product_quantity * p.product_price) - SUM(rm.material_cost * p.product_quantity) AS net_profit
-                FROM
-                    PRODUCT p
-                JOIN
-                    ORDERS o ON p.order_id = o.order_id
-                JOIN
-                    RAW_MATERIAL rm ON o.material_id = rm.material_id;
+        total_bag_sql = """
+            SELECT
+                p.bag_type,
+                SUM(p.product_quantity * p.product_price) AS total_earnings
+            FROM
+                PRODUCT p
+            GROUP BY
+                p.bag_type;
+        """
+        total_client_sql = '''
+            SELECT
+                c.client_name,
+                SUM(p.product_quantity * p.product_price) AS total_sales
+            FROM
+                CLIENT c
+            JOIN
+                ORDERS o ON c.client_id = o.client_id
+            JOIN
+                PRODUCT p ON o.order_id = p.order_id
+            GROUP BY
+                c.client_name;
+        '''
+        financial_summary = '''
+            SELECT
+                SUM(p.product_quantity * p.product_price) AS total_revenue,
+                SUM(rm.material_cost * p.product_quantity) AS total_cost,
+                SUM(p.product_quantity * p.product_price) - SUM(rm.material_cost * p.product_quantity) AS net_profit
+            FROM
+                PRODUCT p
+            JOIN
+                ORDERS o ON p.order_id = o.order_id
+            JOIN
+                RAW_MATERIAL rm ON o.material_id = rm.material_id;
 
 
-            '''
+        '''
 
+        reports = [
+            (self.fetch_data(total_bag_sql), "Total Sales by Bag Type"),
+            (self.fetch_data(total_client_sql), "Total Sales by Client")
+            # (self.fetch_data(financial_summary), "Financial Summary")
+        ]
+        for i in range(len(reports)):
+            reports[i] = (reports[i][0].applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x), reports[i][1])
+        self.generate_pdf(reports,"sales_report.pdf")
 
-            reports = [
-                (self.fetch_data(total_bag_sql), "Total Sales by Bag Type"),
-                (self.fetch_data(total_client_sql), "Total Sales by Client")
-                # (self.fetch_data(financial_summary), "Financial Summary")
-            ]
-            self.generate_pdf(reports,"sales_report.pdf")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
