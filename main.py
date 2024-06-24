@@ -359,7 +359,9 @@ class MainWindow(QMainWindow):
         return pd.read_sql(query, self.db_manager.connection)
 
     def generate_pdf(self, report_data, report_title, file_name):
-        c = canvas.Canvas(file_name, pagesize=letter)
+        file_name = file_name.replace(" ", "_").replace(":", "-")
+        full_file_name = f"{file_name}_{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
+        c = canvas.Canvas(full_file_name, pagesize=letter)
         width, height = letter
 
         # Header
