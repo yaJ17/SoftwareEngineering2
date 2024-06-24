@@ -4,4 +4,5 @@ NOTES FOR DEVELOPERS:
    - pip install mysql-connector-python
    - pip install openpyxl
    - pip install xlwt
-   
+   - pip install pyside6
+   - pip install reportlab

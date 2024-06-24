@@ -1129,11 +1129,7 @@ class DatabaseManager:
         return create_table_query
 
 
-    def close_connection(self):
-        if self.connection and self.connection.is_connected():
-            self.connection.commit()
-            self.connection.close()
-            print("Database connection closed")
+ 
 
 
 
@@ -1156,7 +1152,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def populate_transaction(self):
+    def populate_transaction(self) -> tuple:
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -1168,7 +1164,148 @@ class DatabaseManager:
             '''
             )
             rows = cursor.fetchall()
-            for row in rows:
-                print(row)
+            return rows
         except Error as e:
             print(f"Error: {e}")
+
+    def generate_production_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                P.product_id, 
+                P.order_id, 
+                C.client_name,
+                P.product_quantity, 
+                P.product_defectives, 
+                P.product_cost, 
+                P.product_price, 
+                P.created_at
+            FROM 
+                PRODUCT P
+            JOIN 
+                ORDERS O ON P.order_id = O.order_id
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                P.product_active = 1
+            ORDER BY 
+                P.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+
+    def generate_stock_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                material_id, 
+                material_name, 
+                material_available, 
+                material_type, 
+                material_color, 
+                material_cost, 
+                material_stock, 
+                material_safety_stock, 
+                created_at
+            FROM 
+                RAW_MATERIAL
+            WHERE 
+                raw_material_active = 1
+            ORDER BY 
+                created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+
+    def generate_inventory_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                RM.material_id, 
+                RM.material_name, 
+                RM.material_available, 
+                RM.material_type, 
+                RM.material_color, 
+                RM.material_cost, 
+                RM.material_stock, 
+                RM.material_safety_stock, 
+                S.supplier_name, 
+                S.supplier_loc, 
+                RM.created_at
+            FROM 
+                RAW_MATERIAL RM
+            JOIN 
+                SUPPLIER S ON RM.supplier_id = S.supplier_id
+            WHERE 
+                RM.raw_material_active = 1
+            ORDER BY 
+                RM.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+    def generate_sales_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                O.order_id, 
+                C.client_name, 
+                O.order_quantity, 
+                O.order_progress, 
+                O.bag_type, 
+                O.created_at
+            FROM 
+                ORDERS O
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                O.orders_active = 1
+            ORDER BY 
+                O.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+    def close_connection(self):
+        if self.connection and self.connection.is_connected():
+            self.connection.commit()
+            self.connection.close()
+            print("Database connection closed")
