@@ -525,6 +525,7 @@ class Ui_MainWindow(object):
         self.order_deadline_dateEdit = QDateEdit(self.prod_add)
         self.order_deadline_dateEdit.setObjectName(u"order_deadline_dateEdit")
         self.order_deadline_dateEdit.setGeometry(QRect(50, 230, 211, 22))
+        
         self.label_11 = QLabel(self.prod_add)
         self.label_11.setObjectName(u"label_11")
         self.label_11.setGeometry(QRect(340, 40, 81, 21))

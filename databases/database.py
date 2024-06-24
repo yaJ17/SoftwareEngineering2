@@ -460,7 +460,7 @@ class DatabaseManager:
     '''
         ADDITION OF CLIENT
     '''
-    def add_client(self, name, loc, contact, deadline_id):
+    def add_client(self, name, loc, contact, deadline_id, client_priority):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -472,12 +472,13 @@ class DatabaseManager:
                 client_name,
                 client_loc,
                 client_contact,
-                deadline_id
+                deadline_id,
+                client_priority
                 )
             VALUES 
-            (%s,%s,%s,%s);
+            (%s,%s,%s,%s, %s);
             '''
-            ,(name, loc, contact, deadline_id))
+            ,(name, loc, contact, deadline_id, client_priority))
         except Error as e:
             print(f"Error: {e}")
     
@@ -512,12 +513,21 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT 
-        
-            order_quantity,
-            bag_type,
-            order_progress
+                c.client_name, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                c.client_priority
             FROM 
-                ORDERS O
+                CLIENT c
+            JOIN 
+                ORDERS o ON c.client_id = o.client_id
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+            ORDER BY 
+                c.client_priority ASC, 
+                d.deadline_date ASC;
+
             '''
             )
             rows = cursor.fetchall()
@@ -550,80 +560,65 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def add_order(self, client_id, order_quantity, order_progress, bag_type):
+    def add_order(self, client_name, order_quantity, bag_type, deadline_date, client_priority):
         if self.connection is None:
             print("No connection to the database.")
             return
+
         try:
             cursor = self.connection.cursor()
+
+            deadline_name = client_name + " deadline"
+            self.add_deadline(deadline_name, " ", deadline_date)
+
+            # Fetch the deadline_id
+            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s", 
+                        (deadline_name, deadline_date))
+            deadline_result = cursor.fetchone()
+            if deadline_result is None:
+                print("Deadline not found.")
+                return
+
+            deadline_id = deadline_result[0]  # Extract the first element from the tuple
+            print(f"Deadline ID: {deadline_id}")
+
+            # Insert into CLIENT table
+            self.add_client(client_name, "asd", "asd", deadline_id,client_priority )
+
+            # Fetch the client_id
+            cursor.execute("SELECT client_id FROM CLIENT WHERE client_name = %s AND deadline_id = %s", 
+                        (client_name, deadline_id))
+            client_result = cursor.fetchone()
+            if client_result is None:
+                print("Client not found.")
+                return
+
+            client_id = client_result[0]  # Extract the first element from the tuple
+            print(f"Client ID: {client_id}")
+
+            # Insert into ORDERS table
             cursor.execute('''
                 INSERT INTO ORDERS(
-                client_id,
-                order_quantity, 
-                order_progress, 
-                bag_type
+                    client_id,
+                    order_quantity, 
+                    order_progress, 
+                    bag_type
                 )
-                VALUES (%s,%s,%s,%s)
-            ''', (client_id, order_quantity, order_progress, bag_type))
-        except Error as e:
-            print(f"Error: {e}")
+                VALUES (%s, %s, %s, %s)
+            ''', (client_id, order_quantity, 0, bag_type))
 
-    '''
-        POPULATE THE BAG COMPONENTS ACCORDING TO BAG TYPE
-        O.bag_type is for testing purposes only -> can be excluded
-    '''
-    def populate_bag_components(self):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(
-            '''
-            SELECT 
-                B.bag_component,
-                B.labor_allocation,
-                B.progress,
-                O.bag_type
-            FROM 
-                BAG_COMPONENT B
-            JOIN 
-                ORDERS O ON O.client_id = B.client_id
-            WHERE
-                O.bag_type = B.bag_type;
-            '''
-            )
-            rows = cursor.fetchall()
-            for row in rows:
-                print(row)
-        except Error as e:
-            print(f"Error: {e}")
-
-
-    ''' 
-            UPDATE BAG COMPONENT ORDER
-                                                    '''   
-    def set_bag_component(self,bag_component_id, bag_component, labor_allocation, progress, bag_type):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute('''
-                SELECT bag_component_id FROM bag_component WHERE bag_component_id = %s
-            ''', (bag_component_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == bag_component_id:
-                    cursor.execute("UPDATE bag_component SET bag_component =%s, labor_allocation =%s,progress =%s, bag_type =%s WHERE bag_component_id = %s",
-                                    (bag_component,labor_allocation,progress,bag_type, bag_component_id ))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
+            # Commit the transaction
+            self.connection.commit()
 
         except Error as e:
             print(f"Error: {e}")
-    
+            self.connection.rollback()  # Rollback the transaction in case of error
+
+        finally:
+            cursor.close()  # Ensure the cursor is closed
+
+
+
     '''
     MONTH AND YEAR DEFAULT BY 2024 and January for testing purposes
     '''
@@ -796,31 +791,67 @@ class DatabaseManager:
 
         except Error as e:
             print(f"Error: {e}")
-    def add_raw_material(self, name,stock,available,materialtype, safety_stock, cost, supplier_id, color):
+
+    def add_raw_material(self, name, materialtype, stock, cost, safety_stock, supplier_name, color="", available=0):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute(
-            '''
-            INSERT INTO raw_material(
-                material_name,
-                material_available,
-                material_type,
-                material_color,
-                material_cost,
-                material_stock,
-                material_safety_stock,
-                supplier_id
+
+            # Check if the supplier already exists to avoid duplicate entries
+            cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+            result = cursor.fetchone()
+            if result is None:
+                # Insert the supplier
+                cursor.execute(
+                    """
+                    INSERT INTO supplier(
+                        supplier_name, 
+                        supplier_loc,
+                        supplier_contact
+                    )
+                    VALUES(%s, %s, %s)
+                    """, (supplier_name, "", "")
                 )
-            VALUES 
-            (%s,%s,%s,%s,%s,%s,%s,%s);
-            '''
-            ,(name,available,materialtype, color, cost, stock, safety_stock,supplier_id))
+                # Fetch the supplier_id after insertion
+                cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+                result = cursor.fetchone()
+            
+                if result is None:
+                    print("Supplier not found after insertion.")
+                    return
+            supplier_id = result[0]
+            # Insert the raw material
+            cursor.execute(
+                '''
+                INSERT INTO raw_material(
+                    material_name,
+                    material_available,
+                    material_type,
+                    material_color,
+                    material_cost,
+                    material_stock,
+                    material_safety_stock,
+                    supplier_id
+                )
+                VALUES 
+                (%s, %s, %s, %s, %s, %s, %s, %s)
+                ''',
+                (name, 0, materialtype, "", cost, stock, safety_stock, supplier_id)
+            )
+
+            # Commit the transaction
+            self.connection.commit()
+
         except Error as e:
             print(f"Error: {e}")
-    
+            self.connection.rollback()  # Rollback the transaction in case of error
+
+        finally:
+            cursor.close()  # Ensure the cursor is closed
+
+
     def void_raw_material(self, material_id):
         if self.connection is None:
             print("No connection to the database.")

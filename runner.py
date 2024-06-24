@@ -9,8 +9,8 @@ if __name__ == "__main__":
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
     # db_manager.add_dummy_data()
-    
-
+   # db_manager.add_order('sssss',123,123,'A','2024-12-12', 1)
+    #db_manager.add_raw_material('new material', 'asdleather', 123, 500, 250, 'PARKYU')
     # db_manager.populate_accounts()
     # db_manager.populate_orders()
     # db_manager.populate_raw_materials()
@@ -41,6 +41,7 @@ if __name__ == "__main__":
     # db_manager.set_product(7, 'Running',123,123123,1231231,123123)
     # db_manager.populate_product()
     # db_manager.void_product(1)
-    db_manager.add_transaction(1, "transaction c")
-    db_manager.populate_transaction()
+    # db_manager.add_transaction(1, "transaction c")
+   
+    # db_manager.populate_transaction()
     db_manager.close_connection()

@@ -51,6 +51,8 @@ class MainWindow(QMainWindow):
         self.ui.cancel_add_invProduct.clicked.connect(self.show_inventory)
         self.ui.cancel_add_raw.clicked.connect(self.show_inventory)
 
+
+        self.ui.save_add_order.clicked.connect(self.save_add_production_action)
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
@@ -70,7 +72,7 @@ class MainWindow(QMainWindow):
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
-
+    
     def show_add_order(self):
         self.ui.stackedWidget.setCurrentIndex(10)
 
@@ -167,7 +169,7 @@ class MainWindow(QMainWindow):
         orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = [ 'Quantity', 'Bag Type', 'Progress']
+        headers = [ 'Client Name', "Bag Type"," Order Quantity", "Deadline", "Priority"]
 
         # Create a QStandardItemModel and set headers
         model = QStandardItemModel(len(orders), len(headers))
@@ -186,8 +188,42 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
+    def save_add_production_action(self):
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
+        self.db_manager.add_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text())
+        self.ui.client_name_entry.setText("")
+        self.ui.bag_type_entry.setText("")
+        self.ui.order_quantity_spinBox.setValue(0)
+        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+        self.ui.order_priority_spinBox.setValue(0)
+        self.populate_orders()
+        self.ui.stackedWidget.setCurrentIndex(9)
 
+    # def save_add_finish_product_invent(self):
+    #     # Call save_add_production_action from DatabasecManager to fetch orders data
+    #     # data include bag type, quantity, no. of defectives, product cost, and product price
+    #     self.db_manager.add_product(self.ui.bag_type_entry.text(), self.ui.product_quantity_spinBox.text(), self.ui.product_defective_spinBox.text(), self.ui.product_cost_spinBox.text(), self.ui.product_price_spinBox.text())
+    #     self.ui.bag_type_entry.setText("")
+    #     self.ui.product_quantity_spinBox.setValue(0)
+    #     self.ui.product_defective_spinBox.setValue(0)
+    #     self.ui.product_cost_spinBox.setValue(0)
+    #     self.ui.product_price_spinBox.setValue(0)
+    #     self.populate_product_invent()
+    #     self.ui.stackedWidget.setCurrentIndex(1)
 
+    # def save_add_material_invent(self):
+    #     # Call save_add_production_action from DatabasecManager to fetch orders data
+    #     # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
+    #     self.db_manager.add_raw_material(self.ui.material_name_entry.text(), self.ui.material_type_entry.text(), self.ui.material_stock_spinBox.text(), self.ui.material_cost_spinBox.text(), self.ui.material_safety_stock_spinBox.text(), self.ui.supplier_name_entry.text())
+    #     self.ui.mate  rial_name_entry.setText("")
+    #     self.ui.material_type_entry.setText("")
+    #     self.ui.material_stock_spinBox.setValue(0)
+    #     self.ui.material_cost_spinBox.setValue(0)
+    #     self.ui.material_safety_stock_spinBox.setValue(0)
+    #     self.ui.supplier_name_entry.setText("")
+    #     self.populate_raw_invent()
+        
     def populate_product_invent(self):
         # Call populate_orders from DatabasecManager to fetch orders data
         orders = self.db_manager.populate_product()
