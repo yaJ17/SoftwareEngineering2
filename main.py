@@ -358,7 +358,7 @@ class MainWindow(QMainWindow):
     def fetch_data(self, query):
         return pd.read_sql(query, self.db_manager.connection)
 
-    def generate_pdf(self, report_data, report_title, file_name):
+    def generate_pdf(self, report_data_list, file_name):
         file_name = file_name.replace(" ", "_").replace(":", "-")
         full_file_name = f"{file_name}_{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
         c = canvas.Canvas(full_file_name, pagesize=letter)
@@ -371,34 +371,41 @@ class MainWindow(QMainWindow):
         c.drawCentredString(width / 2, height - 70, "58 Gen. Ordoñez St, Marikina, 1800 Metro Manila")
         c.drawCentredString(width / 2, height - 90, "0908 450 6694")
         
-        # Type of Report and Date Created
-        c.setFont('Helvetica-Bold', 12)
-        c.drawString(30, height - 120, "Type of Report: " + report_title)
-        c.drawString(30, height - 140, "Generated on: " +  pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
-        
-        
-        # Data Table
-        data = report_data.values.tolist()
-        colnames = report_data.columns.tolist()
+        # Date Created
+        c.setFont('Helvetica', 12)
+        c.drawRightString(width - 30, height - 30, "Generated on: " + pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-        table_data = [colnames] + data
+        y_position = height - 120
+        for report_data, report_title in report_data_list:
+            # Type of Report
+            c.setFont('Helvetica-Bold', 12)
+            c.drawString(30, y_position, "Type of Report: " + report_title)
+            y_position -= 20
 
-        table = Table(table_data)
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ]))
+            # Data Table
+            data = report_data.values.tolist()
+            colnames = report_data.columns.tolist()
 
-        table_width, table_height = table.wrapOn(c, width, height)
-        if table_width > width:
-            table_width = width
-        table.wrapOn(c, table_width, height)
-        table.drawOn(c, (width - table_width) / 2, height - 200 - table_height)
+            table_data = [colnames] + data
+
+            table = Table(table_data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+
+            table_width, table_height = table.wrapOn(c, width, height)
+            if table_width > width:
+                table_width = width
+            table.wrapOn(c, table_width, height)
+            table.drawOn(c, (width - table_width) / 2, y_position - table_height - 10)
+
+            y_position -= (table_height + 50)  # Space between tables
 
         c.save()
 
@@ -422,8 +429,10 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 P.created_at DESC;
         """
-        production_data = self.fetch_data(sql_script)
-        self.generate_pdf(production_data,"Production Report", "production_report.pdf")
+        reports = [
+                (self.fetch_data(sql_script), "Product Report")
+            ]
+        self.generate_pdf(reports, "production_report.pdf")
 
     def generate_stock_pdf_clicked(self):
         sql_script = """
@@ -441,8 +450,10 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 created_at DESC;
         """
-        stock_data = self.fetch_data(sql_script)
-        self.generate_pdf(stock_data,"Stock Report", "stock_report.pdf")
+        reports = [
+                (self.fetch_data(sql_script), "Stock Report")
+            ]
+        self.generate_pdf(reports, "stock_report.pdf")
 
     def generate_inventory_pdf_clicked(self):
         sql = """
@@ -463,28 +474,56 @@ class MainWindow(QMainWindow):
             ORDER BY 
                 RM.created_at DESC;
         """
-        invent_data = self.fetch_data(sql)
-        self.generate_pdf(invent_data,"Invetory Report", "invetory_report.pdf")
+        reports = [
+                (self.fetch_data(sql), "Inventory Report")
+            ]
+        self.generate_pdf(reports, "invetory_report.pdf")
 
     def generate_sales_pdf_clicked(self):
-            sql = """
-                SELECT 
-                C.client_name "Client", 
-                O.order_quantity "Order", 
-                O.order_progress "Progress", 
-                O.bag_type "Type", 
-                O.created_at "Date"
-            FROM 
-                ORDERS O
-            JOIN 
-                CLIENT C ON O.client_id = C.client_id
-            WHERE 
-                O.orders_active = 1
-            ORDER BY 
-                O.created_at DESC;
+            total_bag_sql = """
+                SELECT
+                    p.bag_type,
+                    SUM(p.product_quantity * p.product_price) AS total_earnings
+                FROM
+                    PRODUCT p
+                GROUP BY
+                    p.bag_type;
             """
-            sales_data = self.fetch_data(sql)
-            self.generate_pdf(sales_data,"Sales Report", "sales_report.pdf")
+            total_client_sql = '''
+                SELECT
+                    c.client_name,
+                    SUM(p.product_quantity * p.product_price) AS total_sales
+                FROM
+                    CLIENT c
+                JOIN
+                    ORDERS o ON c.client_id = o.client_id
+                JOIN
+                    PRODUCT p ON o.order_id = p.order_id
+                GROUP BY
+                    c.client_name;
+            '''
+            financial_summary = '''
+                SELECT
+                    SUM(p.product_quantity * p.product_price) AS total_revenue,
+                    SUM(rm.material_cost * p.product_quantity) AS total_cost,
+                    SUM(p.product_quantity * p.product_price) - SUM(rm.material_cost * p.product_quantity) AS net_profit
+                FROM
+                    PRODUCT p
+                JOIN
+                    ORDERS o ON p.order_id = o.order_id
+                JOIN
+                    RAW_MATERIAL rm ON o.material_id = rm.material_id;
+
+
+            '''
+
+
+            reports = [
+                (self.fetch_data(total_bag_sql), "Total Sales by Bag Type"),
+                (self.fetch_data(total_client_sql), "Total Sales by Client")
+                # (self.fetch_data(financial_summary), "Financial Summary")
+            ]
+            self.generate_pdf(reports,"sales_report.pdf")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
