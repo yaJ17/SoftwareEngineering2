@@ -309,29 +309,7 @@ class DatabaseManager:
 
     
 
-    #validate login
-    def check_account_login(self, username, password) -> bool:
-        if self.connection is None:
-            print("No connection to the database.")
-            return False
-
-        try:
-            cursor = self.connection.cursor()
-            enc_username = self.cipher.encrypt(username)
-            enc_password = self.cipher.encrypt(password)
-            print(enc_username)
-            sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
-            cursor.execute(sql_script, (enc_username, enc_password))
-            result = cursor.fetchone()
-            if result:
-                print("Login successful")
-                return True
-            else:
-                print("Invalid credentials")
-                return False
-        except Error as e:
-            print(f"Error: {e}")
-            return False
+   
 
     def populate_accounts(self) -> None:
         if self.connection is None:
@@ -1004,31 +982,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def add_account(self, username, password, question, answer):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT RIGHT(MAX(username_id), LENGTH(MAX(username_id)) - 4) FROM ACCOUNTS")
-            last_id = cursor.fetchone()[0]
-            if last_id:
-                new_id = "RXAC"+ str(int(last_id) + 1)
-            else:
-                new_id = "RXAC1"
-            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username,))
-            username_exist = cursor.fetchone()
-            if username_exist is None:
-                #r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$" -> to remove 8 char long
-                if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
-                    cursor.execute("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);", (new_id, username, password,question,answer))
-                else:
-                    print("wrong password")
-        except Error as e:
-            print(f"Error: {e}")
-
-
-
+   
     def get_table_creation_order(self):
         # Order the tables based on foreign key dependencies
         return [
@@ -1369,6 +1323,52 @@ class DatabaseManager:
 
         return decrypted_rows
 
+     #validate login
+    def check_account_login(self, username, password) -> bool:
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+            enc_username = self.cipher.encrypt(username)
+            enc_password = self.cipher.encrypt(password)
+            print(enc_username)
+            sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
+            cursor.execute(sql_script, (enc_username, enc_password))
+            result = cursor.fetchone()
+            if result:
+                print("Login successful")
+                return True
+            else:
+                print("Invalid credentials")
+                return False
+        except Error as e:
+            print(f"Error: {e}")
+            return False
+
+    def add_account(self, username, password, question, answer):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT RIGHT(MAX(username_id), LENGTH(MAX(username_id)) - 4) FROM ACCOUNTS")
+            last_id = cursor.fetchone()[0]
+            if last_id:
+                new_id = "RXAC"+ str(int(last_id) + 1)
+            else:
+                new_id = "RXAC1"
+            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username,))
+            username_exist = cursor.fetchone()
+            if username_exist is None:
+                #r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$" -> to remove 8 char long
+                if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+                    cursor.execute("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);", (new_id, username, password,question,answer))
+                else:
+                    print("wrong password")
+        except Error as e:
+            print(f"Error: {e}")
 
 
     def close_connection(self):
