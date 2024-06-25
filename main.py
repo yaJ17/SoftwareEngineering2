@@ -74,13 +74,14 @@ class MainWindow(QMainWindow):
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
-        # self.db_manager.add_dummy_data()
+        #self.db_manager.add_dummy_data()
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
+        self.ui.edit_save_button.clicked.connect(self.save_edit_order)
         # Populate the product table before showing the window
         self.populate_deadline_table()
 
-
+        self.data = {}
 
         #calendar
         self.ui.calendarWidget.clicked.connect(self.date_clicked)
@@ -214,7 +215,7 @@ class MainWindow(QMainWindow):
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_order(row))
             self.ui.product_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
-
+            edit_button.clearFocus()
         # Set the edit triggers (disable editing)
         self.ui.product_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
@@ -225,6 +226,7 @@ class MainWindow(QMainWindow):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
 
+     
         # Get client name from product_table's first column at specified row
         client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
         if client_name_item:
@@ -312,6 +314,16 @@ class MainWindow(QMainWindow):
 
         self.ui.edit_order_notes.setPlainText(row)
         # Switch to the desired index in stackedWidget
+
+        self.data = {
+            "name": client_name,
+            "bag_type": type_bag,
+            "order_quantity": order_quantity,
+            "deadline_date": deadline_date,
+            "priority": item_priority,
+            "deadline_details": row
+        }
+        print(self.data)
         self.ui.stackedWidget.setCurrentIndex(11)
 
 
@@ -327,6 +339,7 @@ class MainWindow(QMainWindow):
         self.ui.order_priority_spinBox.setValue(0)
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
+        self.data = {}
 
     # def save_add_finish_product_invent(self):
     #     # Call save_add_production_action from DatabasecManager to fetch orders data
@@ -352,44 +365,79 @@ class MainWindow(QMainWindow):
     #     self.ui.supplier_name_entry.setText("")
     #     self.populate_raw_invent()
 
-    def populate_product_invent(self):
+    def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
-        product = self.db_manager.populate_orders_now()
+        orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = ['Bag Type', 'Quantity', 'Product Price', 'Edit']
+        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
+
         # Set the number of rows and columns
-        self.ui.product_inventory_table.setRowCount(len(product))
-        self.ui.product_inventory_table.setColumnCount(len(headers))
+        self.ui.product_table.setRowCount(len(orders))
+        self.ui.product_table.setColumnCount(len(headers))
 
         # Set the headers for the table
-        self.ui.product_inventory_table.setHorizontalHeaderLabels(headers)
+        self.ui.product_table.setHorizontalHeaderLabels(headers)
 
         # Populate the table with fetched data
-        for row_index, row_data in enumerate(product):
+        for row_index, row_data in enumerate(orders):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
-                self.ui.product_inventory_table.setItem(row_index, column_index, item)
-                # Add edit button in the last column
+                self.ui.product_table.setItem(row_index, column_index, item)
+            # Add edit button in the last column
             edit_button = QPushButton('Edit')
             edit_button.setProperty("row", row_index)
 
-            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_invent(row))
-            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+            # Properly connect the button click event
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_order(row))
+            self.ui.product_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
         # Set the edit triggers (disable editing)
-        self.ui.product_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.ui.product_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # Resize columns to fit content
-        self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        # Clear the selection
+        self.ui.product_table.clearSelection()
+
+
+
+
 
     def handle_edit_prod_invent(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
+       
         self.ui.stackedWidget.setCurrentIndex(3)
 
+    
+    def save_edit_order(self):
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        print(self.data)
+        data_name = self.data['name']
+        data_details = self.data['deadline_details']
+        id = self.db_manager.get_order_id(data_name)
+        deadline_id = self.db_manager.get_deadline_id(data_name, data_details)
+        name = self.ui.edit_client_name.text()
+        bag_type = self.ui.edit_bag_type.text()
+        order_quantity = self.ui.edit_order_quantity.value()
+        deadline_date = self.ui.edit_order_deadline.date().toString("yyyy-MM-dd")
+        priority = self.ui.edit_order_priority.value() 
+        print(f"id {id}")
+        deadline_details = self.ui.edit_order_notes.toPlainText()
+        print(deadline_date)
 
-
+        self.db_manager.set_order(id, order_quantity, bag_type)
+        self.db_manager.set_deadline(deadline_id, name, deadline_details, deadline_date)
+        self.db_manager.set_client_detail(deadline_id, priority, name)
+        # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
+        self.ui.client_name_entry.setText("")
+        self.ui.bag_type_entry.setText("")
+        self.ui.order_quantity_spinBox.setValue(0)
+        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+        self.db_manager.connection.commit()
+        self.show_production()
 
     def populate_raw_invent(self):
         # Call populate_orders from DatabaseManager to fetch orders data

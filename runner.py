@@ -9,8 +9,11 @@ if __name__ == "__main__":
     db_manager = DatabaseManager('localhost', 'root', 'admin', key)
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
-    data = db_manager.cipher.decrypt("bW3KcumFHUEs4RaypuSXXQ==:gRVzGpEGPJdYUaj9EXxOmg==")
-    print(data)
+    # data = db_manager.get_deadline_id("Hermand", "Details E")
+    # print(data)
+    db_manager.populate_deadline()
+    # db_manager.populate_client()
+
     # print("===============================")
     # db_manager.generate_production_report()
     # print("===============================")

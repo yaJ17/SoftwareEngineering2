@@ -212,11 +212,11 @@ class DatabaseManager:
 
             # Insert dummy data for DEADLINE
             deadlines = [
-                (self.cipher.encrypt("Meeting with Bitoy"), self.cipher.encrypt("Details A"), "2024-12-31"),
-                (self.cipher.encrypt("Bag A for Angel"), self.cipher.encrypt("Details B"), "2024-11-30"),
-                (self.cipher.encrypt("Bag B for Sweedny"), self.cipher.encrypt("Details C"), "2024-10-31"),
-                (self.cipher.encrypt("Shipment for Bigboy"), self.cipher.encrypt("Details D"), "2024-09-30"),
-                (self.cipher.encrypt("Kindey Shipment"), self.cipher.encrypt("Details E"), "2024-08-31")
+                (self.cipher.encrypt("Straightforward"), self.cipher.encrypt("Details A"), "2024-12-31"),
+                (self.cipher.encrypt("Nikey"), self.cipher.encrypt("Details B"), "2024-11-30"),
+                (self.cipher.encrypt("Adibas"), self.cipher.encrypt("Details C"), "2024-10-31"),
+                (self.cipher.encrypt("Celline"), self.cipher.encrypt("Details D"), "2024-09-30"),
+                (self.cipher.encrypt("Hermand"), self.cipher.encrypt("Details E"), "2024-08-31")
             ]
             cursor.executemany("INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date) VALUES (%s, %s, %s)", deadlines)
 
@@ -398,14 +398,14 @@ class DatabaseManager:
                 progress = row[3]
                 
                 # Decrypt the encrypted columns
-                # decrypted_name = self.cipher.decrypt(encrypted_name)
+                decrypted_name = self.cipher.decrypt(client_name)
                 # decrypted_loc = self.cipher.decrypt(encrypted_loc)
                 # decrypted_contact = self.cipher.decrypt(encrypted_contact)
                 
                 
                 # Create a dictionary for better readability
                 decrypted_row = {
-                    'name': client_name,
+                    'name': decrypted_name,
                     'bag types': bag_types,
                     'deadline': deadline,
                     'progress': progress
@@ -417,21 +417,21 @@ class DatabaseManager:
             print(f"Error: {e}")
 
     #EDIT CLIENT DETAILS
-    def set_client_detail(self, client_id, name, loc,contact):
+    def set_client_detail(self, deadline_id,priority, name, loc="",contact="", ):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute('''
-                SELECT client_id FROM client WHERE client_id = %s;
-            ''',(client_id,))
-            result = cursor.fetchone()
+                SELECT client_id FROM client WHERE deadline_id = %s;
+            ''',(deadline_id,))
+            result = cursor.fetchone()[0]
             print(result)
             if result:
-                if  result[0] == client_id:
-                    sql_script = "UPDATE CLIENT SET client_name=%s, client_loc=%s, client_contact=%s WHERE client_id = %s"
-                    cursor.execute(sql_script, (name,loc,contact,client_id))
+                if  result:
+                    sql_script = "UPDATE CLIENT SET client_name=%s, client_loc=%s, client_contact=%s, client_priority=%s WHERE client_id = %s"
+                    cursor.execute(sql_script, (self.cipher.encrypt(name),loc,contact, priority, result))
                     print("Details updated successfully.")
                 else:
                     print("Invalid client_id.")
@@ -529,11 +529,16 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-
+    def get_order_id(self, name):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT order_id FROM ORDERS WHERE client_id = (SELECT client_id FROM client WHERE client_name= %s)", (self.cipher.encrypt(name),))
+        result = cursor.fetchone()[0]
+        return result
+    
     ''' 
             UPDATE CLIENT ORDER
                                                     '''   
-    def set_order(self, order_id, quantity, progress, bag_type):
+    def set_order(self, order_id, quantity, bag_type):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -545,8 +550,8 @@ class DatabaseManager:
             result = cursor.fetchone()
             if result:
                 if result[0] == order_id:
-                    cursor.execute("UPDATE ORDERs SET order_quantity=%s, order_progress =%s, bag_type =%s WHERE order_id = %s",
-                                    (quantity,progress,bag_type,order_id))
+                    cursor.execute("UPDATE ORDERs SET order_quantity=%s, bag_type =%s WHERE order_id = %s",
+                                    (quantity,self.cipher.encrypt(bag_type),order_id))
                     print("Details updated successfully.")
                 else:
                     print("Invalid order.")
@@ -563,7 +568,7 @@ class DatabaseManager:
             cursor = self.connection.cursor()
 
             # Encrypt deadline_name before adding to the database
-            deadline_name = client_name + " deadline"
+            deadline_name = client_name
             encrypted_deadline_name = self.cipher.encrypt(deadline_name)
             encrypted_deadline_details = self.cipher.encrypt(deadline_details)
             self.add_deadline(encrypted_deadline_name, encrypted_deadline_details, deadline_date)
@@ -642,7 +647,7 @@ class DatabaseManager:
             )
             rows = cursor.fetchall()
             for row in rows:
-                print(row)
+                print(self.cipher.decrypt(row[0]))
         except Error as e:
             print(f"Error: {e}")
 
@@ -685,9 +690,14 @@ class DatabaseManager:
 
         return decrypted_rows
 
+    def get_deadline_id(self, deadline_name, deadline_details):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT deadline_id FROM DEADLINE WHERE deadline_name = %s AND deadline_details = %s",
+                       (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details)))
+        result = cursor.fetchone()[0]
+        return result
 
-
-    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_active):
+    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -699,8 +709,8 @@ class DatabaseManager:
             result = cursor.fetchone()
             if result:
                 if result[0] == deadline_id:
-                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s, deadline_active=%s WHERE deadline_id =%s",
-                                    (deadline_name, deadline_details, deadline_date, deadline_active, deadline_id))
+                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s WHERE deadline_id =%s",
+                                    (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details), deadline_date, deadline_id))
                     print("Details updated successfully.")
                 else:
                     print("Invalid order.")
