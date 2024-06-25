@@ -282,42 +282,35 @@ class MainWindow(QMainWindow):
 
             # Query the CLIENT table to get client_id
             cursor = self.db_manager.connection.cursor()
-            query_client_id = "SELECT client_id FROM CLIENT WHERE client_name = %s"
-            client_id_row = cursor.execute(query_client_id, (client_name,))
+            query_client_id = "SELECT client_id FROM CLIENT WHERE client_name = %s;"
+            encrypted_client_name = self.db_manager.cipher.encrypt(client_name)
+            cursor.execute(query_client_id, (encrypted_client_name,))
+            client_id_row = cursor.fetchone()
             client_id = client_id_row[0] if client_id_row else None
-
+            print(client_id)
             if not client_id:
                 print(f"Error: Client '{client_name}' not found in database")
                 return
 
-            # Query the ORDERS table to get deadline_id
-            query_deadline_id = "SELECT deadline_id FROM ORDERS WHERE client_id = %s AND bag_type = %s"
-            deadline_id_row =  cursor.execute(query_deadline_id, (client_id, bag_type))
-            deadline_id = deadline_id_row[0] if deadline_id_row else None
-
-            if not deadline_id:
-                print(f"Error: No order found for Client '{client_name}' with Bag Type '{bag_type}'")
-                return
-
-            # Query the DEADLINE table to get deadline_details
-            query_deadline_details = "SELECT deadline_details FROM DEADLINE WHERE deadline_id = %s"
-            deadline_details_row =  cursor.execute(query_deadline_details, (deadline_id,))
-            deadline_details = deadline_details_row[0] if deadline_details_row else None
-
-            if not deadline_details:
-                print(f"Error: Deadline details not found for Deadline ID '{deadline_id}'")
-                return
-
-
-
-
-
-
-
+            query = """
+                SELECT 
+                    D.deadline_details
+                FROM 
+                    CLIENT C
+                JOIN 
+                    ORDERS O ON C.client_id = O.client_id
+                JOIN 
+                    DEADLINE D ON C.deadline_id = D.deadline_id
+                WHERE 
+                    C.client_name= %s;
+            """
+            cursor.execute(query, (encrypted_client_name,))
+            row = self.db_manager.cipher.decrypt(cursor.fetchone()[0])
+            print(f"details: {row}")
         except Exception as e:
             print(f"Error executing database query: {e}")
 
-
+        self.ui.edit_order_notes.setPlainText(row)
         # Switch to the desired index in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(11)
 
