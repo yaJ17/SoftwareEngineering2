@@ -480,6 +480,7 @@ class DatabaseManager:
                 reversed_client_active = 0 if client_active == 1 else 1 
                 sql_script = "UPDATE CLIENT SET client_active = %s WHERE client_id = %s"
                 cursor.execute(sql_script, (reversed_client_active, client_id))
+                self.connection.commit()
         except Error as e:
             print(f"Error: {e}")
     '''
@@ -502,14 +503,16 @@ class DatabaseManager:
                 c.client_priority
             FROM 
                 CLIENT c
+			
             JOIN 
                 ORDERS o ON c.client_id = o.client_id
             JOIN 
                 DEADLINE d ON c.deadline_id = d.deadline_id
+			WHERE 
+				c.client_active = 1
             ORDER BY 
                 c.client_priority ASC, 
                 d.deadline_date ASC;
-
             '''
             )
             rows = cursor.fetchall()
@@ -762,7 +765,9 @@ class DatabaseManager:
             FROM 
                 RAW_MATERIAL R
             JOIN 
-                SUPPLIER S ON R.supplier_id = S.supplier_id;
+                SUPPLIER S ON R.supplier_id = S.supplier_id
+			WHERE 
+                R.raw_material_active = 1;
             '''
             )
             rows = cursor.fetchall()
@@ -992,7 +997,11 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-   
+    def get_client_id(self, client_name):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT client_id FROM client WHERE client_name= %s", (self.cipher.encrypt(client_name),))
+        result = cursor.fetchone()[0]
+        return result
     def get_table_creation_order(self):
         # Order the tables based on foreign key dependencies
         return [

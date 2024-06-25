@@ -78,6 +78,8 @@ class MainWindow(QMainWindow):
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         self.ui.edit_save_button.clicked.connect(self.save_edit_order)
+        self.ui.void_order.clicked.connect(self.void_production)
+
         # Populate the product table before showing the window
         self.populate_deadline_table()
 
@@ -344,8 +346,13 @@ class MainWindow(QMainWindow):
         self.ui.order_priority_spinBox.setValue(0)
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
-        self.data = {}
 
+    def void_production(self):
+        client_id = self.db_manager.get_client_id(self.data["name"])
+        self.db_manager.void_client(client_id)
+        self.populate_orders()
+        self.ui.stackedWidget.setCurrentIndex(9)
+        
     # def save_add_finish_product_invent(self):
     #     # Call save_add_production_action from DatabasecManager to fetch orders data
     #     # data include bag type, quantity, no. of defectives, product cost, and product price
