@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainYeBAwE.ui'
+## Form generated from reading UI file 'ui_mainStMmyX.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -19,7 +19,8 @@ from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QDateEd
     QFrame, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QMainWindow, QPlainTextEdit, QPushButton,
     QSizePolicy, QSpinBox, QStackedWidget, QStatusBar,
-    QTableView, QTextEdit, QVBoxLayout, QWidget)
+    QTableView, QTableWidget, QTableWidgetItem, QTextEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -211,28 +212,28 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
-        self.product_inventory_table = QTableView(self.Inventory)
+        self.product_inventory_table = QTableWidget(self.Inventory)
         self.product_inventory_table.setObjectName(u"product_inventory_table")
-        self.product_inventory_table.setGeometry(QRect(50, 50, 281, 271))
+        self.product_inventory_table.setGeometry(QRect(50, 60, 571, 121))
         self.welcome_label_2 = QLabel(self.Inventory)
         self.welcome_label_2.setObjectName(u"welcome_label_2")
         self.welcome_label_2.setGeometry(QRect(60, 20, 191, 31))
         self.welcome_label_2.setFont(font)
         self.welcome_label_2.setTextFormat(Qt.TextFormat.AutoText)
-        self.raw_inventory_table = QTableView(self.Inventory)
+        self.raw_inventory_table = QTableWidget(self.Inventory)
         self.raw_inventory_table.setObjectName(u"raw_inventory_table")
-        self.raw_inventory_table.setGeometry(QRect(340, 50, 281, 271))
+        self.raw_inventory_table.setGeometry(QRect(50, 230, 571, 121))
         self.welcome_label_4 = QLabel(self.Inventory)
         self.welcome_label_4.setObjectName(u"welcome_label_4")
-        self.welcome_label_4.setGeometry(QRect(350, 20, 191, 31))
+        self.welcome_label_4.setGeometry(QRect(60, 190, 181, 31))
         self.welcome_label_4.setFont(font)
         self.welcome_label_4.setTextFormat(Qt.TextFormat.AutoText)
         self.add_product_button = QPushButton(self.Inventory)
         self.add_product_button.setObjectName(u"add_product_button")
-        self.add_product_button.setGeometry(QRect(250, 330, 75, 24))
+        self.add_product_button.setGeometry(QRect(254, 25, 71, 24))
         self.add_inventory_button = QPushButton(self.Inventory)
         self.add_inventory_button.setObjectName(u"add_inventory_button")
-        self.add_inventory_button.setGeometry(QRect(540, 330, 75, 24))
+        self.add_inventory_button.setGeometry(QRect(254, 195, 71, 24))
         self.stackedWidget.addWidget(self.Inventory)
         self.inventory_add_product = QWidget()
         self.inventory_add_product.setObjectName(u"inventory_add_product")
@@ -512,7 +513,7 @@ class Ui_MainWindow(object):
         self.welcome_label_3.setGeometry(QRect(60, 20, 351, 31))
         self.welcome_label_3.setFont(font)
         self.welcome_label_3.setTextFormat(Qt.TextFormat.AutoText)
-        self.product_table = QTableView(self.prod)
+        self.product_table = QTableWidget(self.prod)
         self.product_table.setObjectName(u"product_table")
         self.product_table.setGeometry(QRect(50, 50, 571, 271))
         self.add_order_button = QPushButton(self.prod)
@@ -803,7 +804,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(14)
+        self.stackedWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

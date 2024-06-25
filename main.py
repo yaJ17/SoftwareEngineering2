@@ -4,7 +4,8 @@ from PySide6.QtCore import Qt, QDate
 from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import QDate
-
+from PySide6 import QtCore
+from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView
 import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
@@ -98,7 +99,7 @@ class MainWindow(QMainWindow):
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
-    
+
     def show_add_order(self):
         self.ui.stackedWidget.setCurrentIndex(10)
 
@@ -115,7 +116,7 @@ class MainWindow(QMainWindow):
     def show_daily_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(14)
 
-    
+
     def show_inventory(self):
         self.ui.stackedWidget.setCurrentIndex(1)
         self.populate_product_invent()
@@ -142,7 +143,7 @@ class MainWindow(QMainWindow):
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(7)
 
-   
+
     def show_about(self):
         self.ui.stackedWidget.setCurrentIndex(15)
 
@@ -190,28 +191,43 @@ class MainWindow(QMainWindow):
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
     def populate_orders(self):
-        # Call populate_orders from DatabasecManager to fetch orders data
-        orders = self.db_manager.populate_orders()
+        # Call populate_orders from DatabaseManager to fetch orders data
+        orders = self.db_manager.populate_orders_now()
 
         # Define headers for the table
-        headers = [ 'Client Name', "Bag Type"," Order Quantity", "Deadline", "Priority"]
+        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", "Edit"]
 
-        # Create a QStandardItemModel and set headers
-        model = QStandardItemModel(len(orders), len(headers))
-        model.setHorizontalHeaderLabels(headers)
+        # Set the number of rows and columns
+        self.ui.product_table.setRowCount(len(orders))
+        self.ui.product_table.setColumnCount(len(headers))
 
-        # Populate the model with fetched data
+        # Set the headers for the table
+        self.ui.product_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
         for row_index, row_data in enumerate(orders):
             for column_index, data in enumerate(row_data):
-                item = QStandardItem(str(data))
-                model.setItem(row_index, column_index, item)
+                item = QTableWidgetItem(str(data))
+                self.ui.product_table.setItem(row_index, column_index, item)
+                # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
+
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_order(row))
+            self.ui.product_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
 
-        # Set the model to the product_table in UI
-        self.ui.product_table.setModel(model)
-        self.ui.product_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Set the edit triggers (disable editing)
+        self.ui.product_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
         # Resize columns to fit content
-        self.ui.product_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+
+    def handle_edit_order(self, row):
+        # Implement your edit logic here
+        print(f"Editing order at row {row}")
+        self.ui.stackedWidget.setCurrentIndex(11)
 
     def save_add_production_action(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
@@ -249,53 +265,81 @@ class MainWindow(QMainWindow):
     #     self.ui.material_safety_stock_spinBox.setValue(0)
     #     self.ui.supplier_name_entry.setText("")
     #     self.populate_raw_invent()
-        
+
     def populate_product_invent(self):
-        # Call populate_orders from DatabasecManager to fetch orders data
-        orders = self.db_manager.populate_product()
+        # Call populate_orders from DatabaseManager to fetch orders data
+        product = self.db_manager.populate_orders_now()
 
         # Define headers for the table
-        headers = [ 'Bag Type', 'Quantity', 'Product Price']
+        headers = ['Bag Type', 'Quantity', 'Product Price', 'Edit']
+        # Set the number of rows and columns
+        self.ui.product_inventory_table.setRowCount(len(product))
+        self.ui.product_inventory_table.setColumnCount(len(headers))
 
-        # Create a QStandardItemModel and set headers
-        model = QStandardItemModel(len(orders), len(headers))
-        model.setHorizontalHeaderLabels(headers)
+        # Set the headers for the table
+        self.ui.product_inventory_table.setHorizontalHeaderLabels(headers)
 
-        # Populate the model with fetched data
-        for row_index, row_data in enumerate(orders):
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(product):
             for column_index, data in enumerate(row_data):
-                item = QStandardItem(str(data))
-                model.setItem(row_index, column_index, item)
+                item = QTableWidgetItem(str(data))
+                self.ui.product_inventory_table.setItem(row_index, column_index, item)
+                # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
 
-        # Set the model to the prod_table in UI
-        self.ui.product_inventory_table.setModel(model)
-        self.ui.product_inventory_table.setEditTriggers(QTableView.NoEditTriggers)
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_invent(row))
+            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+        # Set the edit triggers (disable editing)
+        self.ui.product_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
         # Resize columns to fit content
-        self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def handle_edit_prod_invent(self, row):
+        # Implement your edit logic here
+        print(f"Editing order at row {row}")
+        self.ui.stackedWidget.setCurrentIndex(3)
+
+
 
 
     def populate_raw_invent(self):
-        # Call populate_orders from DatabasecManager to fetch orders data
-        orders = self.db_manager.populate_raw_materials()
+        # Call populate_orders from DatabaseManager to fetch orders data
+        raw = self.db_manager.populate_orders_now()
 
         # Define headers for the table
-        headers = [ 'Material Name', 'Stocks', 'Cost']
+        headers = [ 'Material Name', 'Stocks', 'Cost', 'Edit']
+        # Set the number of rows and columns
+        self.ui.raw_inventory_table.setRowCount(len(raw))
+        self.ui.raw_inventory_table.setColumnCount(len(headers))
 
-        # Create a QStandardItemModel and set headers
-        model = QStandardItemModel(len(orders), len(headers))
-        model.setHorizontalHeaderLabels(headers)
+        # Set the headers for the table
+        self.ui.raw_inventory_table.setHorizontalHeaderLabels(headers)
 
-        # Populate the model with fetched data
-        for row_index, row_data in enumerate(orders):
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(raw):
             for column_index, data in enumerate(row_data):
-                item = QStandardItem(str(data))
-                model.setItem(row_index, column_index, item)
+                item = QTableWidgetItem(str(data))
+                self.ui.raw_inventory_table.setItem(row_index, column_index, item)
+                # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
 
-        # Set the model to the prod_table in UI
-        self.ui.raw_inventory_table.setModel(model)
-        self.ui.raw_inventory_table.setEditTriggers(QTableView.NoEditTriggers)
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_raw(row))
+            self.ui.raw_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+        # Set the edit triggers (disable editing)
+        self.ui.raw_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
         # Resize columns to fit content
-        self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def handle_edit_prod_raw(self, row):
+        # Implement your edit logic here
+        print(f"Editing order at row {row}")
+        self.ui.stackedWidget.setCurrentIndex(4)
 
 
     def ratcliff_obershelp_similarity(self, str1, str2):
@@ -386,7 +430,7 @@ class MainWindow(QMainWindow):
         c.setFont('Helvetica', 12)
         c.drawCentredString(width / 2, height - 70, "58 Gen. Ordoñez St, Marikina, 1800 Metro Manila")
         c.drawCentredString(width / 2, height - 90, "0908 450 6694")
-        
+
         # Date Created
         c.setFont('Helvetica', 12)
         c.drawRightString(width - 30, height - 30, "Generated on: " + pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -450,7 +494,7 @@ class MainWindow(QMainWindow):
 
         # Decrypt string columns
         df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
-        
+
         reports = [
                 (df, "Product Report")
             ]
@@ -477,7 +521,7 @@ class MainWindow(QMainWindow):
 
         # Decrypt string columns
         df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
-        
+
         reports = [
                 (df, "Stock Report")
             ]
@@ -507,7 +551,7 @@ class MainWindow(QMainWindow):
 
         # Decrypt string columns
         df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
-        
+
         reports = [
                 (df, "Inventory Report")
             ]
