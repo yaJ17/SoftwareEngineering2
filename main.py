@@ -453,7 +453,7 @@ class MainWindow(QMainWindow):
 
     def populate_raw_invent(self):
         # Call populate_orders from DatabaseManager to fetch orders data
-        raw = self.db_manager.populate_orders_now()
+        raw = self.db_manager.populate_raw_materials()
 
         # Define headers for the table
         headers = [ 'Material Name', 'Stocks', 'Cost', 'Edit']
@@ -486,6 +486,43 @@ class MainWindow(QMainWindow):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
         self.ui.stackedWidget.setCurrentIndex(4)
+
+
+    def populate_product_invent(self):
+        # Call populate_orders from DatabaseManager to fetch orders data
+        prod = self.db_manager.populate_product()
+
+        # Define headers for the table
+        headers = [ 'Bag Type', 'Quantity', 'Price', 'Edit']
+        # Set the number of rows and columns
+        self.ui.product_inventory_table.setRowCount(len(prod))
+        self.ui.product_inventory_table.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.product_inventory_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(prod):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.product_inventory_table.setItem(row_index, column_index, item)
+                # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
+
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_inv(row))
+            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+        # Set the edit triggers (disable editing)
+        self.ui.product_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def handle_edit_prod_inv(self, row):
+        # Implement your edit logic here
+        print(f"Editing order at row {row}")
+        self.ui.stackedWidget.setCurrentIndex(5)
 
 
     def ratcliff_obershelp_similarity(self, str1, str2):

@@ -1366,6 +1366,7 @@ class DatabaseManager:
             print(f"Error: {e}")
             return False
 
+
     def add_account(self, username, password, question, answer):
         if self.connection is None:
             print("No connection to the database.")
