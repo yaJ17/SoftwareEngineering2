@@ -190,111 +190,111 @@ class DatabaseManager:
 
             # Insert dummy data for SUPPLIER
             suppliers = [
-                ("Bitoy Supplier", "Pasay City", "09512949230"),
-                ("Sweedny Silk Manufacturer", "Marikina", "09232592341"),
-                ("Kindey Manufacturer", "Paranaque City", "09123784821"),
-                ("BigBoy Buttons", "Makati", "09281283121"),
-                ("Angel's Zipper", "Pasig", "09234678231")
+                (self.cipher.encrypt("Bitoy Supplier"), self.cipher.encrypt("Pasay City"), self.cipher.encrypt("09512949230")),
+                (self.cipher.encrypt("Sweedny Silk Manufacturer"), self.cipher.encrypt("Marikina"), self.cipher.encrypt("09232592341")),
+                (self.cipher.encrypt("Kindey Manufacturer"), self.cipher.encrypt("Paranaque City"), self.cipher.encrypt("09123784821")),
+                (self.cipher.encrypt("BigBoy Buttons"), self.cipher.encrypt("Makati"), self.cipher.encrypt("09281283121")),
+                (self.cipher.encrypt("Angel's Zipper"), self.cipher.encrypt("Pasig"), self.cipher.encrypt("09234678231"))
             ]
             cursor.executemany("INSERT INTO SUPPLIER (supplier_name, supplier_loc, supplier_contact) VALUES (%s, %s, %s)", suppliers)
 
             # Insert dummy data for RAW_MATERIAL
             raw_materials = [
-                ("Denim", 100, "Type A", "Black", 50, 200, 20, 1),
-                ("Denim", 200, "Type B", "White", 60, 300, 30, 2),
-                ("Mesh", 150, "Type B", "Black", 70, 250, 25, 3),
-                ("Mesh", 180, "Type B", "White", 80, 280, 28, 4),
-                ("Silk", 220, "Type A", "Black", 90, 320, 32, 5)
+                (self.cipher.encrypt("Denim"), 100, self.cipher.encrypt("Type A"), self.cipher.encrypt("Black"), 50, 200, 20, 1),
+                (self.cipher.encrypt("Denim"), 200, self.cipher.encrypt("Type B"), self.cipher.encrypt("White"), 60, 300, 30, 2),
+                (self.cipher.encrypt("Mesh"), 150, self.cipher.encrypt("Type B"), self.cipher.encrypt("Black"), 70, 250, 25, 3),
+                (self.cipher.encrypt("Mesh"), 180, self.cipher.encrypt("Type B"), self.cipher.encrypt("White"), 80, 280, 28, 4),
+                (self.cipher.encrypt("Silk"), 220, self.cipher.encrypt("Type A"), self.cipher.encrypt("Black"), 90, 320, 32, 5)
             ]
             cursor.executemany("INSERT INTO RAW_MATERIAL (material_name, material_available, material_type, material_color, material_cost, material_stock, material_safety_stock, supplier_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", raw_materials)
 
             # Insert dummy data for DEADLINE
             deadlines = [
-                ("Meeting with Bitoy", "Details A", "2024-12-31"),
-                ("Bag A for Angel", "Details B", "2024-11-30"),
-                ("Bag B for Sweedny", "Details C", "2024-10-31"),
-                ("Shipment for Bigboy", "Details D", "2024-09-30"),
-                ("Kindey Shipment", "Details E", "2024-08-31")
+                (self.cipher.encrypt("Meeting with Bitoy"), self.cipher.encrypt("Details A"), "2024-12-31"),
+                (self.cipher.encrypt("Bag A for Angel"), self.cipher.encrypt("Details B"), "2024-11-30"),
+                (self.cipher.encrypt("Bag B for Sweedny"), self.cipher.encrypt("Details C"), "2024-10-31"),
+                (self.cipher.encrypt("Shipment for Bigboy"), self.cipher.encrypt("Details D"), "2024-09-30"),
+                (self.cipher.encrypt("Kindey Shipment"), self.cipher.encrypt("Details E"), "2024-08-31")
             ]
             cursor.executemany("INSERT INTO DEADLINE (deadline_name, deadline_details, deadline_date) VALUES (%s, %s, %s)", deadlines)
 
             # Insert dummy data for CLIENT
             clients = [
-                ("Straightforward", "Marikina", "09313992912", 1, 1),
-                ("Nikey", "Marikina", "09237817271", 2, 2),
-                ("Adibas", "Pasig", "09381233458", 3, 3),
-                ("Celline", "Pasay", "09812877167", 4, 4),
-                ("Hermand", "Quezon", "09271827161", 5, 5)
+                (self.cipher.encrypt("Straightforward"), self.cipher.encrypt("Marikina"), self.cipher.encrypt("09313992912"), 1, 1),
+                (self.cipher.encrypt("Nikey"), self.cipher.encrypt("Marikina"), self.cipher.encrypt("09237817271"), 2, 2),
+                (self.cipher.encrypt("Adibas"), self.cipher.encrypt("Pasig"), self.cipher.encrypt("09381233458"), 3, 3),
+                (self.cipher.encrypt("Celline"), self.cipher.encrypt("Pasay"), self.cipher.encrypt("09812877167"), 4, 4),
+                (self.cipher.encrypt("Hermand"), self.cipher.encrypt("Quezon"), self.cipher.encrypt("09271827161"), 5, 5)
             ]
             cursor.executemany("INSERT INTO CLIENT (client_name, client_loc, client_contact, deadline_id, client_priority) VALUES (%s, %s, %s, %s, %s)", clients)
 
             # Insert dummy data for ORDERS
             orders = [
-                (1, 100, 0, "Bag Type A"),
-                (2, 200, 10, "Bag Type B"),
-                (3, 150, 20, "Bag Type C"),
-                (4, 180, 30, "Bag Type D"),
-                (5, 220, 40, "Bag Type E")
+                (1, 100, 0, self.cipher.encrypt("Bag Type A")),
+                (2, 200, 10, self.cipher.encrypt("Bag Type B")),
+                (3, 150, 20, self.cipher.encrypt("Bag Type C")),
+                (4, 180, 30, self.cipher.encrypt("Bag Type D")),
+                (5, 220, 40, self.cipher.encrypt("Bag Type E"))
             ]
             cursor.executemany("INSERT INTO ORDERS (client_id, order_quantity, order_progress, bag_type) VALUES (%s, %s, %s, %s)", orders)
 
             # Insert dummy data for BAG_COMPONENT
             bag_components = [
-                ("Component A", "Labor A", "In Progress", "Bag Type A", 1),
-                ("Component B", "Labor B", "Completed", "Bag Type B", 2),
-                ("Component C", "Labor C", "Not Started", "Bag Type C", 3),
-                ("Component D", "Labor D", "In Progress", "Bag Type D", 4),
-                ("Component E", "Labor E", "Completed", "Bag Type E", 5)
+                (self.cipher.encrypt("Component A"), self.cipher.encrypt("Labor A"), self.cipher.encrypt("In Progress"), self.cipher.encrypt("Bag Type A"), 1),
+                (self.cipher.encrypt("Component B"), self.cipher.encrypt("Labor B"), self.cipher.encrypt("Completed"), self.cipher.encrypt("Bag Type B"), 2),
+                (self.cipher.encrypt("Component C"), self.cipher.encrypt("Labor C"), self.cipher.encrypt("Not Started"), self.cipher.encrypt("Bag Type C"), 3),
+                (self.cipher.encrypt("Component D"), self.cipher.encrypt("Labor D"), self.cipher.encrypt("In Progress"), self.cipher.encrypt("Bag Type D"), 4),
+                (self.cipher.encrypt("Component E"), self.cipher.encrypt("Labor E"), self.cipher.encrypt("Completed"), self.cipher.encrypt("Bag Type E"), 5)
             ]
             cursor.executemany("INSERT INTO BAG_COMPONENT (bag_component, labor_allocation, progress, bag_type, client_id) VALUES (%s, %s, %s, %s, %s)", bag_components)
 
             # Insert dummy data for PRODUCT
             products = [
-                (1, 100, "Bag Type A", 0, 500, 700),
-                (2, 200, "Bag Type B", 5, 600, 800),
-                (3, 150, "Bag Type C", 10, 550, 750),
-                (4, 180, "Bag Type D", 2, 580, 780),
-                (5, 220, "Bag Type E", 3, 620, 820)
+                (1, 100, self.cipher.encrypt("Bag Type A"), 0, 500, 700),
+                (2, 200, self.cipher.encrypt("Bag Type B"), 5, 600, 800),
+                (3, 150, self.cipher.encrypt("Bag Type C"), 10, 550, 750),
+                (4, 180, self.cipher.encrypt("Bag Type D"), 2, 580, 780),
+                (5, 220, self.cipher.encrypt("Bag Type E"), 3, 620, 820)
             ]
             cursor.executemany("INSERT INTO PRODUCT (order_id, product_quantity, bag_type, product_defectives, product_cost, product_price) VALUES (%s, %s, %s, %s, %s, %s)", products)
 
             # Insert dummy data for SUBCONTRACTOR
             subcontractors = [
-                (1, 50, "Bag Type A"),
-                (2, 60, "Bag Type B"),
-                (3, 70, "Bag Type C"),
-                (4, 80, "Bag Type D"),
-                (5, 90, "Bag Type E")
+                (1, 50, self.cipher.encrypt("Bag Type A")),
+                (2, 60, self.cipher.encrypt("Bag Type B")),
+                (3, 70, self.cipher.encrypt("Bag Type C")),
+                (4, 80, self.cipher.encrypt("Bag Type D")),
+                (5, 90, self.cipher.encrypt("Bag Type E"))
             ]
             cursor.executemany("INSERT INTO SUBCONTRACTOR (order_id, order_quantity, bag_type) VALUES (%s, %s, %s)", subcontractors)
 
             # Insert dummy data for ACCOUNTS
             accounts = [
-                ("user1", "username1", "password1", "Question 1", "Answer 1"),
-                ("user2", "username2", "password2", "Question 2", "Answer 2"),
-                ("user3", "username3", "password3", "Question 3", "Answer 3"),
-                ("user4", "username4", "password4", "Question 4", "Answer 4"),
-                ("user5", "username5", "password5", "Question 5", "Answer 5")
+                (self.cipher.encrypt("user1"), self.cipher.encrypt("username1"), self.cipher.encrypt("password1"), self.cipher.encrypt("Question 1"), self.cipher.encrypt("Answer 1")),
+                (self.cipher.encrypt("user2"), self.cipher.encrypt("username2"), self.cipher.encrypt("password2"), self.cipher.encrypt("Question 2"), self.cipher.encrypt("Answer 2")),
+                (self.cipher.encrypt("user3"), self.cipher.encrypt("username3"), self.cipher.encrypt("password3"), self.cipher.encrypt("Question 3"), self.cipher.encrypt("Answer 3")),
+                (self.cipher.encrypt("user4"), self.cipher.encrypt("username4"), self.cipher.encrypt("password4"), self.cipher.encrypt("Question 4"), self.cipher.encrypt("Answer 4")),
+                (self.cipher.encrypt("user5"), self.cipher.encrypt("username5"), self.cipher.encrypt("password5"), self.cipher.encrypt("Question 5"), self.cipher.encrypt("Answer 5"))
             ]
             cursor.executemany("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s, %s, %s, %s, %s)", accounts)
 
             # Insert dummy data for USER_LOGS
             user_logs = [
-                (1, "Login"),
-                (2, "Logout"),
-                (3, "Login"),
-                (4, "Logout"),
-                (5, "Login")
+                (1, self.cipher.encrypt("Login")),
+                (2, self.cipher.encrypt("Logout")),
+                (3, self.cipher.encrypt("Login")),
+                (4, self.cipher.encrypt("Logout")),
+                (5, self.cipher.encrypt("Login"))
             ]
             cursor.executemany("INSERT INTO USER_LOGS (account_id, action) VALUES (%s, %s)", user_logs)
 
             # Insert dummy data for TRANSACTION_HISTORY
             transaction_history = [
-                (1, "Transaction A"),
-                (2, "Transaction B"),
-                (3, "Transaction C"),
-                (4, "Transaction D"),
-                (5, "Transaction E")
+                (1, self.cipher.encrypt("Transaction A")),
+                (2, self.cipher.encrypt("Transaction B")),
+                (3, self.cipher.encrypt("Transaction C")),
+                (4, self.cipher.encrypt("Transaction D")),
+                (5, self.cipher.encrypt("Transaction E"))
             ]
             cursor.executemany("INSERT INTO TRANSACTION_HISTORY (account_id, action) VALUES (%s, %s)", transaction_history)
 
@@ -302,6 +302,7 @@ class DatabaseManager:
             print("Dummy data inserted successfully.")
         except Error as e:
             print(f"Error: {e}")
+
 
 
     
@@ -460,7 +461,7 @@ class DatabaseManager:
     '''
         ADDITION OF CLIENT
     '''
-    def add_client(self, name, loc, contact, deadline_id):
+    def add_client(self, name, loc, contact, deadline_id, client_priority):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -472,12 +473,13 @@ class DatabaseManager:
                 client_name,
                 client_loc,
                 client_contact,
-                deadline_id
+                deadline_id,
+                client_priority
                 )
             VALUES 
-            (%s,%s,%s,%s);
+            (%s,%s,%s,%s, %s);
             '''
-            ,(name, loc, contact, deadline_id))
+            ,(self.cipher.encrypt(name), self.cipher.encrypt(loc) , self.cipher.encrypt(contact), deadline_id, client_priority))
         except Error as e:
             print(f"Error: {e}")
     
@@ -503,6 +505,7 @@ class DatabaseManager:
     '''
     # POPULATING ORDER ID, BAG TYPE, AND COMPLETION FOR LABELS
     '''
+
     def populate_orders(self) -> tuple:
         if self.connection is None:
             print("No connection to the database.")
@@ -512,20 +515,40 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT 
-        
-            order_quantity,
-            bag_type,
-            order_progress
+                c.client_name, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                c.client_priority
             FROM 
-                ORDERS O
+                CLIENT c
+            JOIN 
+                ORDERS o ON c.client_id = o.client_id
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+            ORDER BY 
+                c.client_priority ASC, 
+                d.deadline_date ASC;
+
             '''
             )
             rows = cursor.fetchall()
+            
+            decrypted_rows = []
             for row in rows:
-                print(row)
-            return rows
+                decrypted_row = []
+                for value in row:
+                    if isinstance(value, str):  # Decrypt only if the value is a string
+                        decrypted_value = self.cipher.decrypt(value)
+                    else:
+                        decrypted_value = value
+                    decrypted_row.append(decrypted_value)
+                decrypted_rows.append(tuple(decrypted_row))
+                
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
+
     ''' 
             UPDATE CLIENT ORDER
                                                     '''   
@@ -550,80 +573,65 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def add_order(self, client_id, order_quantity, order_progress, bag_type):
+    def add_order(self, client_name, order_quantity, bag_type, deadline_date, client_priority):
         if self.connection is None:
             print("No connection to the database.")
             return
+
         try:
             cursor = self.connection.cursor()
+
+            deadline_name = client_name + " deadline"
+            self.add_deadline(self.cipher.encrypt(deadline_name), " ", deadline_date)
+
+            # Fetch the deadline_id
+            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s", 
+                        (self.cipher.decrypt(deadline_name), deadline_date))
+            deadline_result = cursor.fetchone()
+            if deadline_result is None:
+                print("Deadline not found.")
+                return
+
+            deadline_id = deadline_result[0]  # Extract the first element from the tuple
+            print(f"Deadline ID: {deadline_id}")
+
+            # Insert into CLIENT table
+            self.add_client(self.cipher.encrypt(client_name),self.cipher.encrypt(""),self.cipher.encrypt(""), deadline_id,client_priority )
+
+            # Fetch the client_id
+            cursor.execute("SELECT client_id FROM CLIENT WHERE client_name = %s AND deadline_id = %s", 
+                        (self.cipher.decrypt(client_name), deadline_id))
+            client_result = cursor.fetchone()
+            if client_result is None:
+                print("Client not found.")
+                return
+
+            client_id = client_result[0]  # Extract the first element from the tuple
+            print(f"Client ID: {client_id}")
+
+            # Insert into ORDERS table
             cursor.execute('''
                 INSERT INTO ORDERS(
-                client_id,
-                order_quantity, 
-                order_progress, 
-                bag_type
+                    client_id,
+                    order_quantity, 
+                    order_progress, 
+                    bag_type
                 )
-                VALUES (%s,%s,%s,%s)
-            ''', (client_id, order_quantity, order_progress, bag_type))
-        except Error as e:
-            print(f"Error: {e}")
+                VALUES (%s, %s, %s, %s)
+            ''', (client_id, order_quantity, 0, self.cipher.encrypt(bag_type)))
 
-    '''
-        POPULATE THE BAG COMPONENTS ACCORDING TO BAG TYPE
-        O.bag_type is for testing purposes only -> can be excluded
-    '''
-    def populate_bag_components(self):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(
-            '''
-            SELECT 
-                B.bag_component,
-                B.labor_allocation,
-                B.progress,
-                O.bag_type
-            FROM 
-                BAG_COMPONENT B
-            JOIN 
-                ORDERS O ON O.client_id = B.client_id
-            WHERE
-                O.bag_type = B.bag_type;
-            '''
-            )
-            rows = cursor.fetchall()
-            for row in rows:
-                print(row)
-        except Error as e:
-            print(f"Error: {e}")
-
-
-    ''' 
-            UPDATE BAG COMPONENT ORDER
-                                                    '''   
-    def set_bag_component(self,bag_component_id, bag_component, labor_allocation, progress, bag_type):
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute('''
-                SELECT bag_component_id FROM bag_component WHERE bag_component_id = %s
-            ''', (bag_component_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == bag_component_id:
-                    cursor.execute("UPDATE bag_component SET bag_component =%s, labor_allocation =%s,progress =%s, bag_type =%s WHERE bag_component_id = %s",
-                                    (bag_component,labor_allocation,progress,bag_type, bag_component_id ))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
+            # Commit the transaction
+            self.connection.commit()
 
         except Error as e:
             print(f"Error: {e}")
-    
+            self.connection.rollback()  # Rollback the transaction in case of error
+
+        finally:
+            cursor.close()  # Ensure the cursor is closed
+
+
+
     '''
     MONTH AND YEAR DEFAULT BY 2024 and January for testing purposes
     '''
@@ -677,13 +685,20 @@ class DatabaseManager:
                 print(row)
         except Error as e:
             print(f"Error: {e}")
+
     def populate_deadline(self) -> tuple:
         cursor = self.connection.cursor()
         cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date >=CURDATE() ORDER BY deadline_date ASC")
         rows = cursor.fetchall()
+
+        decrypted_rows = []
         for row in rows:
-            print(row)
-        return rows
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+            print(decrypted_row)
+
+        return decrypted_rows
+
     def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_active):
         if self.connection is None:
             print("No connection to the database.")
@@ -733,6 +748,7 @@ class DatabaseManager:
                 cursor.execute(sql_script, (reversed_deadline_active, deadline_id))
         except Error as e:
             print(f"Error: {e}")
+
     def populate_raw_materials(self):
         if self.connection is None:
             print("No connection to the database.")
@@ -744,9 +760,7 @@ class DatabaseManager:
             SELECT
                 R.material_name,
                 R.material_stock,
-              
                 R.material_cost
-      
             FROM 
                 RAW_MATERIAL R
             JOIN 
@@ -754,11 +768,16 @@ class DatabaseManager:
             '''
             )
             rows = cursor.fetchall()
+
+            decrypted_rows = []
             for row in rows:
-                return rows
-                print(row)
+                decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+                decrypted_rows.append(decrypted_row)
+            
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
+
 
     def set_raw_material(self, material_id, name,stock, safety_stock, cost, supplier_name, supplier_contact):
         if self.connection is None:
@@ -796,31 +815,67 @@ class DatabaseManager:
 
         except Error as e:
             print(f"Error: {e}")
-    def add_raw_material(self, name,stock,available,materialtype, safety_stock, cost, supplier_id, color):
+
+    def add_raw_material(self, name, materialtype, stock, cost, safety_stock, supplier_name, color="", available=0):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute(
-            '''
-            INSERT INTO raw_material(
-                material_name,
-                material_available,
-                material_type,
-                material_color,
-                material_cost,
-                material_stock,
-                material_safety_stock,
-                supplier_id
+
+            # Check if the supplier already exists to avoid duplicate entries
+            cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+            result = cursor.fetchone()
+            if result is None:
+                # Insert the supplier
+                cursor.execute(
+                    """
+                    INSERT INTO supplier(
+                        supplier_name, 
+                        supplier_loc,
+                        supplier_contact
+                    )
+                    VALUES(%s, %s, %s)
+                    """, (supplier_name, "", "")
                 )
-            VALUES 
-            (%s,%s,%s,%s,%s,%s,%s,%s);
-            '''
-            ,(name,available,materialtype, color, cost, stock, safety_stock,supplier_id))
+                # Fetch the supplier_id after insertion
+                cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+                result = cursor.fetchone()
+            
+                if result is None:
+                    print("Supplier not found after insertion.")
+                    return
+            supplier_id = result[0]
+            # Insert the raw material
+            cursor.execute(
+                '''
+                INSERT INTO raw_material(
+                    material_name,
+                    material_available,
+                    material_type,
+                    material_color,
+                    material_cost,
+                    material_stock,
+                    material_safety_stock,
+                    supplier_id
+                )
+                VALUES 
+                (%s, %s, %s, %s, %s, %s, %s, %s)
+                ''',
+                (name, 0, materialtype, "", cost, stock, safety_stock, supplier_id)
+            )
+
+            # Commit the transaction
+            self.connection.commit()
+
         except Error as e:
             print(f"Error: {e}")
-    
+            self.connection.rollback()  # Rollback the transaction in case of error
+
+        finally:
+            cursor.close()  # Ensure the cursor is closed
+
+
     def void_raw_material(self, material_id):
         if self.connection is None:
             print("No connection to the database.")
@@ -849,22 +904,24 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT
-                    bag_type,
-                    product_quantity,
-                  
-                    product_price
-        
-                FROM 
-                    PRODUCT;
+                P.bag_type,
+                P.product_quantity,
+                P.product_price
+            FROM 
+                PRODUCT P;
             '''
             )
             rows = cursor.fetchall()
+
+            decrypted_rows = []
             for row in rows:
-                return rows
-                print(row)
+                decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+                decrypted_rows.append(decrypted_row)
+            
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
-    
+
     '''
                     UPDATE PRODUCT INVENTORY
                                                                 '''
@@ -1098,11 +1155,7 @@ class DatabaseManager:
         return create_table_query
 
 
-    def close_connection(self):
-        if self.connection and self.connection.is_connected():
-            self.connection.commit()
-            self.connection.close()
-            print("Database connection closed")
+ 
 
 
 
@@ -1125,7 +1178,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def populate_transaction(self):
+    def populate_transaction(self) -> tuple:
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -1137,7 +1190,148 @@ class DatabaseManager:
             '''
             )
             rows = cursor.fetchall()
-            for row in rows:
-                print(row)
+            return rows
         except Error as e:
             print(f"Error: {e}")
+
+    def generate_production_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                P.product_id, 
+                P.order_id, 
+                C.client_name,
+                P.product_quantity, 
+                P.product_defectives, 
+                P.product_cost, 
+                P.product_price, 
+                P.created_at
+            FROM 
+                PRODUCT P
+            JOIN 
+                ORDERS O ON P.order_id = O.order_id
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                P.product_active = 1
+            ORDER BY 
+                P.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+
+    def generate_stock_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                material_id, 
+                material_name, 
+                material_available, 
+                material_type, 
+                material_color, 
+                material_cost, 
+                material_stock, 
+                material_safety_stock, 
+                created_at
+            FROM 
+                RAW_MATERIAL
+            WHERE 
+                raw_material_active = 1
+            ORDER BY 
+                created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+
+    def generate_inventory_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                RM.material_id, 
+                RM.material_name, 
+                RM.material_available, 
+                RM.material_type, 
+                RM.material_color, 
+                RM.material_cost, 
+                RM.material_stock, 
+                RM.material_safety_stock, 
+                S.supplier_name, 
+                S.supplier_loc, 
+                RM.created_at
+            FROM 
+                RAW_MATERIAL RM
+            JOIN 
+                SUPPLIER S ON RM.supplier_id = S.supplier_id
+            WHERE 
+                RM.raw_material_active = 1
+            ORDER BY 
+                RM.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+    def generate_sales_report(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                O.order_id, 
+                C.client_name, 
+                O.order_quantity, 
+                O.order_progress, 
+                O.bag_type, 
+                O.created_at
+            FROM 
+                ORDERS O
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                O.orders_active = 1
+            ORDER BY 
+                O.created_at DESC;
+            '''
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                print(row)
+        except mysql.connector.Error as e:
+            print(f"Error: {e}")
+
+    def close_connection(self):
+        if self.connection and self.connection.is_connected():
+            self.connection.commit()
+            self.connection.close()
+            print("Database connection closed")

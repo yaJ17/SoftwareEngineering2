@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButto
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QDate
 
-
+import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
@@ -14,6 +14,14 @@ from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual file
 from databases.database import DatabaseManager
 import difflib
 from PySide6.QtWidgets import QPushButton
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import Table, TableStyle
 
 import xlwt
 
@@ -51,10 +59,18 @@ class MainWindow(QMainWindow):
         self.ui.cancel_add_invProduct.clicked.connect(self.show_inventory)
         self.ui.cancel_add_raw.clicked.connect(self.show_inventory)
 
+
+        self.ui.prod_report_btn.clicked.connect(self.generate_product_pdf_clicked)
+        self.ui.stocks_report_btn.clicked.connect(self.generate_stock_pdf_clicked)
+        self.ui.inventory_report_btn.clicked.connect(self.generate_inventory_pdf_clicked)
+        self.ui.sales_report_btn.clicked.connect(self.generate_sales_pdf_clicked)
+
+        self.ui.save_add_order.clicked.connect(self.save_add_production_action)
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
+        # self.db_manager.add_dummy_data()
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         # Populate the product table before showing the window
@@ -70,7 +86,7 @@ class MainWindow(QMainWindow):
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
-
+    
     def show_add_order(self):
         self.ui.stackedWidget.setCurrentIndex(10)
 
@@ -87,7 +103,7 @@ class MainWindow(QMainWindow):
     def show_daily_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(14)
 
-
+    
     def show_inventory(self):
         self.ui.stackedWidget.setCurrentIndex(1)
         self.populate_product_invent()
@@ -114,8 +130,7 @@ class MainWindow(QMainWindow):
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(7)
 
-
-
+   
     def show_about(self):
         self.ui.stackedWidget.setCurrentIndex(15)
 
@@ -167,7 +182,7 @@ class MainWindow(QMainWindow):
         orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = [ 'Quantity', 'Bag Type', 'Progress']
+        headers = [ 'Client Name', "Bag Type"," Order Quantity", "Deadline", "Priority"]
 
         # Create a QStandardItemModel and set headers
         model = QStandardItemModel(len(orders), len(headers))
@@ -186,8 +201,42 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
+    def save_add_production_action(self):
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
+        self.db_manager.add_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text())
+        self.ui.client_name_entry.setText("")
+        self.ui.bag_type_entry.setText("")
+        self.ui.order_quantity_spinBox.setValue(0)
+        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+        self.ui.order_priority_spinBox.setValue(0)
+        self.populate_orders()
+        self.ui.stackedWidget.setCurrentIndex(9)
 
+    # def save_add_finish_product_invent(self):
+    #     # Call save_add_production_action from DatabasecManager to fetch orders data
+    #     # data include bag type, quantity, no. of defectives, product cost, and product price
+    #     self.db_manager.add_product(self.ui.bag_type_entry.text(), self.ui.product_quantity_spinBox.text(), self.ui.product_defective_spinBox.text(), self.ui.product_cost_spinBox.text(), self.ui.product_price_spinBox.text())
+    #     self.ui.bag_type_entry.setText("")
+    #     self.ui.product_quantity_spinBox.setValue(0)
+    #     self.ui.product_defective_spinBox.setValue(0)
+    #     self.ui.product_cost_spinBox.setValue(0)
+    #     self.ui.product_price_spinBox.setValue(0)
+    #     self.populate_product_invent()
+    #     self.ui.stackedWidget.setCurrentIndex(1)
 
+    # def save_add_material_invent(self):
+    #     # Call save_add_production_action from DatabasecManager to fetch orders data
+    #     # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
+    #     self.db_manager.add_raw_material(self.ui.material_name_entry.text(), self.ui.material_type_entry.text(), self.ui.material_stock_spinBox.text(), self.ui.material_cost_spinBox.text(), self.ui.material_safety_stock_spinBox.text(), self.ui.supplier_name_entry.text())
+    #     self.ui.mate  rial_name_entry.setText("")
+    #     self.ui.material_type_entry.setText("")
+    #     self.ui.material_stock_spinBox.setValue(0)
+    #     self.ui.material_cost_spinBox.setValue(0)
+    #     self.ui.material_safety_stock_spinBox.setValue(0)
+    #     self.ui.supplier_name_entry.setText("")
+    #     self.populate_raw_invent()
+        
     def populate_product_invent(self):
         # Call populate_orders from DatabasecManager to fetch orders data
         orders = self.db_manager.populate_product()
@@ -307,6 +356,194 @@ class MainWindow(QMainWindow):
 
 
 
+    def fetch_data(self, query):
+        return pd.read_sql(query, self.db_manager.connection)
+
+    def generate_pdf(self, report_data_list, file_name):
+        file_name = file_name.replace(" ", "_").replace(":", "-")
+        full_file_name = f"{file_name}_{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
+        c = canvas.Canvas(full_file_name, pagesize=letter)
+        width, height = letter
+
+        # Header
+        c.setFont('Helvetica-Bold', 16)
+        c.drawCentredString(width / 2, height - 50, "Rexie Maris Bag Enterprise")
+        c.setFont('Helvetica', 12)
+        c.drawCentredString(width / 2, height - 70, "58 Gen. Ordoñez St, Marikina, 1800 Metro Manila")
+        c.drawCentredString(width / 2, height - 90, "0908 450 6694")
+        
+        # Date Created
+        c.setFont('Helvetica', 12)
+        c.drawRightString(width - 30, height - 30, "Generated on: " + pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+        y_position = height - 120
+        for report_data, report_title in report_data_list:
+            # Type of Report
+            c.setFont('Helvetica-Bold', 12)
+            c.drawString(30, y_position, "Type of Report: " + report_title)
+            y_position -= 20
+
+            # Data Table
+            data = report_data.values.tolist()
+            colnames = report_data.columns.tolist()
+
+            table_data = [colnames] + data
+
+            table = Table(table_data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+
+            table_width, table_height = table.wrapOn(c, width, height)
+            if table_width > width:
+                table_width = width
+            table.wrapOn(c, table_width, height)
+            table.drawOn(c, (width - table_width) / 2, y_position - table_height - 10)
+
+            y_position -= (table_height + 50)  # Space between tables
+
+        c.save()
+
+    def generate_product_pdf_clicked(self):
+        sql_script = """
+        SELECT  
+                C.client_name "Name", 
+                P.product_quantity "Quantity", 
+                P.product_defectives "Defectives", 
+                P.product_cost "Cost", 
+                P.product_price "Price", 
+                P.created_at "Date"
+            FROM 
+                PRODUCT P
+            JOIN 
+                ORDERS O ON P.order_id = O.order_id
+            JOIN 
+                CLIENT C ON O.client_id = C.client_id
+            WHERE 
+                P.product_active = 1
+            ORDER BY 
+                P.created_at DESC;
+        """
+        # Fetch data
+        df = self.fetch_data(sql_script)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
+        reports = [
+                (df, "Product Report")
+            ]
+        self.generate_pdf(reports, "production_report.pdf")
+
+    def generate_stock_pdf_clicked(self):
+        sql_script = """
+        SELECT 
+                material_name "Name", 
+                material_type "Type",  
+                material_cost "Cost", 
+                material_stock "Stock", 
+                material_safety_stock "Safety Stock", 
+                created_at "Date"
+            FROM 
+                RAW_MATERIAL
+            WHERE 
+                raw_material_active = 1
+            ORDER BY 
+                created_at DESC;
+        """
+        # Fetch data
+        df = self.fetch_data(sql_script)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
+        reports = [
+                (df, "Stock Report")
+            ]
+        self.generate_pdf(reports, "stock_report.pdf")
+
+    def generate_inventory_pdf_clicked(self):
+        sql = """
+            SELECT 
+                RM.material_name "Name", 
+                RM.material_type "Type" ,  
+                RM.material_cost "Cost", 
+                RM.material_stock "Stock", 
+                RM.material_safety_stock "Safety Stock", 
+                S.supplier_name "Supplier",  
+                RM.created_at "Date"
+            FROM 
+                RAW_MATERIAL RM
+            JOIN 
+                SUPPLIER S ON RM.supplier_id = S.supplier_id
+            WHERE 
+                RM.raw_material_active = 1
+            ORDER BY 
+                RM.created_at DESC;
+        """
+        # Fetch data
+        df = self.fetch_data(sql)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        
+        reports = [
+                (df, "Inventory Report")
+            ]
+        self.generate_pdf(reports, "inventory_report.pdf")
+
+    def generate_sales_pdf_clicked(self):
+        total_bag_sql = """
+            SELECT
+                p.bag_type,
+                SUM(p.product_quantity * p.product_price) AS total_earnings
+            FROM
+                PRODUCT p
+            GROUP BY
+                p.bag_type;
+        """
+        total_client_sql = '''
+            SELECT
+                c.client_name,
+                SUM(p.product_quantity * p.product_price) AS total_sales
+            FROM
+                CLIENT c
+            JOIN
+                ORDERS o ON c.client_id = o.client_id
+            JOIN
+                PRODUCT p ON o.order_id = p.order_id
+            GROUP BY
+                c.client_name;
+        '''
+        financial_summary = '''
+            SELECT
+                SUM(p.product_quantity * p.product_price) AS total_revenue,
+                SUM(rm.material_cost * p.product_quantity) AS total_cost,
+                SUM(p.product_quantity * p.product_price) - SUM(rm.material_cost * p.product_quantity) AS net_profit
+            FROM
+                PRODUCT p
+            JOIN
+                ORDERS o ON p.order_id = o.order_id
+            JOIN
+                RAW_MATERIAL rm ON o.material_id = rm.material_id;
+
+
+        '''
+
+        reports = [
+            (self.fetch_data(total_bag_sql), "Total Sales by Bag Type"),
+            (self.fetch_data(total_client_sql), "Total Sales by Client")
+            # (self.fetch_data(financial_summary), "Financial Summary")
+        ]
+        for i in range(len(reports)):
+            reports[i] = (reports[i][0].applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x), reports[i][1])
+        self.generate_pdf(reports,"sales_report.pdf")
 
 
 if __name__ == "__main__":
