@@ -1,10 +1,9 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget
-from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from ui_login import Ui_Login
 from databases.database import DatabaseManager  # Adjust the import path as necessary
 import sys
-import subprocess
-
+from main import MainWindow  # Import MainWindow from main.py
+from PySide6.QtCore import QTimer
 class LoginWindow(QMainWindow):
     def __init__(self):
         super(LoginWindow, self).__init__()
@@ -21,7 +20,6 @@ class LoginWindow(QMainWindow):
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
-
         # Initialize variables
         self.failed_attempts = 0
         self.timer = QTimer(self)
@@ -37,21 +35,10 @@ class LoginWindow(QMainWindow):
             # Reset failed attempts on successful login
             self.failed_attempts = 0
 
-            # Close the LoginWindow
-            self.close()
-
-            # Launch main.py using subprocess
-            print(f"Launching main.py using {sys.executable}")
-            try:
-                proc = subprocess.Popen([sys.executable, 'main.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                out, err = proc.communicate(timeout=10)  # Adjust timeout as needed
-                print(f"stdout: {out.decode()}")
-                print(f"stderr: {err.decode()}")
-            except subprocess.TimeoutExpired:
-                print("Process timeout expired")
-            except Exception as e:
-                print(f"Error launching main.py: {e}")
-
+            # Pass username to the main window
+            self.main_window = MainWindow(username=username)
+            self.main_window.show()
+            self.close()  # Close the login window
         else:
             QMessageBox.warning(self, "Login Failed", "Invalid username or password")
             self.failed_attempts += 1

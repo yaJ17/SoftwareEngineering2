@@ -22,7 +22,7 @@ from register import RegisterWindow  # Adjust the import path as necessary
 current_date = datetime.date.today()
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, username):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -92,6 +92,7 @@ class MainWindow(QMainWindow):
         self.show()
         self.ui.add_account.clicked.connect(self.show_register_window)
 
+        self.ui.username_label.setText(username)
     def show_register_window(self):
         self.register_window = RegisterWindow()
         self.register_window.show()
