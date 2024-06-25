@@ -577,6 +577,7 @@ class MainWindow(QMainWindow):
         model.setHorizontalHeaderLabels(headers)
         # Populate the model with fetched data
         for row_index, row_data in enumerate(schedules):
+
             for column_index, data in enumerate(row_data):
                 item = QStandardItem(str(data))
                 model.setItem(row_index, column_index, item)
