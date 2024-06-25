@@ -258,7 +258,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
-        priority_item = self.ui.product_table.item(row, 2)  # Assuming order quantity is in the third column
+        priority_item = self.ui.product_table.item(row, 4)  # Assuming order quantity is in the third column
         if priority_item:
             item_priority = int(priority_item.text())
             self.ui.edit_order_priority.setValue(item_priority)
