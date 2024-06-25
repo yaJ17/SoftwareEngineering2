@@ -1,6 +1,9 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButton, QLabel, QWidget, QVBoxLayout, QDateEdit, QCalendarWidget, QTextEdit, QSizePolicy, QHeaderView, QTableWidget, QTableWidgetItem, QHBoxLayout, QComboBox, QStackedWidget
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QDate
+from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
+from PySide6.QtCore import QDate
 
 import pandas as pd
 import sys
@@ -22,6 +25,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle
+
+
 
 import xlwt
 
@@ -75,6 +80,13 @@ class MainWindow(QMainWindow):
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         # Populate the product table before showing the window
         self.populate_deadline_table()
+
+
+
+        #calendar
+        self.ui.calendarWidget.clicked.connect(self.date_clicked)
+        self.schedules_table = QTableWidget(self)
+        self.clicked_date = None
 
         # Show the window after populating the table
         self.show()
@@ -204,7 +216,8 @@ class MainWindow(QMainWindow):
     def save_add_production_action(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
         deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
-        self.db_manager.add_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text())
+        self.db_manager.add_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
+        print(self.ui.add_order_notes.toPlainText())
         self.ui.client_name_entry.setText("")
         self.ui.bag_type_entry.setText("")
         self.ui.order_quantity_spinBox.setValue(0)
@@ -352,6 +365,8 @@ class MainWindow(QMainWindow):
             self.search_in_table(search_term, self.ui.raw_inventory_table)
         elif current_index == 9:
             self.search_in_table(search_term, self.ui.product_table)
+        elif current_index == 14:
+            self.search_in_table(search_term, self.ui.daily_table)
         # Add more conditions if there are more tables to search in
 
 
@@ -544,6 +559,82 @@ class MainWindow(QMainWindow):
         for i in range(len(reports)):
             reports[i] = (reports[i][0].applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x), reports[i][1])
         self.generate_pdf(reports,"sales_report.pdf")
+
+
+
+    #calendar
+    def date_clicked(self, date):
+        # Handle the date clicked event
+        clicked_date_str = date.toString(Qt.ISODate)  # Convert QDate to ISO date string (YYYY-MM-DD)
+        print(f"Date clicked: {clicked_date_str}")
+
+        # Fetch data from daily_table where date matches clicked date
+        schedules = self.db_manager.get_schedules_by_date(clicked_date_str)
+
+        # Display fetched schedules in your QTableView (self.ui.daily_table)
+        headers = ['deadline_name', "deadline_details", " deadline_date"]
+        model = QStandardItemModel(len(schedules), len(headers))
+        model.setHorizontalHeaderLabels(headers)
+        # Populate the model with fetched data
+        for row_index, row_data in enumerate(schedules):
+            for column_index, data in enumerate(row_data):
+                item = QStandardItem(str(data))
+                model.setItem(row_index, column_index, item)
+                # Set the model to the product_table in UI
+        self.ui.daily_table.setModel(model)
+        self.ui.daily_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Resize columns to fit content
+        self.ui.daily_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+        # Navigate to index 14 in stackedWidget
+        self.ui.stackedWidget.setCurrentIndex(14)
+
+
+'''
+    def display_schedules(self, schedules):
+        scheds = self.db_manager.populate_deadline_daily()
+        headers = ['deadline_name', "deadline_details", " deadline_date"]
+        model = QStandardItemModel(len(scheds), len(headers))
+        model.setHorizontalHeaderLabels(headers)
+        # Populate the model with fetched data
+        for row_index, row_data in enumerate(scheds):
+            for column_index, data in enumerate(row_data):
+                item = QStandardItem(str(data))
+                model.setItem(row_index, column_index, item)
+                # Set the model to the product_table in UI
+        self.ui.daily_table.setModel(model)
+        self.ui.daily_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Resize columns to fit content
+        self.ui.daily_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+'''
+
+
+
+'''
+orders = self.db_manager.populate_orders()
+
+        # Define headers for the table
+        headers = [ 'Client Name', "Bag Type"," Order Quantity", "Deadline", "Priority"]
+
+        # Create a QStandardItemModel and set headers
+        model = QStandardItemModel(len(orders), len(headers))
+        model.setHorizontalHeaderLabels(headers)
+
+        # Populate the model with fetched data
+        for row_index, row_data in enumerate(orders):
+            for column_index, data in enumerate(row_data):
+                item = QStandardItem(str(data))
+                model.setItem(row_index, column_index, item)
+
+
+        # Set the model to the product_table in UI
+        self.ui.product_table.setModel(model)
+        self.ui.product_table.setEditTriggers(QTableView.NoEditTriggers)
+        # Resize columns to fit content
+        self.ui.product_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        
+        '''
 
 
 if __name__ == "__main__":

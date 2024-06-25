@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'ui_mainYeBAwE.ui'
+##
+## Created by: Qt User Interface Compiler version 6.7.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -10,7 +19,7 @@ from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QDateEd
     QFrame, QHBoxLayout, QHeaderView, QLabel,
     QLineEdit, QMainWindow, QPlainTextEdit, QPushButton,
     QSizePolicy, QSpinBox, QStackedWidget, QStatusBar,
-    QTableView, QVBoxLayout, QWidget)
+    QTableView, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -186,7 +195,7 @@ class Ui_MainWindow(object):
         self.label.setGeometry(QRect(530, 40, 131, 16))
         self.logout_button = QPushButton(self.dashBoard)
         self.logout_button.setObjectName(u"logout_button")
-        self.logout_button.setGeometry(QRect(560, 330, 75, 24))
+        self.logout_button.setGeometry(QRect(543, 329, 111, 24))
         self.dashboard_label = QLabel(self.dashBoard)
         self.dashboard_label.setObjectName(u"dashboard_label")
         self.dashboard_label.setGeometry(QRect(430, 10, 91, 41))
@@ -196,6 +205,9 @@ class Ui_MainWindow(object):
         self.prod_table = QTableView(self.dashBoard)
         self.prod_table.setObjectName(u"prod_table")
         self.prod_table.setGeometry(QRect(10, 240, 501, 111))
+        self.logout_button_5 = QPushButton(self.dashBoard)
+        self.logout_button_5.setObjectName(u"logout_button_5")
+        self.logout_button_5.setGeometry(QRect(543, 300, 111, 24))
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
@@ -451,7 +463,7 @@ class Ui_MainWindow(object):
         self.help.setObjectName(u"help")
         self.label_30 = QLabel(self.help)
         self.label_30.setObjectName(u"label_30")
-        self.label_30.setGeometry(QRect(50, 110, 581, 211))
+        self.label_30.setGeometry(QRect(50, 99, 581, 211))
         font2 = QFont()
         font2.setFamilies([u"Poppins Light"])
         self.label_30.setFont(font2)
@@ -462,6 +474,9 @@ class Ui_MainWindow(object):
         font3.setFamilies([u"Poppins ExtraBold"])
         font3.setPointSize(33)
         self.label_31.setFont(font3)
+        self.pushButton = QPushButton(self.help)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setGeometry(QRect(50, 300, 75, 24))
         self.stackedWidget.addWidget(self.help)
         self.maintenance = QWidget()
         self.maintenance.setObjectName(u"maintenance")
@@ -471,7 +486,7 @@ class Ui_MainWindow(object):
         self.maintenance_label.setFont(font3)
         self.version_label = QLabel(self.maintenance)
         self.version_label.setObjectName(u"version_label")
-        self.version_label.setGeometry(QRect(90, 110, 381, 61))
+        self.version_label.setGeometry(QRect(90, 110, 121, 61))
         self.version_label.setFont(font2)
         self.update_button = QPushButton(self.maintenance)
         self.update_button.setObjectName(u"update_button")
@@ -483,6 +498,12 @@ class Ui_MainWindow(object):
         self.restore_button = QPushButton(self.maintenance)
         self.restore_button.setObjectName(u"restore_button")
         self.restore_button.setGeometry(QRect(90, 280, 75, 24))
+        self.textEdit = QTextEdit(self.maintenance)
+        self.textEdit.setObjectName(u"textEdit")
+        self.textEdit.setGeometry(QRect(230, 171, 171, 141))
+        self.label_128 = QLabel(self.maintenance)
+        self.label_128.setObjectName(u"label_128")
+        self.label_128.setGeometry(QRect(230, 142, 131, 21))
         self.stackedWidget.addWidget(self.maintenance)
         self.prod = QWidget()
         self.prod.setObjectName(u"prod")
@@ -525,11 +546,10 @@ class Ui_MainWindow(object):
         self.order_deadline_dateEdit = QDateEdit(self.prod_add)
         self.order_deadline_dateEdit.setObjectName(u"order_deadline_dateEdit")
         self.order_deadline_dateEdit.setGeometry(QRect(50, 230, 211, 22))
-        
         self.label_11 = QLabel(self.prod_add)
         self.label_11.setObjectName(u"label_11")
         self.label_11.setGeometry(QRect(340, 40, 81, 21))
-        self.add_order_notes = QPlainTextEdit(self.prod_add)
+        self.add_order_notes = QTextEdit(self.prod_add)
         self.add_order_notes.setObjectName(u"add_order_notes")
         self.add_order_notes.setGeometry(QRect(340, 60, 281, 251))
         self.label_12 = QLabel(self.prod_add)
@@ -635,27 +655,27 @@ class Ui_MainWindow(object):
         self.save_weekly.setEnabled(False)
         self.save_weekly.setGeometry(QRect(500, 330, 75, 24))
         self.stackedWidget.addWidget(self.sched_week)
-        self.dailydeadline = QWidget()
-        self.dailydeadline.setObjectName(u"dailydeadline")
-        self.label_74 = QLabel(self.dailydeadline)
+        self.scheddaily = QWidget()
+        self.scheddaily.setObjectName(u"scheddaily")
+        self.label_74 = QLabel(self.scheddaily)
         self.label_74.setObjectName(u"label_74")
         self.label_74.setGeometry(QRect(10, 20, 631, 31))
-        self.return_calendar_2 = QPushButton(self.dailydeadline)
+        self.return_calendar_2 = QPushButton(self.scheddaily)
         self.return_calendar_2.setObjectName(u"return_calendar_2")
         self.return_calendar_2.setGeometry(QRect(580, 320, 75, 24))
-        self.daily_table = QTableView(self.dailydeadline)
+        self.daily_table = QTableView(self.scheddaily)
         self.daily_table.setObjectName(u"daily_table")
-        self.daily_table.setEnabled(False)
+        self.daily_table.setEnabled(True)
         self.daily_table.setGeometry(QRect(0, 60, 661, 241))
         self.daily_table.horizontalHeader().setStretchLastSection(True)
-        self.save_daily = QPushButton(self.dailydeadline)
+        self.save_daily = QPushButton(self.scheddaily)
         self.save_daily.setObjectName(u"save_daily")
         self.save_daily.setEnabled(False)
         self.save_daily.setGeometry(QRect(500, 320, 75, 24))
-        self.edit_daily = QPushButton(self.dailydeadline)
+        self.edit_daily = QPushButton(self.scheddaily)
         self.edit_daily.setObjectName(u"edit_daily")
         self.edit_daily.setGeometry(QRect(420, 320, 75, 24))
-        self.stackedWidget.addWidget(self.dailydeadline)
+        self.stackedWidget.addWidget(self.scheddaily)
         self.about = QWidget()
         self.about.setObjectName(u"about")
         self.label_2 = QLabel(self.about)
@@ -783,7 +803,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(14)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -791,7 +811,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.logo_wannabe.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-style:italic;\">Rexie Marie Bags</span></p></body></html>", None))
+        self.logo_wannabe.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-style:italic;\">Rexie Maris Bags</span></p></body></html>", None))
         self.menu_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:8pt; font-weight:400;\">Menu Bar</span></p></body></html>", None))
         self.search_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Search</span></p></body></html>", None))
         self.search_bar.setText("")
@@ -815,6 +835,7 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
         self.logout_button.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
+        self.logout_button_5.setText(QCoreApplication.translate("MainWindow", u"Add an Account", None))
         self.welcome_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Finish Product Inventory</span></p></body></html>", None))
         self.welcome_label_4.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Raw Material Inventory</span></p></body></html>", None))
         self.add_product_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
@@ -882,6 +903,7 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-weight:700;\">\u2022 Help </span><span style=\" font-family:'Segoe UI';\">contains the general information about the system</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-weight:700;\">\u2022 Maintenance </span><span style=\" font-family:'Segoe UI';\">contains the current system version and will serve as the portal for future updates.</span></p></body></html>", None))
         self.label_31.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Help</p></body></html>", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Instructions", None))
         self.maintenance_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Maintenance</p></body></html>", None))
         self.version_label.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
@@ -895,6 +917,15 @@ class Ui_MainWindow(object):
         self.update_button.setText(QCoreApplication.translate("MainWindow", u"Update", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
         self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
+        self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Input details here</p></body></html>", None))
+        self.label_128.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-weight:700;\">Report a Bug</span></p></body></html>", None))
         self.welcome_label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Production</span></p></body></html>", None))
         self.add_order_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Client Name</span></p></body></html>", None))

@@ -573,7 +573,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def add_order(self, client_name, order_quantity, bag_type, deadline_date, client_priority):
+    def add_order(self, client_name, order_quantity, bag_type, deadline_date, client_priority, deadline_details):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -581,13 +581,18 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor()
 
+            # Encrypt deadline_name before adding to the database
             deadline_name = client_name + " deadline"
-            self.add_deadline(self.cipher.encrypt(deadline_name), " ", deadline_date)
-
+            encrypted_deadline_name = self.cipher.encrypt(deadline_name)
+            encrypted_deadline_details = self.cipher.encrypt(deadline_details)
+            self.add_deadline(encrypted_deadline_name, encrypted_deadline_details, deadline_date)
+            print(f"deadline details: {deadline_details}")
+            print(self.cipher.decrypt(encrypted_deadline_name))
             # Fetch the deadline_id
-            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s", 
-                        (self.cipher.decrypt(deadline_name), deadline_date))
+            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s",
+                           (encrypted_deadline_name, deadline_date))
             deadline_result = cursor.fetchone()
+
             if deadline_result is None:
                 print("Deadline not found.")
                 return
@@ -596,11 +601,13 @@ class DatabaseManager:
             print(f"Deadline ID: {deadline_id}")
 
             # Insert into CLIENT table
-            self.add_client(self.cipher.encrypt(client_name),self.cipher.encrypt(""),self.cipher.encrypt(""), deadline_id,client_priority )
+            encrypted_client_name = self.cipher.encrypt(client_name)
+            self.add_client(client_name, "", "", deadline_id, client_priority)
+            self.connection.commit()
 
-            # Fetch the client_id
-            cursor.execute("SELECT client_id FROM CLIENT WHERE client_name = %s AND deadline_id = %s", 
-                        (self.cipher.decrypt(client_name), deadline_id))
+            print(f"Fetching client_id for encrypted_client_name: {encrypted_client_name}, deadline_id: {deadline_id}")
+            cursor.execute("SELECT client_id FROM CLIENT WHERE client_name = %s AND deadline_id = %s",
+                           (encrypted_client_name, deadline_id))
             client_result = cursor.fetchone()
             if client_result is None:
                 print("Client not found.")
@@ -629,8 +636,6 @@ class DatabaseManager:
 
         finally:
             cursor.close()  # Ensure the cursor is closed
-
-
 
     '''
     MONTH AND YEAR DEFAULT BY 2024 and January for testing purposes
@@ -698,6 +703,8 @@ class DatabaseManager:
             print(decrypted_row)
 
         return decrypted_rows
+
+
 
     def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date,deadline_active):
         if self.connection is None:
@@ -1329,6 +1336,35 @@ class DatabaseManager:
                 print(row)
         except mysql.connector.Error as e:
             print(f"Error: {e}")
+
+    def get_schedules_by_date(self, date):
+        cursor = self.connection.cursor()
+        query = "SELECT deadline_name, deadline_details, deadline_date FROM deadline WHERE deadline_date = %s"
+        cursor.execute(query, (date,))
+        schedules = cursor.fetchall()
+
+        decrypted_rows = []
+        for row in schedules:
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+            print(decrypted_row)
+
+        return decrypted_rows
+
+
+    def populate_deadline_daily(self, date) -> tuple:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s ORDER BY deadline_date ASC")
+        rows = cursor.fetchall()
+
+        decrypted_rows = []
+        for row in rows:
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+            print(decrypted_row)
+
+        return decrypted_rows
 
     def close_connection(self):
         if self.connection and self.connection.is_connected():
