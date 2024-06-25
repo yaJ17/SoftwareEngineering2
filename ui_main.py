@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainStMmyX.ui'
+## Form generated from reading UI file 'ui_mainxbKKgT.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -17,10 +17,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QDateEdit,
     QFrame, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QPlainTextEdit, QPushButton,
-    QSizePolicy, QSpinBox, QStackedWidget, QStatusBar,
-    QTableView, QTableWidget, QTableWidgetItem, QTextEdit,
-    QVBoxLayout, QWidget)
+    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
+    QSpinBox, QStackedWidget, QStatusBar, QTableView,
+    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -581,7 +581,7 @@ class Ui_MainWindow(object):
         self.label_38 = QLabel(self.prod_edit)
         self.label_38.setObjectName(u"label_38")
         self.label_38.setGeometry(QRect(50, 260, 121, 21))
-        self.edit_order_notes = QPlainTextEdit(self.prod_edit)
+        self.edit_order_notes = QTextEdit(self.prod_edit)
         self.edit_order_notes.setObjectName(u"edit_order_notes")
         self.edit_order_notes.setGeometry(QRect(340, 60, 281, 251))
         self.label_39 = QLabel(self.prod_edit)
@@ -804,7 +804,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(11)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

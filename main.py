@@ -1,35 +1,25 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButton, QLabel, QWidget, QVBoxLayout, QDateEdit, QCalendarWidget, QTextEdit, QSizePolicy, QHeaderView, QTableWidget, QTableWidgetItem, QHBoxLayout, QComboBox, QStackedWidget
-from PySide6.QtGui import QFont
-from PySide6.QtCore import Qt, QDate
-from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import QDate
-from PySide6 import QtCore
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView
 import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush
-import os
 from PySide6.QtCore import Qt
 from PySide6.QtCore import QSize
 from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual filename of your UI code
 from databases.database import DatabaseManager
 import difflib
 from PySide6.QtWidgets import QPushButton
-
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle
+import datetime
+from PySide6.QtCore import QDate, QDateTime
 
-
-
-import xlwt
+current_date = datetime.date.today()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -37,6 +27,9 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setFixedSize(QSize(908, 463))  # Set the fixed size of the window
+
+        self.current_date = datetime.date.today()
+        self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
 
         # Connect button clicks to their respective functions
         self.ui.dash_button.clicked.connect(self.show_dashboard)
@@ -59,11 +52,16 @@ class MainWindow(QMainWindow):
 
         self.ui.add_order_button.clicked.connect(self.show_add_order)
         self.ui.cancel_add_order.clicked.connect(self.show_production)
+        self.ui.edit_cancel_button.clicked.connect(self.show_production)
+
 
         self.ui.add_product_button.clicked.connect(self.show_add_finished_product)
         self.ui.add_inventory_button.clicked.connect(self.show_add_raw_material)
         self.ui.cancel_add_invProduct.clicked.connect(self.show_inventory)
         self.ui.cancel_add_raw.clicked.connect(self.show_inventory)
+        self.ui.cancel_update_product.clicked.connect(self.show_inventory)
+        self.ui.cancel_edit_raw.clicked.connect(self.show_inventory)
+
 
 
         self.ui.prod_report_btn.clicked.connect(self.generate_product_pdf_clicked)
@@ -192,10 +190,10 @@ class MainWindow(QMainWindow):
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
-        orders = self.db_manager.populate_orders_now()
+        orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", "Edit"]
+        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
 
         # Set the number of rows and columns
         self.ui.product_table.setRowCount(len(orders))
@@ -223,11 +221,106 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-
     def handle_edit_order(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
+
+        # Get client name from product_table's first column at specified row
+        client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
+        if client_name_item:
+            client_name = client_name_item.text()
+            self.ui.edit_client_name.setText(client_name)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get bagtype name from product_table's first column at specified row
+        bagtype = self.ui.product_table.item(row, 1)  # Assuming client name is in the first column
+        if bagtype:
+            type_bag = bagtype.text()
+            self.ui.edit_bag_type.setText(type_bag)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        order_quantity_item = self.ui.product_table.item(row, 2)  # Assuming order quantity is in the third column
+        if order_quantity_item:
+            order_quantity = int(order_quantity_item.text())
+            self.ui.edit_order_quantity.setValue(order_quantity)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get deadline date from product_table's fourth column at specified row
+        deadline_item = self.ui.product_table.item(row, 3)  # Assuming deadline date is in the fourth column
+        if deadline_item:
+            deadline_str = deadline_item.text()
+            deadline_date = QDateTime.fromString(deadline_str,
+                                                 "yyyy-MM-dd")  # Assuming the deadline format is "yyyy-MM-dd"
+            self.ui.edit_order_deadline.setDate(deadline_date.date())
+        else:
+            print(f"Error: No data found in row {row}")
+
+        priority_item = self.ui.product_table.item(row, 2)  # Assuming order quantity is in the third column
+        if priority_item:
+            item_priority = int(priority_item.text())
+            self.ui.edit_order_priority.setValue(item_priority)
+        else:
+            print(f"Error: No data found in row {row}")
+
+
+        #NOTES
+        # Get client name and bag type from product_table
+        client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
+        bag_type_item = self.ui.product_table.item(row, 1)  # Assuming bag type is in the second column
+
+
+        client_name = client_name_item.text()
+        bag_type = bag_type_item.text()
+
+        try:
+            # Assuming db_manager is an instance of DatabaseManager
+            # Initialize or get db_manager instance
+
+
+            # Query the CLIENT table to get client_id
+            cursor = self.db_manager.connection.cursor()
+            query_client_id = "SELECT client_id FROM CLIENT WHERE client_name = %s"
+            client_id_row = cursor.execute(query_client_id, (client_name,))
+            client_id = client_id_row[0] if client_id_row else None
+
+            if not client_id:
+                print(f"Error: Client '{client_name}' not found in database")
+                return
+
+            # Query the ORDERS table to get deadline_id
+            query_deadline_id = "SELECT deadline_id FROM ORDERS WHERE client_id = %s AND bag_type = %s"
+            deadline_id_row =  cursor.execute(query_deadline_id, (client_id, bag_type))
+            deadline_id = deadline_id_row[0] if deadline_id_row else None
+
+            if not deadline_id:
+                print(f"Error: No order found for Client '{client_name}' with Bag Type '{bag_type}'")
+                return
+
+            # Query the DEADLINE table to get deadline_details
+            query_deadline_details = "SELECT deadline_details FROM DEADLINE WHERE deadline_id = %s"
+            deadline_details_row =  cursor.execute(query_deadline_details, (deadline_id,))
+            deadline_details = deadline_details_row[0] if deadline_details_row else None
+
+            if not deadline_details:
+                print(f"Error: Deadline details not found for Deadline ID '{deadline_id}'")
+                return
+
+
+
+
+
+
+
+        except Exception as e:
+            print(f"Error executing database query: {e}")
+
+
+        # Switch to the desired index in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(11)
+
 
     def save_add_production_action(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data

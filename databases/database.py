@@ -551,49 +551,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def populate_orders_now(self) -> tuple:
-        if self.connection is None:
-            print("No connection to the database.")
-            return
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(
-                '''
-                SELECT 
-                    c.client_name, 
-                    o.bag_type, 
-                    o.order_quantity, 
-                    d.deadline_date
-                
-                FROM 
-                    CLIENT c
-                JOIN 
-                    ORDERS o ON c.client_id = o.client_id
-                JOIN 
-                    DEADLINE d ON c.deadline_id = d.deadline_id
-                ORDER BY 
-                    c.client_priority ASC, 
-                    d.deadline_date ASC;
-    
-                '''
-            )
-            rows = cursor.fetchall()
 
-            decrypted_rows = []
-            for row in rows:
-                decrypted_row = []
-                for value in row:
-                    if isinstance(value, str):  # Decrypt only if the value is a string
-                        decrypted_value = self.cipher.decrypt(value)
-                    else:
-                        decrypted_value = value
-                    decrypted_row.append(decrypted_value)
-
-                decrypted_rows.append(tuple(decrypted_row))
-
-            return decrypted_rows
-        except Error as e:
-            print(f"Error: {e}")
     ''' 
             UPDATE CLIENT ORDER
                                                     '''   
@@ -1410,6 +1368,8 @@ class DatabaseManager:
             print(decrypted_row)
 
         return decrypted_rows
+
+
 
     def close_connection(self):
         if self.connection and self.connection.is_connected():
