@@ -18,7 +18,7 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 import datetime
 from PySide6.QtCore import QDate, QDateTime
-
+from register import RegisterWindow  # Adjust the import path as necessary
 current_date = datetime.date.today()
 
 class MainWindow(QMainWindow):
@@ -90,7 +90,11 @@ class MainWindow(QMainWindow):
 
         # Show the window after populating the table
         self.show()
+        self.ui.add_account.clicked.connect(self.show_register_window)
 
+    def show_register_window(self):
+        self.register_window = RegisterWindow()
+        self.register_window.show()
     def show_dashboard(self):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.populate_deadline_table()

@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'ui_mainxbKKgT.ui'
-##
-## Created by: Qt User Interface Compiler version 6.7.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -206,9 +197,9 @@ class Ui_MainWindow(object):
         self.prod_table = QTableView(self.dashBoard)
         self.prod_table.setObjectName(u"prod_table")
         self.prod_table.setGeometry(QRect(10, 240, 501, 111))
-        self.logout_button_5 = QPushButton(self.dashBoard)
-        self.logout_button_5.setObjectName(u"logout_button_5")
-        self.logout_button_5.setGeometry(QRect(543, 300, 111, 24))
+        self.add_account = QPushButton(self.dashBoard)
+        self.add_account.setObjectName(u"add_account")
+        self.add_account.setGeometry(QRect(543, 300, 111, 24))
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
@@ -804,7 +795,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(11)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -836,7 +827,7 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
         self.logout_button.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
-        self.logout_button_5.setText(QCoreApplication.translate("MainWindow", u"Add an Account", None))
+        self.add_account.setText(QCoreApplication.translate("MainWindow", u"Add an Account", None))
         self.welcome_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Finish Product Inventory</span></p></body></html>", None))
         self.welcome_label_4.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Raw Material Inventory</span></p></body></html>", None))
         self.add_product_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
