@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
 
         self.ui.save_add_order.clicked.connect(self.save_add_production_action)
         self.ui.save_add_raw.clicked.connect(self.save_add_material_invent)
+        self.ui.save_add_invProduct.clicked.connect(self.save_add_finish_product_invent)
 
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
@@ -85,9 +86,10 @@ class MainWindow(QMainWindow):
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         self.ui.edit_save_button.clicked.connect(self.save_edit_order)
         self.ui.update_edit_raw.clicked.connect(self.save_edit_material)
+        self.ui.update_products.clicked.connect(self.save_edit_product)
         self.ui.void_order.clicked.connect(self.void_production)
         self.ui.archive_raw.clicked.connect(self.void_material)
-
+        self.ui.Archive_finished_product.clicked.connect(self.void_product)
         # Populate the product table before showing the window
         self.populate_deadline_table()
 
@@ -411,17 +413,25 @@ class MainWindow(QMainWindow):
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
         
-    # def save_add_finish_product_invent(self):
-    #     # Call save_add_production_action from DatabasecManager to fetch orders data
-    #     # data include bag type, quantity, no. of defectives, product cost, and product price
-    #     self.db_manager.add_product(self.ui.bag_type_entry.text(), self.ui.product_quantity_spinBox.text(), self.ui.product_defective_spinBox.text(), self.ui.product_cost_spinBox.text(), self.ui.product_price_spinBox.text())
-    #     self.ui.bag_type_entry.setText("")
-    #     self.ui.product_quantity_spinBox.setValue(0)
-    #     self.ui.product_defective_spinBox.setValue(0)
-    #     self.ui.product_cost_spinBox.setValue(0)
-    #     self.ui.product_price_spinBox.setValue(0)
-    #     self.populate_product_invent()
-    #     self.ui.stackedWidget.setCurrentIndex(1)
+    def save_add_finish_product_invent(self):
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        # data include bag type, quantity, no. of defectives, product cost, and product price
+        bag_type = self.ui.inventory_bag_type.text()
+        quantity = self.ui.add_inventory_product.value()
+        defective = self.ui.add_inventory_defective.value()
+        cost = self.ui.inventory_product_cost.value()
+        price = self.ui.inventory_active_product.value()
+        print(bag_type, quantity, defective, cost, price)
+        self.db_manager.add_product(bag_type, quantity, defective, cost, price)
+
+       
+        self.ui.inventory_bag_type.setText("")
+        self.ui.add_inventory_product.setValue(0)
+        self.ui.add_inventory_defective.setValue(0)
+        self.ui.inventory_product_cost.setValue(0)
+        self.ui.inventory_active_product.setValue(0)
+        self.show_inventory()
+
 
     def save_add_material_invent(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
@@ -485,14 +495,6 @@ class MainWindow(QMainWindow):
 
 
 
-
-    def handle_edit_prod_invent(self, row):
-        # Implement your edit logic here
-        print(f"Editing order at row {row}")
-       
-        self.ui.stackedWidget.setCurrentIndex(3)
-
-    
     def save_edit_order(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
         print(self.data)
@@ -669,9 +671,54 @@ class MainWindow(QMainWindow):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
         print('pinindot mo ako')
-        
-        self.ui.stackedWidget.setCurrentIndex(5)
+        bag_type_item = self.ui.product_inventory_table.item(row, 0)  # Assuming client name is in the first column
+        quantity_item = self.ui.product_inventory_table.item(row, 1)
+        defective_item = self.ui.product_inventory_table.item(row, 2)
+        cost_item = self.ui.product_inventory_table.item(row, 3)
+        price_item = self.ui.product_inventory_table.item(row, 4)
 
+        if bag_type_item and quantity_item and defective_item and cost_item and price_item:
+            bag_type = bag_type_item.text()
+            quantity = int(quantity_item.text())
+            defective = int(defective_item.text())
+            cost = int(cost_item.text())
+            price = int(price_item.text())
+
+            self.ui.Edit_inventory_bag_type.setText(bag_type)
+            self.ui.Edit_inventory_product_2.setValue(quantity)
+            self.ui.edit_inventory_defective_2.setValue(defective)
+            self.ui.edit_product_cost_2.setValue(cost)
+            self.ui.edit_inventory_active_product_2.setValue(price)
+
+            print(bag_type)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        self.data = {
+            "bag_type": bag_type,
+            "quantity": quantity,
+            "defective": defective,
+                "cost": cost,
+                "price": price,
+        }
+
+       
+        self.ui.stackedWidget.setCurrentIndex(3)
+
+    def save_edit_product(self):
+        print(self.data)
+        bag_type = self.ui.Edit_inventory_bag_type.text()
+        quantity = self.ui.Edit_inventory_product_2.value()
+        defective= self.ui.edit_inventory_defective_2.value()
+        cost =self.ui.edit_product_cost_2.value()
+        price = self.ui.edit_inventory_active_product_2.value()
+        self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+        self.db_manager.connection.commit()
+        self.show_inventory()
+
+    def void_product(self):
+        self.db_manager.void_product(self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+        self.show_inventory()
 
     def ratcliff_obershelp_similarity(self, str1, str2):
        return difflib.SequenceMatcher(None, str1, str2).ratio()
