@@ -925,8 +925,8 @@ class DatabaseManager:
                 product_quantity,
                 product_defectives,
                 product_cost,
-                product_price
-
+                product_price,
+                (product_price - product_cost) as profit
             FROM 
                 PRODUCT
             WHERE

@@ -710,7 +710,7 @@ class MainWindow(QMainWindow):
         prod = self.db_manager.populate_product()
 
         # Define headers for the table
-        headers = [ 'Bag Type', 'Quantity', 'Defective', 'Cost', 'Price' ,'Edit']
+        headers = [ 'Bag Type', 'Quantity', 'Defective', 'Cost', 'Price' ,'Profit','Edit']
         # Set the number of rows and columns
         self.ui.product_inventory_table.setRowCount(len(prod))
         self.ui.product_inventory_table.setColumnCount(len(headers))
