@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox
 from PySide6.QtCore import Qt
 from ui_register import Ui_MainWindow  # Adjust the import path as necessary
 from databases.database import DatabaseManager  # Adjust the import path as necessary
@@ -17,12 +17,17 @@ class RegisterWindow(QMainWindow):
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
 
+
+
+
         # Connect buttons to their respective methods
         self.ui.submit_register.clicked.connect(self.handle_register)
         self.ui.cancel_register.clicked.connect(self.handle_cancel)
 
         # Show password requirements upon loading
         self.show_password_requirements()
+
+
 
     def show_password_requirements(self):
         QMessageBox.information(

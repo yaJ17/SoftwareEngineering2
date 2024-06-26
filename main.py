@@ -25,11 +25,12 @@ current_date = datetime.date.today()
 from mysql.connector import Error  # Import the Error class
 class MainWindow(QMainWindow):
     def __init__(self, username, username_id):
+
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setFixedSize(QSize(908, 463))  # Set the fixed size of the window
-
+        self.ui.stackedWidget.setCurrentIndex(0)
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
 
@@ -186,24 +187,50 @@ class MainWindow(QMainWindow):
 
         # Define headers for the table
         headers = ['Name', 'Details', 'Date']
+        # Set the number of rows and columns
+        self.ui.prod_table.setRowCount(len(deadline))
+        self.ui.prod_table.setColumnCount(len(headers))
 
-        # Create a QStandardItemModel and set headers
-        model = QStandardItemModel(len(deadline), len(headers))
-        model.setHorizontalHeaderLabels(headers)
+        # Set the headers for the table
+        self.ui.prod_table.setHorizontalHeaderLabels(headers)
 
-        # Assuming deadline is a list of tuples or lists where each tuple/list is a row of data
+        # Populate the table with fetched data
         for row_index, row_data in enumerate(deadline):
             for column_index, data in enumerate(row_data):
-                item = QStandardItem(str(data))
-                model.setItem(row_index, column_index, item)
+                item = QTableWidgetItem(str(data))
+                self.ui.prod_table.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.prod_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
-        # Set the model to the table view
-        self.ui.prod_table.setModel(model)
-
-
-        self.ui.prod_table.setEditTriggers(QTableView.NoEditTriggers)
         # Resize columns to fit content
-        self.ui.prod_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+
+    def populate_table_transac(self):
+        # Call the populate_deadline function from database module
+        transac = self.db_manager.populate_transaction()
+        print("hello")
+        for row in transac:
+            print(row)
+
+        # Define headers for the table
+        headers = ['Account ID', 'Action', 'TimeStamp']
+        self.ui.table_transac.setRowCount(len(transac))
+        self.ui.table_transac.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.table_transac.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(transac):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.table_transac.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.table_transac.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.table_transac.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -878,7 +905,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-
     # Set the initial view to the dashboard after showing the window
     window.show_dashboard()
     sys.exit(app.exec())

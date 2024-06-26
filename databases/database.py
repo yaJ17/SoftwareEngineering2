@@ -1173,7 +1173,18 @@ class DatabaseManager:
             '''
             )
             rows = cursor.fetchall()
-            return rows
+            decrypted_rows = []
+            for row in rows:
+                decrypted_row = []
+                for value in row:
+                    if isinstance(value, str):  # Decrypt only if the value is a string
+                        decrypted_value = self.cipher.decrypt(value)
+                    else:
+                        decrypted_value = value
+                    decrypted_row.append(decrypted_value)
+                decrypted_rows.append(tuple(decrypted_row))
+
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
 
@@ -1499,6 +1510,7 @@ class DatabaseManager:
         except Error as e:
             print(f"Error while checking username existence: {e}")
             return False
+
 
     def add_account(self, username, password, question, answer):
         if self.connection is None:

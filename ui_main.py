@@ -194,7 +194,7 @@ class Ui_MainWindow(object):
         self.dashboard_label.setFont(font)
         self.dashboard_label.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.dashboard_label.setTextFormat(Qt.TextFormat.AutoText)
-        self.prod_table = QTableView(self.dashBoard)
+        self.prod_table = QTableWidget(self.dashBoard)
         self.prod_table.setObjectName(u"prod_table")
         self.prod_table.setGeometry(QRect(10, 240, 501, 111))
         self.add_account = QPushButton(self.dashBoard)
@@ -428,11 +428,12 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.inventory_edit_raw)
         self.transac = QWidget()
         self.transac.setObjectName(u"transac")
-        self.table_transac = QTableView(self.transac)
+        self.table_transac = QTableWidget(self.transac)
         self.table_transac.setObjectName(u"table_transac")
         self.table_transac.setEnabled(False)
         self.table_transac.setGeometry(QRect(0, 70, 661, 281))
-        self.table_transac.horizontalHeader().setStretchLastSection(True)
+        self.table_transac.setToolTipDuration(8)
+        self.table_transac.horizontalHeader().setMinimumSectionSize(1)
         self.label_75 = QLabel(self.transac)
         self.label_75.setObjectName(u"label_75")
         self.label_75.setGeometry(QRect(10, 30, 631, 31))
@@ -784,7 +785,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(6)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
