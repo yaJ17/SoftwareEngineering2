@@ -155,6 +155,7 @@ class MainWindow(QMainWindow):
 
     def show_transaction(self):
         self.ui.stackedWidget.setCurrentIndex(6)
+        self.populate_table_transac()
 
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(7)
@@ -626,6 +627,8 @@ class MainWindow(QMainWindow):
         elif current_index == 1:
             self.search_in_table(search_term, self.ui.product_inventory_table)
             self.search_in_table(search_term, self.ui.raw_inventory_table)
+        elif current_index == 6:
+            self.search_in_table(search_term, self.ui.table_transac)
         elif current_index == 9:
             self.search_in_table(search_term, self.ui.product_table)
         elif current_index == 14:
