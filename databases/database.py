@@ -655,27 +655,32 @@ class DatabaseManager:
 
     #FOR EDITING THE DEADLINE NAME, DETAIL, DATE, STATUS
 
-    def populate_deadline_by_week(self, start_date, end_date):
+    def populate_deadline_by_week(self):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-            '''
-            SELECT 
-                deadline_name,
-                deadline_date
-            FROM
-                deadline
-            WHERE
-                deadline_date BETWEEN %s AND %s;
-            ''',
-            (start_date, end_date)
+                '''
+                SELECT
+                    deadline_name,
+                    deadline_details,
+                    deadline_date
+                FROM
+                    DEADLINE
+                WHERE
+                    YEARWEEK(deadline_date, 1) = YEARWEEK(CURDATE(), 1);
+ 
+                '''
             )
             rows = cursor.fetchall()
+            decrypted_rows = []
             for row in rows:
-                print(row)
+                decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+                decrypted_rows.append(decrypted_row)
+                print(decrypted_row)
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
 
@@ -1513,15 +1518,16 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor()
 
+            encrypted_username = self.cipher.encrypt(username)
             # Execute query to check if username exists
             query = "SELECT COUNT(*) FROM ACCOUNTS WHERE username = %s"
-            cursor.execute(query, (username,))
+            cursor.execute(query, (encrypted_username,))
 
             # Fetch the result
-            result = cursor.fetchone()
+            result = cursor.fetchone()[0]
 
             # Check if username count is greater than 0
-            if result and result[0] > 0:
+            if result > 0:
                 return True
             else:
                 return False
@@ -1530,6 +1536,31 @@ class DatabaseManager:
             print(f"Error while checking username existence: {e}")
             return False
 
+    def check_usernameid_exists(self, usernameid):
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+
+            encrypted_usernameid = self.cipher.encrypt(usernameid)
+            # Execute query to check if username_id exists
+            query = "SELECT COUNT(*) FROM ACCOUNTS WHERE username_id = %s"
+            cursor.execute(query, (encrypted_usernameid,))
+
+            # Fetch the result
+            result = cursor.fetchone()[0]
+
+            # Check if username_id count is greater than 0
+            if result > 0:
+                return True
+            else:
+                return False
+
+        except Error as e:
+            print(f"Error while checking username_id existence: {e}")
+            return False
 
     def add_account(self, username, password, question, answer):
         if self.connection is None:
@@ -1537,9 +1568,10 @@ class DatabaseManager:
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT RIGHT(MAX(username_id), LENGTH(MAX(username_id)) - 4) FROM ACCOUNTS")
-            last_id = cursor.fetchone()[0]
-
+            cursor.execute("SELECT username_id FROM ACCOUNTS ORDER BY created_at DESC LIMIT 1")
+            encrypted_last_id = cursor.fetchone()[0]
+            last_id = self.cipher.decrypt(encrypted_last_id)
+            print(last_id)
             if last_id and last_id.startswith('RXAC'):
                 numeric_part = last_id[4:]
                 if numeric_part.isdigit():
@@ -1550,25 +1582,24 @@ class DatabaseManager:
             else:
                 new_id = "RXAC1"
 
-            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username,))
+            username_register = self.cipher.encrypt(username)
+
+            cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username_register,))
             username_exist = cursor.fetchone()
             if username_exist is None:
                 # Validate password criteria
-                if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
-                    # Encrypt the data before insertion
-                    enc_id = self.cipher.encrypt(new_id)
-                    enc_username = self.cipher.encrypt(username)
-                    enc_password = self.cipher.encrypt(password)
-                    enc_question = self.cipher.encrypt(question)
-                    enc_answer = self.cipher.encrypt(answer)
+                 # Encrypt the data before insertion
+                enc_id = self.cipher.encrypt(new_id)
+                enc_password = self.cipher.encrypt(password)
+                enc_question = self.cipher.encrypt(question)
+                enc_answer = self.cipher.encrypt(answer)
 
-                    cursor.execute(
-                        "INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);",
-                        (enc_id, enc_username, enc_password, enc_question, enc_answer))
-                    self.connection.commit()  # Don't forget to commit the transaction
-                    print("Account added successfully.")
-                else:
-                    print("Password does not meet criteria.")
+                cursor.execute(
+                    "INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);",
+                    (enc_id, username_register, enc_password, enc_question, enc_answer))
+                self.connection.commit()  # Don't forget to commit the transaction
+                print("Account added successfully.")
+
             else:
                 print("Username already exists.")
         except Error as e:

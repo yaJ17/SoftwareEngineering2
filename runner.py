@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # db_manager.generate_sales_report()
     # print("===============================")
     # db_manager.generate_stock_report()
-    #db_manager.add_dummy_data()
+    db_manager.add_dummy_data()
    # db_manager.add_order('sssss',123,123,'A','2024-12-12', 1)
     #db_manager.add_raw_material('new material', 'asdleather', 123, 500, 250, 'PARKYU')
     # db_manager.populate_accounts()
