@@ -1,3 +1,4 @@
+################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -442,20 +443,20 @@ class Ui_MainWindow(object):
         self.help.setObjectName(u"help")
         self.label_30 = QLabel(self.help)
         self.label_30.setObjectName(u"label_30")
-        self.label_30.setGeometry(QRect(50, 99, 581, 211))
+        self.label_30.setGeometry(QRect(50, 90, 581, 211))
         font2 = QFont()
         font2.setFamilies([u"Poppins Light"])
         self.label_30.setFont(font2)
         self.label_31 = QLabel(self.help)
         self.label_31.setObjectName(u"label_31")
-        self.label_31.setGeometry(QRect(50, 50, 381, 61))
+        self.label_31.setGeometry(QRect(50, 41, 381, 61))
         font3 = QFont()
         font3.setFamilies([u"Poppins ExtraBold"])
         font3.setPointSize(33)
         self.label_31.setFont(font3)
-        self.pushButton = QPushButton(self.help)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(50, 300, 75, 24))
+        self.instruct_button = QPushButton(self.help)
+        self.instruct_button.setObjectName(u"instruct_button")
+        self.instruct_button.setGeometry(QRect(50, 300, 75, 24))
         self.stackedWidget.addWidget(self.help)
         self.maintenance = QWidget()
         self.maintenance.setObjectName(u"maintenance")
@@ -463,14 +464,10 @@ class Ui_MainWindow(object):
         self.maintenance_label.setObjectName(u"maintenance_label")
         self.maintenance_label.setGeometry(QRect(90, 50, 361, 61))
         self.maintenance_label.setFont(font3)
-        self.version_label = QLabel(self.maintenance)
-        self.version_label.setObjectName(u"version_label")
-        self.version_label.setGeometry(QRect(90, 110, 121, 61))
-        self.version_label.setFont(font2)
         self.update_button = QPushButton(self.maintenance)
         self.update_button.setObjectName(u"update_button")
         self.update_button.setEnabled(False)
-        self.update_button.setGeometry(QRect(90, 180, 75, 24))
+        self.update_button.setGeometry(QRect(90, 148, 75, 24))
         self.backup_button = QPushButton(self.maintenance)
         self.backup_button.setObjectName(u"backup_button")
         self.backup_button.setGeometry(QRect(90, 250, 75, 24))
@@ -665,6 +662,10 @@ class Ui_MainWindow(object):
         self.label_29.setObjectName(u"label_29")
         self.label_29.setGeometry(QRect(80, 130, 501, 161))
         self.label_29.setFont(font2)
+        self.version_label = QLabel(self.about)
+        self.version_label.setObjectName(u"version_label")
+        self.version_label.setGeometry(QRect(250, 80, 121, 61))
+        self.version_label.setFont(font2)
         self.stackedWidget.addWidget(self.about)
         self.reports = QWidget()
         self.reports.setObjectName(u"reports")
@@ -785,7 +786,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(6)
+        self.stackedWidget.setCurrentIndex(7)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -883,17 +884,8 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-weight:700;\">\u2022 Help </span><span style=\" font-family:'Segoe UI';\">contains the general information about the system</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-weight:700;\">\u2022 Maintenance </span><span style=\" font-family:'Segoe UI';\">contains the current system version and will serve as the portal for future updates.</span></p></body></html>", None))
         self.label_31.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Help</p></body></html>", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Instructions", None))
+        self.instruct_button.setText(QCoreApplication.translate("MainWindow", u"Instructions", None))
         self.maintenance_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Maintenance</p></body></html>", None))
-        self.version_label.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"hr { height: 1px; border-width: 0; }\n"
-"li.unchecked::marker { content: \"\\2610\"; }\n"
-"li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Poppins Light'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI';\">Current Version:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-size:24pt; font-weight:700;\">1.0.0</span></p></body></html>", None))
         self.update_button.setText(QCoreApplication.translate("MainWindow", u"Update", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
         self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
@@ -954,6 +946,15 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI';\">As a fulfillment for the requirements of the Software Engineering class under the Computer </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span st"
                         "yle=\" font-family:'Segoe UI';\">Science degree program curriculum.</span></p></body></html>", None))
+        self.version_label.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Poppins Light'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI';\">Current System Version:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-size:24pt; font-weight:700;\">1.0.0</span></p></body></html>", None))
         self.maintenance_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Reports</p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.prod_report_btn.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><br/></p></body></html>", None))

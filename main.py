@@ -7,7 +7,7 @@ import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
-from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush, QDesktopServices
 from PySide6.QtCore import Qt
 from PySide6.QtCore import QSize
 from ui_main import Ui_MainWindow  # Replace 'your_ui_file' with the actual filename of your UI code
@@ -19,9 +19,10 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 import datetime
-from PySide6.QtCore import QDate, QDateTime
+from PySide6.QtCore import QDate, QDateTime, QUrl
 from register import RegisterWindow  # Adjust the import path as necessary
 current_date = datetime.date.today()
+import os
 from mysql.connector import Error  # Import the Error class
 class MainWindow(QMainWindow):
     def __init__(self, username, username_id):
@@ -93,6 +94,8 @@ class MainWindow(QMainWindow):
         self.schedules_table = QTableWidget(self)
         self.clicked_date = None
 
+        # Connect instruct_button to open_user_manual method
+        self.ui.instruct_button.clicked.connect(self.open_user_manual)
 
         self.ui.username_label.setText(username)
         self.ui.username_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -103,8 +106,21 @@ class MainWindow(QMainWindow):
         self.show()
         self.ui.add_account.clicked.connect(self.show_register_window)
 
+    def open_user_manual(self):
+        # Directory of the current script
+        current_dir = os.path.dirname(os.path.realpath(__file__))
 
+        # Path to the User Manual PDF
+        pdf_path = os.path.join(current_dir, "User Manual.pdf")
 
+        # Check if the PDF file exists
+        if not os.path.exists(pdf_path):
+            QMessageBox.warning(self, "File Not Found", "User Manual.pdf not found in the application directory.")
+            return
+
+        # Open the PDF file with the default PDF viewer
+        url = QUrl.fromLocalFile(pdf_path)
+        QDesktopServices.openUrl(url)
     def show_register_window(self):
         self.register_window = RegisterWindow()
         self.register_window.show()
