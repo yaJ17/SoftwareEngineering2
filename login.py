@@ -33,11 +33,12 @@ class LoginWindow(QMainWindow):
 
             # Call DatabaseManager to check login
             if self.db_manager.check_account_login(username, password):
+                username_id = self.db_manager.get_username_id(username, password)
                 QMessageBox.information(self, "Login Successful", "Login Successful!")
                 # Reset failed attempts on successful login
                 self.failed_attempts = 0
 
-                username_id = self.db_manager.get_username_id(username, password)
+
                 # Pass username and username_id to the main window
                 self.main_window = MainWindow(username=username, username_id=username_id)
                 self.main_window.show()
@@ -50,12 +51,13 @@ class LoginWindow(QMainWindow):
         else:
 
             if self.db_manager.check_account_login_by_id(username, password):
+                userName = self.db_manager.get_username_by_id_and_password(username, password)
                 QMessageBox.information(self, "Login Successful", "Login Successful!")
                 # Reset failed attempts on successful login
                 self.failed_attempts = 0
 
                 # Pass username and username_id to the main window
-                userName = self.db_manager.get_username_by_id_and_password(username, password)
+
                 self.main_window = MainWindow(username=userName, username_id=username)
                 self.main_window.show()
                 self.close()  # Close the login window

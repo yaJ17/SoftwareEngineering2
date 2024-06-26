@@ -1511,17 +1511,19 @@ class DatabaseManager:
             return False
 
         try:
+
             cursor = self.connection.cursor()
 
+            user_name = self.cipher.encrypt(username)
             # Execute query to check if username exists
-            query = "SELECT COUNT(*) FROM ACCOUNTS WHERE username = %s"
-            cursor.execute(query, (username,))
+            query = "SELECT username FROM ACCOUNTS WHERE username = %s"
+            cursor.execute(query, (user_name,))
 
             # Fetch the result
-            result = cursor.fetchone()
+            result = cursor.fetchone()[0]
 
             # Check if username count is greater than 0
-            if result and result[0] > 0:
+            if result:
                 return True
             else:
                 return False
@@ -1529,6 +1531,8 @@ class DatabaseManager:
         except Error as e:
             print(f"Error while checking username existence: {e}")
             return False
+
+
 
 
     def add_account(self, username, password, question, answer):
