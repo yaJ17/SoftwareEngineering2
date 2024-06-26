@@ -1342,6 +1342,28 @@ class DatabaseManager:
 
         return decrypted_rows
 
+    def get_username_id(self, input_value):
+        cursor = self.connection.cursor()
+
+        # Check if input_value is username or username_id
+        if input_value.isdigit():  # Assume it's username_id
+            sql_query = "SELECT username, username_id FROM ACCOUNTS WHERE username_id = %s"
+        else:  # Assume it's username
+            sql_query = "SELECT username, username_id FROM ACCOUNTS WHERE username = %s"
+
+        try:
+            cursor.execute(sql_query, (input_value,))
+            result = cursor.fetchone()
+            if result:
+                username = self.cipher.decrypt(result[0])
+                username_id = self.cipher.decrypt(result[1])
+                return username, username_id
+            else:
+                return None, None
+        except Error as e:
+            print(f"Error fetching username and username_id: {e}")
+            return None, None
+
      #validate login
     def check_account_login(self, username, password) -> bool:
         if self.connection is None:
@@ -1352,8 +1374,9 @@ class DatabaseManager:
             cursor = self.connection.cursor()
             enc_username = self.cipher.encrypt(username)
             enc_password = self.cipher.encrypt(password)
-            print(enc_username)
+
             sql_script = "SELECT username, password FROM ACCOUNTS WHERE username = %s AND password = %s"
+
             cursor.execute(sql_script, (enc_username, enc_password))
             result = cursor.fetchone()
             if result:
@@ -1366,6 +1389,116 @@ class DatabaseManager:
             print(f"Error: {e}")
             return False
 
+    def check_account_login_by_id(self, username_id, password) -> bool:
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+            enc_username_id = self.cipher.encrypt(username_id)
+            enc_password = self.cipher.encrypt(password)
+
+            sql_script = "SELECT username_id, password FROM ACCOUNTS WHERE username_id = %s AND password = %s"
+
+            cursor.execute(sql_script, (enc_username_id, enc_password))
+            result = cursor.fetchone()
+            if result:
+                print("Login successful")
+                return True
+            else:
+                print("Invalid credentials")
+                return False
+        except Error as e:
+            print(f"Error: {e}")
+            return False
+
+    def get_username_id(self, username, password):
+        if self.connection is None:
+            print("No connection to the database.")
+            return None
+
+        try:
+            cursor = self.connection.cursor()
+
+            # Encrypt username and password
+            encrypted_username = self.cipher.encrypt(username)
+            encrypted_password = self.cipher.encrypt(password)
+
+            # Execute query to fetch username_id
+            query = "SELECT username_id FROM ACCOUNTS WHERE username = %s AND password = %s"
+            cursor.execute(query, (encrypted_username, encrypted_password))
+
+            # Fetch the result
+            result = cursor.fetchone()
+
+            if result:
+                # Decrypt and return username_id
+                decrypted_username_id = self.cipher.decrypt(result[0])
+                return decrypted_username_id
+            else:
+                print("Username and password combination not found.")
+                return None
+
+        except Error as e:
+            print(f"Error while retrieving username_id: {e}")
+            return None
+
+    def get_username_by_id_and_password(self, username_id, password):
+        if self.connection is None:
+            print("No connection to the database.")
+            return None
+
+        try:
+            cursor = self.connection.cursor()
+
+            # Encrypt username_id and password
+            encrypted_username_id = self.cipher.encrypt(username_id)
+            encrypted_password = self.cipher.encrypt(password)
+
+            # Execute query to fetch username
+            query = "SELECT username FROM ACCOUNTS WHERE username_id = %s AND password = %s"
+            cursor.execute(query, (encrypted_username_id, encrypted_password))
+
+            # Fetch the result
+            result = cursor.fetchone()
+
+            if result:
+                # Decrypt and return username
+                decrypted_username = self.cipher.decrypt(result[0])
+                return decrypted_username
+            else:
+                print("Username ID and password combination not found.")
+                return None
+
+        except Error as e:
+            print(f"Error while retrieving username: {e}")
+            return None
+
+    def check_username_exists(self, username):
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+
+            # Execute query to check if username exists
+            query = "SELECT COUNT(*) FROM ACCOUNTS WHERE username = %s"
+            cursor.execute(query, (username,))
+
+            # Fetch the result
+            result = cursor.fetchone()
+
+            # Check if username count is greater than 0
+            if result and result[0] > 0:
+                return True
+            else:
+                return False
+
+        except Error as e:
+            print(f"Error while checking username existence: {e}")
+            return False
 
     def add_account(self, username, password, question, answer):
         if self.connection is None:
@@ -1375,21 +1508,40 @@ class DatabaseManager:
             cursor = self.connection.cursor()
             cursor.execute("SELECT RIGHT(MAX(username_id), LENGTH(MAX(username_id)) - 4) FROM ACCOUNTS")
             last_id = cursor.fetchone()[0]
-            if last_id:
-                new_id = "RXAC"+ str(int(last_id) + 1)
+
+            if last_id and last_id.startswith('RXAC'):
+                numeric_part = last_id[4:]
+                if numeric_part.isdigit():
+                    new_id = "RXAC" + str(int(numeric_part) + 1)
+                else:
+                    print(f"Unexpected format for username_id: {last_id}")
+                    return
             else:
                 new_id = "RXAC1"
+
             cursor.execute("SELECT username FROM ACCOUNTS WHERE username = %s", (username,))
             username_exist = cursor.fetchone()
             if username_exist is None:
-                #r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$" -> to remove 8 char long
+                # Validate password criteria
                 if re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
-                    cursor.execute("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);", (new_id, username, password,question,answer))
+                    # Encrypt the data before insertion
+                    enc_id = self.cipher.encrypt(new_id)
+                    enc_username = self.cipher.encrypt(username)
+                    enc_password = self.cipher.encrypt(password)
+                    enc_question = self.cipher.encrypt(question)
+                    enc_answer = self.cipher.encrypt(answer)
+
+                    cursor.execute(
+                        "INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s,%s, %s,%s,%s);",
+                        (enc_id, enc_username, enc_password, enc_question, enc_answer))
+                    self.connection.commit()  # Don't forget to commit the transaction
+                    print("Account added successfully.")
                 else:
-                    print("wrong password")
+                    print("Password does not meet criteria.")
+            else:
+                print("Username already exists.")
         except Error as e:
             print(f"Error: {e}")
-
 
     def close_connection(self):
         if self.connection and self.connection.is_connected():

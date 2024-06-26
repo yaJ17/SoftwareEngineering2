@@ -29,21 +29,40 @@ class LoginWindow(QMainWindow):
         username = self.ui.username_login.text()
         password = self.ui.password_login.text()
 
-        # Call DatabaseManager to check login
-        if self.db_manager.check_account_login(username, password):
-            QMessageBox.information(self, "Login Successful", "Login Successful!")
-            # Reset failed attempts on successful login
-            self.failed_attempts = 0
+        if self.db_manager.check_username_exists(username):
 
-            # Pass username to the main window
-            self.main_window = MainWindow(username=username)
-            self.main_window.show()
-            self.close()  # Close the login window
+            username_id = self.db_manager.get_username_id(username, password)
+            # Call DatabaseManager to check login
+            if self.db_manager.check_account_login(username, password):
+                QMessageBox.information(self, "Login Successful", "Login Successful!")
+                # Reset failed attempts on successful login
+                self.failed_attempts = 0
+
+                # Pass username and username_id to the main window
+                self.main_window = MainWindow(username=username, username_id=username_id)
+                self.main_window.show()
+                self.close()  # Close the login window
+            else:
+                QMessageBox.warning(self, "Login Failed", "Invalid username or password")
+                self.failed_attempts += 1
+                if self.failed_attempts >= 5:
+                    self.disable_login()
         else:
-            QMessageBox.warning(self, "Login Failed", "Invalid username or password")
-            self.failed_attempts += 1
-            if self.failed_attempts >= 5:
-                self.disable_login()
+            userName = self.db_manager.get_username_by_id_and_password(username, password)
+            if self.db_manager.check_account_login_by_id(username, password):
+                QMessageBox.information(self, "Login Successful", "Login Successful!")
+                # Reset failed attempts on successful login
+                self.failed_attempts = 0
+
+                # Pass username and username_id to the main window
+                self.main_window = MainWindow(username=userName, username_id=username)
+                self.main_window.show()
+                self.close()  # Close the login window
+            else:
+                QMessageBox.warning(self, "Login Failed", "Invalid username or password")
+                self.failed_attempts += 1
+                if self.failed_attempts >= 5:
+                    self.disable_login()
 
     def disable_login(self):
         # Disable textboxes and login button

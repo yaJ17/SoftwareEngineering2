@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import QDate
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView
 import pandas as pd
 import sys
@@ -20,9 +22,9 @@ import datetime
 from PySide6.QtCore import QDate, QDateTime
 from register import RegisterWindow  # Adjust the import path as necessary
 current_date = datetime.date.today()
-
+from mysql.connector import Error  # Import the Error class
 class MainWindow(QMainWindow):
-    def __init__(self, username):
+    def __init__(self, username, username_id):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -90,11 +92,18 @@ class MainWindow(QMainWindow):
         self.schedules_table = QTableWidget(self)
         self.clicked_date = None
 
+
+        self.ui.username_label.setText(username)
+        self.ui.username_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.ui.username_id.setText(username_id)
+        self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
         # Show the window after populating the table
         self.show()
         self.ui.add_account.clicked.connect(self.show_register_window)
 
-        self.ui.username_label.setText(username)
+
+
     def show_register_window(self):
         self.register_window = RegisterWindow()
         self.register_window.show()
