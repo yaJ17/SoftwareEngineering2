@@ -48,7 +48,8 @@ class LoginWindow(QMainWindow):
                 self.failed_attempts += 1
                 if self.failed_attempts >= 5:
                     self.disable_login()
-        else:
+
+        elif self.db_manager.check_usernameid_exists(username):
 
             if self.db_manager.check_account_login_by_id(username, password):
                 userName = self.db_manager.get_username_by_id_and_password(username, password)
@@ -66,6 +67,13 @@ class LoginWindow(QMainWindow):
                 self.failed_attempts += 1
                 if self.failed_attempts >= 5:
                     self.disable_login()
+
+        else:
+            QMessageBox.warning(self, "Login Failed", "Invalid username or password")
+            self.failed_attempts += 1
+            if self.failed_attempts >= 5:
+                self.disable_login()
+
 
     def disable_login(self):
         # Disable textboxes and login button

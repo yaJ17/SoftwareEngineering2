@@ -18,8 +18,6 @@ class RegisterWindow(QMainWindow):
         self.db_manager.create_schema_and_tables()
 
 
-
-
         # Connect buttons to their respective methods
         self.ui.submit_register.clicked.connect(self.handle_register)
         self.ui.cancel_register.clicked.connect(self.handle_cancel)

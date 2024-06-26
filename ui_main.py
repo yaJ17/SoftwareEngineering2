@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'ui_mainmrjKFn.ui'
-##
-## Created by: Qt User Interface Compiler version 6.7.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -617,6 +607,9 @@ class Ui_MainWindow(object):
         self.weekly_calendar = QPushButton(self.sched)
         self.weekly_calendar.setObjectName(u"weekly_calendar")
         self.weekly_calendar.setGeometry(QRect(490, 330, 75, 24))
+        self.add_deadline_button = QPushButton(self.sched)
+        self.add_deadline_button.setObjectName(u"add_deadline_button")
+        self.add_deadline_button.setGeometry(QRect(410, 330, 75, 24))
         self.stackedWidget.addWidget(self.sched)
         self.sched_week = QWidget()
         self.sched_week.setObjectName(u"sched_week")
@@ -838,10 +831,10 @@ class Ui_MainWindow(object):
         self.label_48.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">No. of Defectives</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.label_49.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">ADD FINISHED PRODUCT</span></p></body></html>", None))
         self.label_50.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Bag Type</span></p></body></html>", None))
-        self.label_46.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">No. of Active</span></p><p align=\"right\"><br/></p></body></html>", None))
+        self.label_46.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Price</span></p></body></html>", None))
         self.update_products.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.cancel_update_product.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
-        self.label_51.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\">Price</p></body></html>", None))
+        self.label_51.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Price</span></p></body></html>", None))
         self.label_55.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Product Cost</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.label_53.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Quantity</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.label_56.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Bag Type</span></p></body></html>", None))
@@ -929,6 +922,7 @@ class Ui_MainWindow(object):
         self.void_order.setText(QCoreApplication.translate("MainWindow", u"Void Order", None))
         self.daily_calendar.setText(QCoreApplication.translate("MainWindow", u"Daily", None))
         self.weekly_calendar.setText(QCoreApplication.translate("MainWindow", u"Weekly", None))
+        self.add_deadline_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.label_73.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">This week's Deadlines</span></p></body></html>", None))
         self.return_calendar.setText(QCoreApplication.translate("MainWindow", u"Back", None))
         self.edit_weekly.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
