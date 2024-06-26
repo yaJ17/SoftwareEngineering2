@@ -930,7 +930,9 @@ class DatabaseManager:
             FROM 
                 PRODUCT
             WHERE
-                product_active = 1;
+                product_active = 1
+            ORDER BY
+                product_id DESC;
             '''
             )
             rows = cursor.fetchall()
@@ -947,19 +949,18 @@ class DatabaseManager:
     '''
                     UPDATE PRODUCT INVENTORY
                                                                 '''
-    def set_product(self, product_id, bag_type, quantity, defective, cost, price):
+    def set_product(self, bag_type, quantity, defective, cost, price, oldbag_type, oldquantity, olddefective, oldcost, oldprice):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute('''
-                SELECT product_id FROM product WHERE product_id = %s
-            ''', (product_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == product_id:
-                    sql_script = '''
+                SELECT product_id FROM product WHERE bag_type = %s and product_quantity = %s and product_defectives = %s and product_cost = %s and product_price = %s
+            ''', (self.cipher.encrypt(oldbag_type), oldquantity, olddefective, oldcost, oldprice))
+            product_id = cursor.fetchone()[0]
+            if product_id:
+                sql_script = '''
                     UPDATE product SET
                         bag_type = %s,
                         product_quantity= %s,
@@ -970,14 +971,15 @@ class DatabaseManager:
                         product_id = %s;
 
                     '''
-                    cursor.execute(sql_script, (bag_type, quantity,defective,cost,price,product_id))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
+                cursor.execute(sql_script, (self.cipher.encrypt(bag_type), quantity,defective,cost,price,product_id))
+                print("Details updated successfully.")
+            else:
+                print("Invalid order.")
 
         except Error as e:
             print(f"Error: {e}")
-    def add_product(self, order_id, product_quantity, bag_type,product_defectives,product_cost,product_price):
+
+    def add_product(self, bag_type,product_quantity, product_defectives,product_cost,product_price, order_id=1):
         if self.connection is None:
             print("No connection to the database.")
             return
@@ -996,20 +998,23 @@ class DatabaseManager:
             VALUES 
             (%s,%s,%s,%s,%s,%s);
             '''
-            ,(order_id, product_quantity, bag_type,product_defectives,product_cost,product_price))
+            ,(order_id, product_quantity, self.cipher.encrypt(bag_type),product_defectives,product_cost,product_price))
         except Error as e:
             print(f"Error: {e}")
     
-    def void_product(self, product_id):
+    def void_product(self, bag_type,product_quantity, product_defectives,product_cost,product_price):
         if self.connection is None:   
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT  product_active FROM product WHERE product_id = %s", (product_id,))
+            cursor.execute('''
+                SELECT product_id, product_active FROM product WHERE bag_type = %s and product_quantity = %s and product_defectives = %s and product_cost = %s and product_price = %s
+            ''', (self.cipher.encrypt(bag_type), product_quantity, product_defectives, product_cost, product_price))
             result = cursor.fetchone()
             if result is not None:
-                material_active = result[0]  
+                material_active = result[1] 
+                product_id = result[0]
                 reversed_product_active = 0 if material_active == 1 else 1 
                 sql_script = "UPDATE product SET  product_active = %s WHERE product_id = %s"
                 cursor.execute(sql_script, (reversed_product_active, product_id))
