@@ -761,13 +761,19 @@ class DatabaseManager:
             SELECT
                 R.material_name,
                 R.material_stock,
-                R.material_cost
+                R.material_safety_stock,
+                R.material_cost,
+                R.material_type,
+                S.supplier_name
+
             FROM 
                 RAW_MATERIAL R
             JOIN 
                 SUPPLIER S ON R.supplier_id = S.supplier_id
 			WHERE 
-                R.raw_material_active = 1;
+                R.raw_material_active = 1
+            ORDER BY
+                material_id DESC;
             '''
             )
             rows = cursor.fetchall()
@@ -782,36 +788,39 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
-    def set_raw_material(self, material_id, name,stock, safety_stock, cost, supplier_name, supplier_contact):
+    def set_raw_material(self, name,stock, mattype,safety_stock, cost, supplier_name, oldname, oldtype, oldstock):
         if self.connection is None:
-            print("No connection to the database.")
+            print("No connection to the databasep.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute('''
-                SELECT material_id FROM raw_material WHERE material_id = %s
-            ''', (material_id,))
-            result = cursor.fetchone()
+                SELECT material_id FROM raw_material WHERE material_name = %s and material_type = %s and  material_stock=%s
+            ''', (self.cipher.encrypt(oldname), self.cipher.encrypt(oldtype), oldstock))
+            result = cursor.fetchone()[0]
+            print(result)
+            material_id = result
+
             if result:
-                if result[0] == material_id:
+                if result:
                     sql_script = '''
                     UPDATE RAW_MATERIAL SET
                         material_name = %s,
                         material_stock =%s,
+                        material_type = %s,
                         material_safety_stock = %s,
                         material_cost = %s
                     WHERE material_id = %s;
-
                     '''
                     cursor.execute(sql_script, 
-                    (name,stock,safety_stock,cost,material_id))
+                    (self.cipher.encrypt(name),stock,self.cipher.encrypt(mattype),safety_stock,cost,material_id))
                     sql_script = '''
                     UPDATE SUPPLIER SET
                         supplier_name = %s,
                         supplier_contact =%s
                     WHERE supplier_id = (SELECT supplier_id FROM raw_material WHERE material_id = %s);
                     '''
-                    cursor.execute(sql_script, (supplier_name,supplier_contact, material_id))
+                    cursor.execute(sql_script, (self.cipher.encrypt(supplier_name),"", material_id))
                     print("Details updated successfully.")
                 else:
                     print("Invalid order.")
@@ -827,7 +836,7 @@ class DatabaseManager:
             cursor = self.connection.cursor()
 
             # Check if the supplier already exists to avoid duplicate entries
-            cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+            cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (self.cipher.encrypt(supplier_name), ))
             result = cursor.fetchone()
             if result is None:
                 # Insert the supplier
@@ -839,10 +848,10 @@ class DatabaseManager:
                         supplier_contact
                     )
                     VALUES(%s, %s, %s)
-                    """, (supplier_name, "", "")
+                    """, (self.cipher.encrypt(supplier_name), self.cipher.encrypt(""),self.cipher.encrypt(""))
                 )
                 # Fetch the supplier_id after insertion
-                cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (supplier_name,))
+                cursor.execute("SELECT supplier_id FROM supplier WHERE supplier_name = %s", (self.cipher.encrypt(supplier_name),))
                 result = cursor.fetchone()
             
                 if result is None:
@@ -865,7 +874,7 @@ class DatabaseManager:
                 VALUES 
                 (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''',
-                (name, 0, materialtype, "", cost, stock, safety_stock, supplier_id)
+                (self.cipher.encrypt(name), 0, self.cipher.encrypt(materialtype), self.cipher.encrypt(""), cost, stock, safety_stock, supplier_id)
             )
 
             # Commit the transaction
@@ -873,18 +882,19 @@ class DatabaseManager:
 
         except Error as e:
             print(f"Error: {e}")
-            self.connection.rollback()  # Rollback the transaction in case of error
 
         finally:
             cursor.close()  # Ensure the cursor is closed
 
 
-    def void_raw_material(self, material_id):
+    def void_raw_material(self, name, matname):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
+            cursor.execute("SELECT r.material_id from raw_material r WHERE r.material_name = %s ", (self.cipher.encrypt(name),))
+            material_id = cursor.fetchone()[0]
             cursor.execute("SELECT  raw_material_active FROM raw_material WHERE material_id = %s", (material_id,))
             result = cursor.fetchone()
             if result is not None:
@@ -907,11 +917,16 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT
-                P.bag_type,
-                P.product_quantity,
-                P.product_price
+                bag_type,
+                product_quantity,
+                product_defectives,
+                product_cost,
+                product_price
+
             FROM 
-                PRODUCT P;
+                PRODUCT
+            WHERE
+                product_active = 1;
             '''
             )
             rows = cursor.fetchall()
