@@ -59,7 +59,8 @@ class MainWindow(QMainWindow):
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
         self.ui.return_calendar.clicked.connect(self.show_scheduling)
         self.ui.return_calendar_2.clicked.connect(self.show_scheduling)
-
+        self.ui.quick_raw.clicked.connect(self.show_add_raw_material)
+        self.ui.quick_stock.clicked.connect(self.show_add_finished_product)
         self.ui.add_order_button.clicked.connect(self.show_add_order)
         self.ui.cancel_add_order.clicked.connect(self.show_production)
         self.ui.edit_cancel_button.clicked.connect(self.show_production)
@@ -948,6 +949,7 @@ class MainWindow(QMainWindow):
             ]
         self.generate_pdf(reports, "production_report.pdf")
 
+
     def generate_stock_pdf_clicked(self):
         sql_script = """
         SELECT 
@@ -974,6 +976,7 @@ class MainWindow(QMainWindow):
                 (df, "Stock Report")
             ]
         self.generate_pdf(reports, "stock_report.pdf")
+
 
     def generate_inventory_pdf_clicked(self):
         sql = """
@@ -1004,6 +1007,7 @@ class MainWindow(QMainWindow):
                 (df, "Inventory Report")
             ]
         self.generate_pdf(reports, "inventory_report.pdf")
+
 
     def generate_sales_pdf_clicked(self):
         total_bag_sql = """
