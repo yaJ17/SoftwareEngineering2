@@ -132,7 +132,7 @@ class MainWindow(QMainWindow):
     def show_dashboard(self):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.populate_deadline_table()
-
+        self.populate_dashboard_weekly()
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
@@ -255,6 +255,33 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+    def populate_dashboard_weekly(self):
+        # Call the populate_deadline function from database module
+        deadline_week = self.db_manager.populate_deadline()
+        print("hello")
+        for row in deadline_week:
+            print(row)
+
+        # Define headers for the table
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
+        # Set the number of rows and columns
+        self.ui.dashboard_weekly.setRowCount(len(deadline_week))
+        self.ui.dashboard_weekly.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.dashboard_weekly.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(deadline_week):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.dashboard_weekly.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.dashboard_weekly.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.dashboard_weekly.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def populate_table_transac(self):
         # Call the populate_deadline function from database module

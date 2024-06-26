@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'ui_mainxUiEuL.ui'
+##
+## Created by: Qt User Interface Compiler version 6.7.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -5,12 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QDateEdit,
-    QFrame, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QSpinBox, QStackedWidget, QStatusBar, QTableView,
-    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QCalendarWidget, QDateEdit, QFrame,
+    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
+    QMainWindow, QPushButton, QSizePolicy, QSpinBox,
+    QStackedWidget, QStatusBar, QTableView, QTableWidget,
+    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -104,65 +113,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11 = QHBoxLayout(self.horizontalLayoutWidget_6)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_20 = QVBoxLayout()
-        self.verticalLayout_20.setObjectName(u"verticalLayout_20")
-        self.checkBox_5 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_5.setObjectName(u"checkBox_5")
+        self.dashboard_weekly = QTableWidget(self.horizontalLayoutWidget_6)
+        self.dashboard_weekly.setObjectName(u"dashboard_weekly")
 
-        self.verticalLayout_20.addWidget(self.checkBox_5)
-
-        self.checkBox_36 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_36.setObjectName(u"checkBox_36")
-
-        self.verticalLayout_20.addWidget(self.checkBox_36)
-
-        self.checkBox_37 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_37.setObjectName(u"checkBox_37")
-
-        self.verticalLayout_20.addWidget(self.checkBox_37)
-
-
-        self.horizontalLayout_11.addLayout(self.verticalLayout_20)
-
-        self.verticalLayout_21 = QVBoxLayout()
-        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
-        self.checkBox_38 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_38.setObjectName(u"checkBox_38")
-
-        self.verticalLayout_21.addWidget(self.checkBox_38)
-
-        self.checkBox_39 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_39.setObjectName(u"checkBox_39")
-
-        self.verticalLayout_21.addWidget(self.checkBox_39)
-
-        self.checkBox_40 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_40.setObjectName(u"checkBox_40")
-
-        self.verticalLayout_21.addWidget(self.checkBox_40)
-
-
-        self.horizontalLayout_11.addLayout(self.verticalLayout_21)
-
-        self.verticalLayout_22 = QVBoxLayout()
-        self.verticalLayout_22.setObjectName(u"verticalLayout_22")
-        self.checkBox_41 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_41.setObjectName(u"checkBox_41")
-
-        self.verticalLayout_22.addWidget(self.checkBox_41)
-
-        self.checkBox_42 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_42.setObjectName(u"checkBox_42")
-
-        self.verticalLayout_22.addWidget(self.checkBox_42)
-
-        self.checkBox_43 = QCheckBox(self.horizontalLayoutWidget_6)
-        self.checkBox_43.setObjectName(u"checkBox_43")
-
-        self.verticalLayout_22.addWidget(self.checkBox_43)
-
-
-        self.horizontalLayout_11.addLayout(self.verticalLayout_22)
+        self.horizontalLayout_11.addWidget(self.dashboard_weekly)
 
         self.label_22 = QLabel(self.dashBoard)
         self.label_22.setObjectName(u"label_22")
@@ -787,7 +741,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -804,16 +758,7 @@ class Ui_MainWindow(object):
         self.quick_raw.setText(QCoreApplication.translate("MainWindow", u"Add Raw Material", None))
         self.quick_stock.setText(QCoreApplication.translate("MainWindow", u"Add Bag Product", None))
         self.quickie_add.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Quick Add</span></p></body></html>", None))
-        self.task_abel.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Tasks</span></p></body></html>", None))
-        self.checkBox_5.setText(QCoreApplication.translate("MainWindow", u"Task 1", None))
-        self.checkBox_36.setText(QCoreApplication.translate("MainWindow", u"Task 2", None))
-        self.checkBox_37.setText(QCoreApplication.translate("MainWindow", u"Task 3", None))
-        self.checkBox_38.setText(QCoreApplication.translate("MainWindow", u"Task 4", None))
-        self.checkBox_39.setText(QCoreApplication.translate("MainWindow", u"Task 5", None))
-        self.checkBox_40.setText(QCoreApplication.translate("MainWindow", u"Task 6", None))
-        self.checkBox_41.setText(QCoreApplication.translate("MainWindow", u"Task 7", None))
-        self.checkBox_42.setText(QCoreApplication.translate("MainWindow", u"Task 8", None))
-        self.checkBox_43.setText(QCoreApplication.translate("MainWindow", u"Task 9", None))
+        self.task_abel.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Weekly Tasks</span></p></body></html>", None))
         self.label_22.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Upcoming Deadlines</span></p></body></html>", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">History</span></p></body></html>", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
