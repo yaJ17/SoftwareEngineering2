@@ -35,6 +35,12 @@ class MainWindow(QMainWindow):
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
 
+        #weekly buttons
+        self.ui.edit_weekly.clicked.connect(self.enable_edit_weekly)
+
+
+
+
         # Connect button clicks to their respective functions
         self.ui.dash_button.clicked.connect(self.show_dashboard)
         self.ui.prod_button.clicked.connect(self.show_production)
@@ -92,7 +98,7 @@ class MainWindow(QMainWindow):
         self.ui.Archive_finished_product.clicked.connect(self.void_product)
         # Populate the product table before showing the window
         self.populate_deadline_table()
-
+        self.populate_dashboard_weekly()
         self.data = {}
 
         #calendar
@@ -258,24 +264,32 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+    def enable_edit_weekly(self):
+        # Enable editing in table_weekly
+        self.ui.weekly_table.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked)
+
+        # Enable save_weekly button
+
+
     def populate_dashboard_weekly(self):
         # Call the populate_deadline function from database module
-        deadline_week = self.db_manager.populate_deadline()
+        dead_week = self.db_manager.populate_deadline()
+
         print("hello")
-        for row in deadline_week:
+        for row in dead_week:
             print(row)
 
         # Define headers for the table
         headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
         # Set the number of rows and columns
-        self.ui.dashboard_weekly.setRowCount(len(deadline_week))
+        self.ui.dashboard_weekly.setRowCount(len(dead_week))
         self.ui.dashboard_weekly.setColumnCount(len(headers))
 
         # Set the headers for the table
         self.ui.dashboard_weekly.setHorizontalHeaderLabels(headers)
 
         # Populate the table with fetched data
-        for row_index, row_data in enumerate(deadline_week):
+        for row_index, row_data in enumerate(dead_week):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.dashboard_weekly.setItem(row_index, column_index, item)
@@ -284,6 +298,8 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.dashboard_weekly.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+
 
     def populate_table_transac(self):
         # Call the populate_deadline function from database module
@@ -839,6 +855,8 @@ class MainWindow(QMainWindow):
             self.search_in_table(search_term, self.ui.table_transac)
         elif current_index == 9:
             self.search_in_table(search_term, self.ui.product_table)
+        elif current_index == 13:
+            self.search_in_table(search_term, self.ui.weekly_table)
         elif current_index == 14:
             self.search_in_table(search_term, self.ui.daily_table)
         # Add more conditions if there are more tables to search in
@@ -1043,23 +1061,30 @@ class MainWindow(QMainWindow):
         print(f"Date clicked: {clicked_date_str}")
 
         # Fetch data from daily_table where date matches clicked date
-        schedules = self.db_manager.get_schedules_by_date(clicked_date_str)
+        schedules = self.db_manager.populate_deadline()
+        print("hello")
+        for row in schedules:
+            print(row)
 
-        # Display fetched schedules in your QTableView (self.ui.daily_table)
-        headers = ['deadline_name', "deadline_details", " deadline_date"]
-        model = QStandardItemModel(len(schedules), len(headers))
-        model.setHorizontalHeaderLabels(headers)
-        # Populate the model with fetched data
+        # Define headers for the table
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
+        # Set the number of rows and columns
+        self.ui.daily_table.setRowCount(len(schedules))
+        self.ui.daily_table.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.daily_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
         for row_index, row_data in enumerate(schedules):
-
             for column_index, data in enumerate(row_data):
-                item = QStandardItem(str(data))
-                model.setItem(row_index, column_index, item)
-                # Set the model to the product_table in UI
-        self.ui.daily_table.setModel(model)
-        self.ui.daily_table.setEditTriggers(QTableView.NoEditTriggers)
+                item = QTableWidgetItem(str(data))
+                self.ui.daily_table.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.daily_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
         # Resize columns to fit content
-        self.ui.daily_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.daily_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         # Navigate to index 14 in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(14)

@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'MainWindow - untitled 2QnIHfb.ui'
-##
-## Created by: Qt User Interface Compiler version 6.7.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -29,6 +20,7 @@ class Ui_MainWindow(object):
         self.password_register = QLineEdit(self.centralwidget)
         self.password_register.setObjectName(u"password_register")
         self.password_register.setGeometry(QRect(151, 132, 301, 21))
+        self.password_register.setEchoMode(QLineEdit.EchoMode.Password)
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(80, 40, 371, 41))
@@ -47,6 +39,7 @@ class Ui_MainWindow(object):
         self.confirm_password = QLineEdit(self.centralwidget)
         self.confirm_password.setObjectName(u"confirm_password")
         self.confirm_password.setGeometry(QRect(151, 165, 301, 21))
+        self.confirm_password.setEchoMode(QLineEdit.EchoMode.Password)
         self.label_4 = QLabel(self.centralwidget)
         self.label_4.setObjectName(u"label_4")
         self.label_4.setGeometry(QRect(19, 165, 111, 20))

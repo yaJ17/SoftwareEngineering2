@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'ui_mainxUiEuL.ui'
-##
-## Created by: Qt User Interface Compiler version 6.7.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -18,8 +9,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QCalendarWidget, QDateEdit, QFrame,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QPushButton, QSizePolicy, QSpinBox,
-    QStackedWidget, QStatusBar, QTableView, QTableWidget,
-    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
+    QStackedWidget, QStatusBar, QTableWidget, QTableWidgetItem,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -107,17 +98,6 @@ class Ui_MainWindow(object):
         self.task_abel.setFont(font)
         self.task_abel.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.task_abel.setTextFormat(Qt.TextFormat.AutoText)
-        self.horizontalLayoutWidget_6 = QWidget(self.dashBoard)
-        self.horizontalLayoutWidget_6.setObjectName(u"horizontalLayoutWidget_6")
-        self.horizontalLayoutWidget_6.setGeometry(QRect(10, 130, 501, 81))
-        self.horizontalLayout_11 = QHBoxLayout(self.horizontalLayoutWidget_6)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
-        self.dashboard_weekly = QTableWidget(self.horizontalLayoutWidget_6)
-        self.dashboard_weekly.setObjectName(u"dashboard_weekly")
-
-        self.horizontalLayout_11.addWidget(self.dashboard_weekly)
-
         self.label_22 = QLabel(self.dashBoard)
         self.label_22.setObjectName(u"label_22")
         self.label_22.setGeometry(QRect(20, 220, 121, 16))
@@ -153,6 +133,9 @@ class Ui_MainWindow(object):
         self.add_account = QPushButton(self.dashBoard)
         self.add_account.setObjectName(u"add_account")
         self.add_account.setGeometry(QRect(543, 300, 111, 24))
+        self.dashboard_weekly = QTableWidget(self.dashBoard)
+        self.dashboard_weekly.setObjectName(u"dashboard_weekly")
+        self.dashboard_weekly.setGeometry(QRect(10, 130, 499, 79))
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
@@ -572,7 +555,7 @@ class Ui_MainWindow(object):
         self.label_73.setGeometry(QRect(10, 30, 631, 31))
         self.weekly_table = QTableWidget(self.sched_week)
         self.weekly_table.setObjectName(u"weekly_table")
-        self.weekly_table.setEnabled(False)
+        self.weekly_table.setEnabled(True)
         self.weekly_table.setGeometry(QRect(0, 70, 661, 241))
         self.weekly_table.horizontalHeader().setMinimumSectionSize(1)
         self.return_calendar = QPushButton(self.sched_week)
@@ -594,11 +577,11 @@ class Ui_MainWindow(object):
         self.return_calendar_2 = QPushButton(self.scheddaily)
         self.return_calendar_2.setObjectName(u"return_calendar_2")
         self.return_calendar_2.setGeometry(QRect(580, 320, 75, 24))
-        self.daily_table = QTableView(self.scheddaily)
+        self.daily_table = QTableWidget(self.scheddaily)
         self.daily_table.setObjectName(u"daily_table")
         self.daily_table.setEnabled(True)
         self.daily_table.setGeometry(QRect(0, 60, 661, 241))
-        self.daily_table.horizontalHeader().setStretchLastSection(True)
+        self.daily_table.horizontalHeader().setMinimumSectionSize(1)
         self.save_daily = QPushButton(self.scheddaily)
         self.save_daily.setObjectName(u"save_daily")
         self.save_daily.setEnabled(False)
@@ -619,8 +602,12 @@ class Ui_MainWindow(object):
         self.label_29.setFont(font2)
         self.version_label = QLabel(self.about)
         self.version_label.setObjectName(u"version_label")
-        self.version_label.setGeometry(QRect(250, 80, 121, 61))
+        self.version_label.setGeometry(QRect(250, 85, 151, 20))
         self.version_label.setFont(font2)
+        self.version_label_2 = QLabel(self.about)
+        self.version_label_2.setObjectName(u"version_label_2")
+        self.version_label_2.setGeometry(QRect(250, 99, 121, 31))
+        self.version_label_2.setFont(font2)
         self.stackedWidget.addWidget(self.about)
         self.reports = QWidget()
         self.reports.setObjectName(u"reports")
@@ -741,7 +728,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(14)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -758,7 +745,7 @@ class Ui_MainWindow(object):
         self.quick_raw.setText(QCoreApplication.translate("MainWindow", u"Add Raw Material", None))
         self.quick_stock.setText(QCoreApplication.translate("MainWindow", u"Add Bag Product", None))
         self.quickie_add.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Quick Add</span></p></body></html>", None))
-        self.task_abel.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Weekly Tasks</span></p></body></html>", None))
+        self.task_abel.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Tasks</span></p></body></html>", None))
         self.label_22.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Upcoming Deadlines</span></p></body></html>", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">History</span></p></body></html>", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
@@ -901,7 +888,15 @@ class Ui_MainWindow(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Poppins Light'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI';\">Current System Version:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-size:24pt; font-weight:700;\">1.0.0</span></p></body></html>", None))
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+        self.version_label_2.setText(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Poppins Light'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI'; font-size:18pt; font-weight:700;\">1.0.0</span></p></body></html>", None))
         self.maintenance_label_2.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Reports</p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.prod_report_btn.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><br/></p></body></html>", None))
