@@ -88,6 +88,7 @@ class LoginWindow(QMainWindow):
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.exec()
 
+
         # Start a timer to enable login after 3 minutes (180000 ms)
         self.timer.start(180000)
 
