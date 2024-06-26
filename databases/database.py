@@ -164,10 +164,9 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS TRANSACTION_HISTORY (
                 transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-                account_id INT NOT NULL,
+                account_id VARCHAR(256) NOT NULL,
                 action VARCHAR(256) NOT NULL,
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (account_id) REFERENCES accounts(account_id),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -292,11 +291,11 @@ class DatabaseManager:
 
             # Insert dummy data for TRANSACTION_HISTORY
             transaction_history = [
-                (1, self.cipher.encrypt("Transaction A")),
-                (2, self.cipher.encrypt("Transaction B")),
-                (3, self.cipher.encrypt("Transaction C")),
-                (4, self.cipher.encrypt("Transaction D")),
-                (5, self.cipher.encrypt("Transaction E"))
+                (self.cipher.encrypt("major"), self.cipher.encrypt("Added Raw Material")),
+                (self.cipher.encrypt("majormina A"), self.cipher.encrypt("Added Daedline")),
+                (self.cipher.encrypt("major A"), self.cipher.encrypt("Added Deadline")),
+                (self.cipher.encrypt("major A"), self.cipher.encrypt("Added Deadline")),
+                (self.cipher.encrypt("major A"), self.cipher.encrypt("Edit Deadline"))
             ]
             cursor.executemany("INSERT INTO TRANSACTION_HISTORY (account_id, action) VALUES (%s, %s)", transaction_history)
 

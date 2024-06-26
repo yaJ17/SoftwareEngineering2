@@ -106,6 +106,7 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setText(username_id)
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
+        self.username = username
         # Show the window after populating the table
         self.show()
         self.ui.add_account.clicked.connect(self.show_register_window)
@@ -235,7 +236,7 @@ class MainWindow(QMainWindow):
             print(row)
 
         # Define headers for the table
-        headers = ['Account ID', 'Action', 'TimeStamp']
+        headers = ['Username', 'Action', 'TimeStamp']
         self.ui.table_transac.setRowCount(len(transac))
         self.ui.table_transac.setColumnCount(len(headers))
 
