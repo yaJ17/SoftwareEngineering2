@@ -381,8 +381,9 @@ class MainWindow(QMainWindow):
             self.ui.edit_bag_type.setText(type_bag)
         else:
             print(f"Error: No data found in row {row}")
+        completed_item = self.ui.product_table.item(row, 2)
 
-        order_quantity_item = self.ui.product_table.item(row, 2)  # Assuming order quantity is in the third column
+        order_quantity_item = self.ui.product_table.item(row, 3)  # Assuming order quantity is in the third column
         if order_quantity_item:
             order_quantity = int(order_quantity_item.text())
             self.ui.edit_order_quantity.setValue(order_quantity)
@@ -390,7 +391,7 @@ class MainWindow(QMainWindow):
             print(f"Error: No data found in row {row}")
 
         # Get deadline date from product_table's fourth column at specified row
-        deadline_item = self.ui.product_table.item(row, 3)  # Assuming deadline date is in the fourth column
+        deadline_item = self.ui.product_table.item(row, 4)  # Assuming deadline date is in the fourth column
         if deadline_item:
             deadline_str = deadline_item.text()
             deadline_date = QDateTime.fromString(deadline_str,
@@ -399,7 +400,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
-        priority_item = self.ui.product_table.item(row, 4)  # Assuming order quantity is in the third column
+        priority_item = self.ui.product_table.item(row, 5)  # Assuming order quantity is in the third column
         if priority_item:
             item_priority = int(priority_item.text())
             self.ui.edit_order_priority.setValue(item_priority)
@@ -533,7 +534,7 @@ class MainWindow(QMainWindow):
         orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
+        headers = ['Client Name', "Bag Type","Completed","Order Quantity", "Deadline", 'Priority', "Edit"]
 
         # Set the number of rows and columns
         self.ui.product_table.setRowCount(len(orders))

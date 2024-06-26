@@ -496,7 +496,8 @@ class DatabaseManager:
             '''
             SELECT 
                 c.client_name, 
-                o.bag_type, 
+                o.bag_type,
+                o.order_progress,
                 o.order_quantity, 
                 d.deadline_date, 
                 c.client_priority
