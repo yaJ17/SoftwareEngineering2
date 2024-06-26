@@ -655,27 +655,32 @@ class DatabaseManager:
 
     #FOR EDITING THE DEADLINE NAME, DETAIL, DATE, STATUS
 
-    def populate_deadline_by_week(self, start_date, end_date):
+    def populate_deadline_by_week(self):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-            '''
-            SELECT 
-                deadline_name,
-                deadline_date
-            FROM
-                deadline
-            WHERE
-                deadline_date BETWEEN %s AND %s;
-            ''',
-            (start_date, end_date)
+                '''
+                SELECT
+                    deadline_name,
+                    deadline_details,
+                    deadline_date
+                FROM
+                    DEADLINE
+                WHERE
+                    YEARWEEK(deadline_date, 1) = YEARWEEK(CURDATE(), 1);
+ 
+                '''
             )
             rows = cursor.fetchall()
+            decrypted_rows = []
             for row in rows:
-                print(row)
+                decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+                decrypted_rows.append(decrypted_row)
+                print(decrypted_row)
+            return decrypted_rows
         except Error as e:
             print(f"Error: {e}")
 

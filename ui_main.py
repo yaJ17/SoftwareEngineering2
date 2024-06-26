@@ -1,4 +1,12 @@
-################################
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'ui_mainmrjKFn.ui'
+##
+## Created by: Qt User Interface Compiler version 6.7.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
@@ -615,11 +623,11 @@ class Ui_MainWindow(object):
         self.label_73 = QLabel(self.sched_week)
         self.label_73.setObjectName(u"label_73")
         self.label_73.setGeometry(QRect(10, 30, 631, 31))
-        self.weekly_table = QTableView(self.sched_week)
+        self.weekly_table = QTableWidget(self.sched_week)
         self.weekly_table.setObjectName(u"weekly_table")
         self.weekly_table.setEnabled(False)
         self.weekly_table.setGeometry(QRect(0, 70, 661, 241))
-        self.weekly_table.horizontalHeader().setStretchLastSection(True)
+        self.weekly_table.horizontalHeader().setMinimumSectionSize(1)
         self.return_calendar = QPushButton(self.sched_week)
         self.return_calendar.setObjectName(u"return_calendar")
         self.return_calendar.setGeometry(QRect(580, 330, 75, 24))
@@ -786,7 +794,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(7)
+        self.stackedWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -833,7 +841,7 @@ class Ui_MainWindow(object):
         self.label_46.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">No. of Active</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.update_products.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.cancel_update_product.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
-        self.label_51.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">No. of Active</span></p><p align=\"right\"><br/></p></body></html>", None))
+        self.label_51.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\">Price</p></body></html>", None))
         self.label_55.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Product Cost</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.label_53.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Quantity</span></p><p align=\"right\"><br/></p></body></html>", None))
         self.label_56.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Bag Type</span></p></body></html>", None))

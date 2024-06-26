@@ -149,6 +149,7 @@ class MainWindow(QMainWindow):
 
     def show_weekly_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(13)
+        self.populate_weekly_table()
 
     def show_daily_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(14)
@@ -227,6 +228,33 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+
+    def populate_weekly_table(self):
+        # Call the populate_deadline function from database module
+        deadline_week = self.db_manager.populate_deadline()
+        print("hello")
+        for row in deadline_week:
+            print(row)
+
+        # Define headers for the table
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
+        # Set the number of rows and columns
+        self.ui.weekly_table.setRowCount(len(deadline_week))
+        self.ui.weekly_table.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.weekly_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(deadline_week):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.weekly_table.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.weekly_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def populate_table_transac(self):
         # Call the populate_deadline function from database module
@@ -481,17 +509,6 @@ class MainWindow(QMainWindow):
 
         # Clear the selection
         self.ui.product_table.clearSelection()
-
-
-
-
-
-    def handle_edit_prod_invent(self, row):
-        # Implement your edit logic here
-        print(f"Editing order at row {row}")
-       
-        self.ui.stackedWidget.setCurrentIndex(3)
-
     
     def save_edit_order(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
