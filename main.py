@@ -74,6 +74,8 @@ class MainWindow(QMainWindow):
         self.ui.sales_report_btn.clicked.connect(self.generate_sales_pdf_clicked)
 
         self.ui.save_add_order.clicked.connect(self.save_add_production_action)
+        self.ui.save_add_raw.clicked.connect(self.save_add_material_invent)
+
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
@@ -82,7 +84,9 @@ class MainWindow(QMainWindow):
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         self.ui.edit_save_button.clicked.connect(self.save_edit_order)
+        self.ui.update_edit_raw.clicked.connect(self.save_edit_material)
         self.ui.void_order.clicked.connect(self.void_production)
+        self.ui.archive_raw.clicked.connect(self.void_material)
 
         # Populate the product table before showing the window
         self.populate_deadline_table()
@@ -418,17 +422,28 @@ class MainWindow(QMainWindow):
     #     self.populate_product_invent()
     #     self.ui.stackedWidget.setCurrentIndex(1)
 
-    # def save_add_material_invent(self):
-    #     # Call save_add_production_action from DatabasecManager to fetch orders data
-    #     # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
-    #     self.db_manager.add_raw_material(self.ui.material_name_entry.text(), self.ui.material_type_entry.text(), self.ui.material_stock_spinBox.text(), self.ui.material_cost_spinBox.text(), self.ui.material_safety_stock_spinBox.text(), self.ui.supplier_name_entry.text())
-    #     self.ui.mate  rial_name_entry.setText("")
-    #     self.ui.material_type_entry.setText("")
-    #     self.ui.material_stock_spinBox.setValue(0)
-    #     self.ui.material_cost_spinBox.setValue(0)
-    #     self.ui.material_safety_stock_spinBox.setValue(0)
-    #     self.ui.supplier_name_entry.setText("")
-    #     self.populate_raw_invent()
+    def save_add_material_invent(self):
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
+        name = self.ui.add_inventory_Materiel.text()
+        mat_type = self.ui.add_material_type.text()
+        stock = self.ui.add_material_stock.value()
+        cost = self.ui.add_material_cost.value()
+        safety = self.ui.add_safety_stock.value()
+        supplier = self.ui.add_material_supplier.text()
+        print(name, mat_type, stock, cost, safety, supplier)
+        self.db_manager.add_raw_material(name,mat_type, stock, cost, safety, supplier)
+        self.ui.add_inventory_Materiel.setText("")
+        self.ui.add_material_type.setText("")
+        self.ui.add_material_stock.setValue(0)
+        self.ui.add_material_cost.setValue(0)
+        self.ui.add_safety_stock.setValue(0)
+        self.ui.add_material_supplier.setText("")
+        self.show_inventory()
+
+    def void_material(self):
+        self.db_manager.void_raw_material(self.data['name'], self.data['supplier'])
+        self.show_inventory()
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -509,7 +524,7 @@ class MainWindow(QMainWindow):
         raw = self.db_manager.populate_raw_materials()
 
         # Define headers for the table
-        headers = [ 'Material Name', 'Stocks', 'Cost', 'Edit']
+        headers = [ 'Name', 'Stocks', 'Safety Stock', 'Cost','Type','Supplier','Edit']
         # Set the number of rows and columns
         self.ui.raw_inventory_table.setRowCount(len(raw))
         self.ui.raw_inventory_table.setColumnCount(len(headers))
@@ -534,11 +549,88 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
-        self.ui.stackedWidget.setCurrentIndex(4)
+        print(f"Tite")
+         # Get client name from product_table's first column at specified row
+        material_name = self.ui.raw_inventory_table.item(row, 0)
+        if material_name:
+            name = material_name.text()
+            print(name)
+            self.ui.Edit_inventory_Materiel.setText(name)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get bagtype name from product_table's first column at specified row
+        material_type = self.ui.raw_inventory_table.item(row, 4)  # Assuming client name is in the first column
+        if material_type:
+            type_bag = material_type.text()
+            self.ui.Edit_material_type.setText(type_bag)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        stock_item = self.ui.raw_inventory_table.item(row, 1)  # Assuming order quantity is in the third column
+        if stock_item:
+            stock = int(stock_item.text())
+            self.ui.edit_material_stock.setValue(stock)
+        else:
+            print(f"Error: No stock found in row {row}")
+
+        # Get deadline date from product_table's fourth column at specified row
+        safety_item = self.ui.raw_inventory_table.item(row, 2)  # Assuming deadline date is in the fourth column
+        if safety_item:
+            safety = int(safety_item.text())
+            self.ui.edit_safety_stock.setValue(safety)
+        else:
+            print(f"Error: No safety found in row {row}")
+
+        cost_item = self.ui.raw_inventory_table.item(row, 3)  # Assuming order quantity is in the third column
+        if cost_item:
+            cost = int(cost_item.text())
+            print(cost)
+            self.ui.edit_material_cost.setValue(cost)
+        else:
+            print(f"Error: No cost found in row {row}")
+
+        supplier_item = self.ui.raw_inventory_table.item(row, 5)  # Assuming order quantity is in the third column
+        if supplier_item:
+            supplier = supplier_item.text()
+            self.ui.edit_material_supplier.setText(supplier)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        self.data = {
+            "name": name,
+            "material_type": type_bag,
+            "cost": cost,
+            "stock": stock,
+            "safety_stock": safety,
+            "supplier": supplier
+
+        }
+
+        self.ui.stackedWidget.setCurrentIndex(5)
+
+    def save_edit_material(self):
+        print(self.data)
+        name = self.ui.Edit_inventory_Materiel.text()
+        mat_type = self.ui.Edit_material_type.text()
+        stock = self.ui.edit_material_stock.value()
+        cost = self.ui.edit_material_cost.value()
+        safety = self.ui.edit_safety_stock.value()
+        supplier = self.ui.edit_material_supplier.text()
+        print(name, mat_type, stock, cost, safety, supplier,  self.data['name'], self.data['material_type'], self.data['stock'])
+        self.db_manager.set_raw_material(name, stock, mat_type,safety, cost, supplier, self.data['name'], self.data['material_type'], self.data['stock'])
+        self.ui.add_material_type.setText("")
+        self.ui.add_material_stock.setValue(0)
+        self.ui.add_material_cost.setValue(0)
+        self.ui.add_safety_stock.setValue(0)
+        self.ui.add_material_supplier.setText("")
+        self.db_manager.connection.commit()
+        self.show_inventory()
+        
 
 
     def populate_product_invent(self):
@@ -546,7 +638,7 @@ class MainWindow(QMainWindow):
         prod = self.db_manager.populate_product()
 
         # Define headers for the table
-        headers = [ 'Bag Type', 'Quantity', 'Price', 'Edit']
+        headers = [ 'Bag Type', 'Quantity', 'Defective', 'Cost', 'Price' ,'Edit']
         # Set the number of rows and columns
         self.ui.product_inventory_table.setRowCount(len(prod))
         self.ui.product_inventory_table.setColumnCount(len(headers))
@@ -575,6 +667,8 @@ class MainWindow(QMainWindow):
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
+        print('pinindot mo ako')
+        
         self.ui.stackedWidget.setCurrentIndex(5)
 
 
@@ -584,51 +678,49 @@ class MainWindow(QMainWindow):
 
 
     def search_in_table(self, search_term, table):
-        model = table.model()
-        first_exact_match = None
         search_term_lower = search_term.lower()
-        matched_perfect = False  # Convert search term to lowercase
+        first_exact_match = None
+        matched_perfect = False
         matching = []
 
-        for row in range(model.rowCount()):
-            for column in range(model.columnCount()):
-                item = model.item(row, column)
-                item.setBackground(QBrush(Qt.transparent))  # Reset background color
-                item.setForeground(QBrush(QColor(Qt.white)))  # Reset text color
+        # Reset the background and text colors for all items
+        for row in range(table.rowCount()):
+            for column in range(table.columnCount()):
+                item = table.item(row, column)
+                if item is not None:
+                    item.setBackground(QBrush(Qt.transparent))
+                    item.setForeground(QBrush(QColor(Qt.black)))
 
-        for row in range(model.rowCount()):
-            for column in range(model.columnCount()):
-                item = model.item(row, column)
-                item_text = item.text().lower()
-                if  item_text == search_term_lower:
-                    matched_perfect = True
-                    matching.append(item)
-        for row in range(model.rowCount()):
-            for column in range(model.columnCount()):
-                item = model.item(row, column)
-                item_text = item.text().lower()  # Convert item text to lowercase for comparison
-                if matched_perfect and item in matching:
-                    print(f"Item Text: {item_text}: search term: {search_term_lower}")
-                    highlight_color = QColor(255, 255, 255, 128)  # RGBA color with 50% opacity (128/255)
-                    item.setBackground(QBrush(highlight_color))
-                    item.setForeground(QBrush(QColor("black")))
-                    if first_exact_match is None:
-                        first_exact_match = table.model().index(row, column)
-                elif self.ratcliff_obershelp_similarity(item_text, search_term_lower) >= 0.45 and matched_perfect is False:
-                    print(f"ratio: {self.ratcliff_obershelp_similarity(item_text, search_term_lower)} item searched: {search_term_lower}, text: {item_text}")
-                    highlight_color = QColor(255, 255, 255, 128)  # RGBA color with 50% opacity (128/255)
-                    item.setBackground(QBrush(highlight_color))
-                    item.setForeground(QBrush(QColor("black")))
-                    if first_exact_match is None:
-                        first_exact_match = table.model().index(row, column)
-                else:
-                    item.setBackground(QBrush(Qt.transparent))  # Retain original background color
-                    item.setForeground(QBrush(QColor(Qt.black)))  # Retain original text color
+        # Search for the term in the table
+        for row in range(table.rowCount()):
+            for column in range(table.columnCount()):
+                item = table.item(row, column)
+                if item is not None:
+                    item_text = item.text().lower()
+                    if item_text == search_term_lower:
+                        matched_perfect = True
+                        matching.append(item)
 
-            if first_exact_match is not None:
-                # Scroll to the first exact match
-                table.scrollTo(first_exact_match, QtWidgets.QAbstractItemView.PositionAtCenter)
+        for row in range(table.rowCount()):
+            for column in range(table.columnCount()):
+                item = table.item(row, column)
+                if item is not None:
+                    item_text = item.text().lower()
+                    if matched_perfect and item in matching:
+                        highlight_color = QColor(255, 255, 255, 128)  # RGBA color with 50% opacity (128/255)
+                        item.setBackground(QBrush(highlight_color))
+                        item.setForeground(QBrush(QColor("black")))
+                        if first_exact_match is None:
+                            first_exact_match = table.model().index(row, column)
+                    elif self.ratcliff_obershelp_similarity(item_text, search_term_lower) >= 0.45 and not matched_perfect:
+                        highlight_color = QColor(255, 255, 255, 128)
+                        item.setBackground(QBrush(highlight_color))
+                        item.setForeground(QBrush(QColor("black")))
+                        if first_exact_match is None:
+                            first_exact_match = table.model().index(row, column)
 
+        if first_exact_match is not None:
+            table.scrollTo(first_exact_match, QTableWidget.PositionAtCenter)
 
 
 
