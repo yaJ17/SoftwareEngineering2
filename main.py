@@ -20,7 +20,8 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 import datetime
 from PySide6.QtCore import QDate, QDateTime, QUrl
-from register import RegisterWindow  # Adjust the import path as necessary
+from register import RegisterWindow
+
 current_date = datetime.date.today()
 import os
 from mysql.connector import Error  # Import the Error class
@@ -199,8 +200,16 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(8)
 
     def logout(self):
-        # Perform logout actions (e.g., closing the window or redirecting to login screen)
+
+        self.username = None
+        self.username_id = None
         self.close()
+        self.show_login_window()
+
+    def show_login_window(self):
+        from login import LoginWindow
+        self.login_window = LoginWindow()
+        self.login_window.show()
 
     def backup(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
