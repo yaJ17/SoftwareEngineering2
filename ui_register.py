@@ -102,7 +102,7 @@ class Ui_MainWindow(object):
         self.special_question.setItemText(8, QCoreApplication.translate("MainWindow", u"What is the name of the town where you were born?", None))
 
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\">Special Question</p></body></html>", None))
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\">Anser to<br/>Special Question</p></body></html>", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\">Answer to<br/>Special Question</p></body></html>", None))
         self.cancel_register.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
     # retranslateUi
 

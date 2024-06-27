@@ -11,7 +11,7 @@ if __name__ == "__main__":
     db_manager.create_schema_and_tables()
     #db_manager.add_raw_material('bobo', 'asdasd',12,1,1,'asdasd')
     data = db_manager.populate_raw_materials()
-    db_manager.add_dummy_data()
+    #db_manager.add_dummy_data()
     print(data)
     # data = db_manager.get_deadline_id("Hermand", "Details E")
     # print(data)
