@@ -1605,6 +1605,41 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
+    def validate_user_for_reset(self, username, question, answer):
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+        try:
+            cursor = self.connection.cursor()
+            enc_username = self.cipher.encrypt(username)
+            cursor.execute("SELECT username, secret_question, secret_answer FROM ACCOUNTS WHERE username = %s",
+                           (enc_username,))
+            result = cursor.fetchone()
+            if result:
+                enc_question = self.cipher.encrypt(question)
+                enc_answer = self.cipher.encrypt(answer)
+                stored_question, stored_answer = result[1], result[2]
+                if enc_question == stored_question and enc_answer == stored_answer:
+                    return True
+            return False
+        except Error as e:
+            print(f"Error: {e}")
+            return False
+
+    def update_password(self, username, new_password):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            enc_username = self.cipher.encrypt(username)
+            enc_password = self.cipher.encrypt(new_password)
+            cursor.execute("UPDATE ACCOUNTS SET password = %s WHERE username = %s", (enc_password, enc_username))
+            self.connection.commit()
+            print("Password updated successfully.")
+        except Error as e:
+            print(f"Error: {e}")
+
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()

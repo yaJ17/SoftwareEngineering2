@@ -105,7 +105,10 @@ class LoginWindow(QMainWindow):
         self.failed_attempts = 0
 
     def handle_forgot_password(self):
-        QMessageBox.information(self, "Forgot Password", "Forgot Password functionality is not implemented yet.")
+        from forgot_password import ForgotPasswordWindow  # Adjust the import path as necessary
+        self.FP_window = ForgotPasswordWindow()
+        self.FP_window.show()
+        self.close()
 
     def handle_exit(self):
         self.close()
