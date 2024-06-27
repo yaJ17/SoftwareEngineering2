@@ -56,6 +56,9 @@ class MainWindow(QMainWindow):
         self.ui.cancel_add_deadline.clicked.connect(self.cancel_add_dl)
         self.ui.cancel_edit_deadline.clicked.connect(self.cancel_edit_dl)
         self.ui.add_deadline_button.clicked.connect(self.add_dl)
+        self.ui.save_add_deadline.bclicked.connect(self.save_added_deadline)
+        self.ui.save_edit_deadline.bclicked.connect(self.save_edited_deadline)
+        self.ui.archive_edit_deadline.bclicked.connect(self.archive_deadline)
 
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
@@ -247,6 +250,12 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+    def save_added_deadline(self):
+        print("")
+    def save_edited_deadline(self):
+        print("")
+    def archive_deadline(self):
+        print("")
     def cancel_add_dl(self):
 
         self.ui.stackedWidget.setCurrentIndex(12)
