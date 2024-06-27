@@ -697,6 +697,19 @@ class DatabaseManager:
 
         return decrypted_rows
 
+    def populate_deadline_now(self, date) -> tuple:
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s ORDER BY deadline_date ASC", (date,))
+        rows = cursor.fetchall()
+
+        decrypted_rows = []
+        for row in rows:
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+            print(decrypted_row)
+
+        return decrypted_rows
+
     def get_deadline_id(self, deadline_name, deadline_details):
         cursor = self.connection.cursor()
         cursor.execute("SELECT deadline_id FROM DEADLINE WHERE deadline_name = %s AND deadline_details = %s",

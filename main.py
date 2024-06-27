@@ -1074,7 +1074,7 @@ class MainWindow(QMainWindow):
         print(f"Date clicked: {clicked_date_str}")
 
         # Fetch data from daily_table where date matches clicked date
-        schedules = self.db_manager.populate_deadline()
+        schedules = self.db_manager.populate_deadline_now(clicked_date_str)
         print("hello")
         for row in schedules:
             print(row)
