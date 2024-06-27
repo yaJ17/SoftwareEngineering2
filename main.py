@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
 
     def populate_weekly_table(self):
         # Call the populate_deadline function from database module
-        deadline_week = self.db_manager.populate_deadline()
+        deadline_week = self.db_manager.populate_deadline_by_week()
         print("hello")
         for row in deadline_week:
             print(row)
