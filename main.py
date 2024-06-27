@@ -56,9 +56,9 @@ class MainWindow(QMainWindow):
         self.ui.cancel_add_deadline.clicked.connect(self.cancel_add_dl)
         self.ui.cancel_edit_deadline.clicked.connect(self.cancel_edit_dl)
         self.ui.add_deadline_button.clicked.connect(self.add_dl)
-        self.ui.save_add_deadline.bclicked.connect(self.save_added_deadline)
-        self.ui.save_edit_deadline.bclicked.connect(self.save_edited_deadline)
-        self.ui.archive_edit_deadline.bclicked.connect(self.archive_deadline)
+        self.ui.save_add_deadline.clicked.connect(self.save_added_deadline)
+        self.ui.save_edit_deadline.clicked.connect(self.save_edited_deadline)
+        self.ui.archive_edit_deadline.clicked.connect(self.archive_deadline)
 
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
@@ -121,6 +121,7 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.username = username
+        self.username_id = username_id
         # Show the window after populating the table
         self.show()
         self.ui.add_account.clicked.connect(self.show_register_window)
@@ -251,13 +252,37 @@ class MainWindow(QMainWindow):
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def save_added_deadline(self):
-        print("")
-    def save_edited_deadline(self):
-        print("")
-    def archive_deadline(self):
-        print("")
-    def cancel_add_dl(self):
+        print("pinindot mo ako")
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        deadline_date = self.ui.add_deadline_date.date().toString("yyyy-MM-dd")
+        deadline_name = self.ui.add_deadline_name.text()
+        deadline_details = self.ui.add_deadline_details.toPlainText()
+        print(deadline_name, deadline_details, deadline_date)
+        self.db_manager.add_deadline(deadline_name, deadline_details, deadline_date)
 
+        self.ui.add_deadline_date.setDate(QDate.currentDate())
+        self.ui.add_deadline_name.setText("")
+        self.ui.add_deadline_details.setText("")
+        # self.ui.stackedWidget.setCurrentIndex(14)
+        self.db_manager.connection.commit()
+        self.show_scheduling()
+    def save_edited_deadline(self):
+        print("pinindot mo ako edit")
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        deadline_date = self.ui.edit_deadline_date.date().toString("yyyy-MM-dd")
+        deadline_name = self.ui.edit_deadline_name.text()
+        deadline_details = self.ui.edit_deadline_details.toPlainText()
+        print(deadline_name, deadline_details, deadline_date)
+        self.db_manager.set_deadline(deadline_name, deadline_details, deadline_date, self.data['name'], self.data['details'], self.data['date'])
+        self.db_manager.connection.commit()
+        self.show_scheduling()
+
+    def archive_deadline(self):
+        self.db_manager.void_deadline(self.data['name'], self.data['details'], self.data['date'])
+        self.db_manager.connection.commit()
+        self.show_scheduling()
+
+    def cancel_add_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
     def cancel_edit_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
@@ -327,7 +352,11 @@ class MainWindow(QMainWindow):
             self.ui.edit_deadline_date.setDate(dl_date.date())
         else:
             print(f"Error: No data found in row {row}")
-
+        self.data = {
+            'name': dl_name,
+            'details': dl_details,
+            'date': dl_date.date().toString("yyyy-MM-dd")
+        }
         self.ui.stackedWidget.setCurrentIndex(18)
 
     def handle_edit_deadline_daily(self, row):
@@ -355,9 +384,12 @@ class MainWindow(QMainWindow):
             self.ui.edit_deadline_date.setDate(dl_date.date())
         else:
             print(f"Error: No data found in row {row}")
-
+        self.data = {
+            'name': dl_name,
+            'details': dl_details,
+            'date': dl_date.date().toString("yyyy-MM-dd")
+        }
         self.ui.stackedWidget.setCurrentIndex(18)
-
 
 
     def populate_dashboard_weekly(self):
@@ -564,12 +596,14 @@ class MainWindow(QMainWindow):
         self.ui.order_quantity_spinBox.setValue(0)
         self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
         self.ui.order_priority_spinBox.setValue(0)
+        self.db_manager.connection.commit()
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
 
     def void_production(self):
         client_id = self.db_manager.get_client_id(self.data["name"])
         self.db_manager.void_client(client_id)
+        self.db_manager.connection.commit()
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
         
@@ -583,7 +617,7 @@ class MainWindow(QMainWindow):
         price = self.ui.inventory_active_product.value()
         print(bag_type, quantity, defective, cost, price)
         self.db_manager.add_product(bag_type, quantity, defective, cost, price)
-
+        self.db_manager.connection.commit()
        
         self.ui.inventory_bag_type.setText("")
         self.ui.add_inventory_product.setValue(0)
@@ -604,16 +638,19 @@ class MainWindow(QMainWindow):
         supplier = self.ui.add_material_supplier.text()
         print(name, mat_type, stock, cost, safety, supplier)
         self.db_manager.add_raw_material(name,mat_type, stock, cost, safety, supplier)
+        self.db_manager.connection.commit()
         self.ui.add_inventory_Materiel.setText("")
         self.ui.add_material_type.setText("")
         self.ui.add_material_stock.setValue(0)
         self.ui.add_material_cost.setValue(0)
         self.ui.add_safety_stock.setValue(0)
         self.ui.add_material_supplier.setText("")
+
         self.show_inventory()
 
     def void_material(self):
         self.db_manager.void_raw_material(self.data['name'], self.data['supplier'])
+        self.db_manager.connection.commit()
         self.show_inventory()
 
     def populate_orders(self):
@@ -875,6 +912,7 @@ class MainWindow(QMainWindow):
 
     def void_product(self):
         self.db_manager.void_product(self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+        self.db_manager.connection.commit()
         self.show_inventory()
 
     def ratcliff_obershelp_similarity(self, str1, str2):
@@ -972,6 +1010,10 @@ class MainWindow(QMainWindow):
         c.setFont('Helvetica', 12)
         c.drawRightString(width - 30, height - 30, "Generated on: " + pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"))
 
+        # Generated By
+        c.setFont('Helvetica', 12)
+        c.drawRightString(width - 30, 30, f"Generated by: {self.username} / {self.username_id}")
+
         y_position = height - 120
         for report_data, report_title in report_data_list:
             # Type of Report
@@ -1005,7 +1047,7 @@ class MainWindow(QMainWindow):
             y_position -= (table_height + 50)  # Space between tables
 
         c.save()
-
+    
     def generate_product_pdf_clicked(self):
         sql_script = """
         SELECT  

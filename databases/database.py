@@ -670,8 +670,11 @@ class DatabaseManager:
                 FROM
                     DEADLINE
                 WHERE
-                    YEARWEEK(deadline_date, 1) = YEARWEEK(CURDATE(), 1);
- 
+                    YEARWEEK(deadline_date, 1) = YEARWEEK(CURDATE(), 1) and
+                    deadline_active = 1
+                ORDER BY
+                    deadline_date ASC,
+                    deadline_id DESC
                 '''
             )
             rows = cursor.fetchall()
@@ -686,7 +689,7 @@ class DatabaseManager:
 
     def populate_deadline(self) -> tuple:
         cursor = self.connection.cursor()
-        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date >=CURDATE() ORDER BY deadline_date ASC")
+        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date >=CURDATE() and deadline_active = 1 ORDER BY deadline_date ASC, deadline_id DESC")
         rows = cursor.fetchall()
 
         decrypted_rows = []
@@ -699,7 +702,7 @@ class DatabaseManager:
 
     def populate_deadline_now(self, date) -> tuple:
         cursor = self.connection.cursor()
-        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s ORDER BY deadline_date ASC", (date,))
+        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s  and deadline_active = 1 ORDER BY deadline_date ASC,deadline_id DESC", (date,))
         rows = cursor.fetchall()
 
         decrypted_rows = []
@@ -717,23 +720,22 @@ class DatabaseManager:
         result = cursor.fetchone()[0]
         return result
 
-    def set_deadline(self, deadline_id, deadline_name, deadline_details, deadline_date):
+    def set_deadline(self,deadline_name, deadline_details, deadline_date, olddeadline_name, olddeadline_details, olddeadline_date):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
             cursor.execute('''
-                SELECT deadline_id FROM deadline WHERE deadline_id = %s
-            ''', (deadline_id,))
-            result = cursor.fetchone()
-            if result:
-                if result[0] == deadline_id:
-                    cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s WHERE deadline_id =%s",
+                SELECT deadline_id FROM deadline WHERE deadline_name = %s and deadline_details = %s and deadline_date = %s
+            ''', (self.cipher.encrypt(olddeadline_name), self.cipher.encrypt(olddeadline_details), olddeadline_date))
+            deadline_id = cursor.fetchone()[0]
+            if deadline_id:
+                cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s WHERE deadline_id =%s",
                                     (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details), deadline_date, deadline_id))
-                    print("Details updated successfully.")
-                else:
-                    print("Invalid order.")
+                print("Details updated successfully.")
+            else:
+                print("Invalid order.")
 
         except Error as e:
             print(f"Error: {e}")
@@ -745,18 +747,22 @@ class DatabaseManager:
             print("No connection to database")
         try:
             cursor = self.connection.cursor()
-            cursor.execute("INSERT INTO deadline(deadline_name, deadline_details, deadline_date) VALUES(%s,%s,%s)", (name,details,date))
+            cursor.execute("INSERT INTO deadline(deadline_name, deadline_details, deadline_date) VALUES(%s,%s,%s)", (self.cipher.encrypt(name), self.cipher.encrypt(details), date))
         except Error as e:
             print(f"Error: {e}")
     '''
                     POPULATE raw material INVENTORY
                                                                 '''
-    def void_deadline(self, deadline_id):
+    def void_deadline(self, deadline_name, deadline_details, date):
         if self.connection is None:
             print("No connection to the database.")
             return
         try:
             cursor = self.connection.cursor()
+            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name =%s and deadline_details =%s and deadline_date =%s", 
+                           (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details), date))
+            deadline_id = cursor.fetchone()[0]
+            print(deadline_id)
             cursor.execute("SELECT deadline_active FROM deadline WHERE deadline_id = %s", (deadline_id,))
             result = cursor.fetchone()
             if result is not None:
@@ -1379,7 +1385,7 @@ class DatabaseManager:
     def populate_deadline_daily(self, date) -> tuple:
         cursor = self.connection.cursor()
         cursor.execute(
-            "SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s ORDER BY deadline_date ASC")
+            "SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s and deadline_active = 1 ORDER BY deadline_date ASC, deadline_id DESC")
         rows = cursor.fetchall()
 
         decrypted_rows = []
