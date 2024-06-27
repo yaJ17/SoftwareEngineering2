@@ -1658,6 +1658,40 @@ class DatabaseManager:
             print("Password updated successfully.")
         except Error as e:
             print(f"Error: {e}")
+    def populate_user_logs(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT a.username, u.action, u.timestamp FROM USER_LOGS u JOIN accounts a ON u.account_id = a.account_id;")
+            result = cursor.fetchall()
+            decrypted_rows = []
+            for row in result:
+                decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+                decrypted_rows.append(decrypted_row)
+            return decrypted_rows
+        except Error as e:
+            print(f"Error: {e}")
+    def add_user_log(self, username, userid, action):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("""
+                INSERT INTO USER_LOGS 
+	                (account_id ,
+                    action
+                    ) 
+                VALUES 
+                    ((SELECT account_id FROM accounts WHERE username = %s and username_id = %s), %s);
+                """,
+                (self.cipher.encrypt(username), self.cipher.encrypt(userid), self.cipher.encrypt(action)))
+            self.connection.commit()
+            print("User log added successfully.")
+        except Error as e:
+            print(f"Error: {e}")
 
     def close_connection(self):
         if self.connection and self.connection.is_connected():
