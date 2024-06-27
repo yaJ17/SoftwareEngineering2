@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>10</number>
     </property>
     <widget class="QWidget" name="dashBoard">
      <widget class="QLabel" name="welcome_label">
@@ -1976,35 +1976,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <string>Back</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="edit_weekly">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>330</y>
-        <width>75</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Edit</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="save_weekly">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>330</y>
-        <width>75</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="scheddaily">
      <widget class="QLabel" name="label_74">
@@ -2048,35 +2019,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>1</number>
       </attribute>
-     </widget>
-     <widget class="QPushButton" name="save_daily">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>500</x>
-        <y>320</y>
-        <width>75</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="edit_daily">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>320</y>
-        <width>75</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Edit</string>
-      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="about">
@@ -2261,6 +2203,239 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </layout>
        </item>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="sched_add">
+     <widget class="QDateEdit" name="add_deadline_date">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>257</y>
+        <width>311</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>87</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Name&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>137</y>
+        <width>131</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Details&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="add_deadline_name">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>107</y>
+        <width>311</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="add_deadline_details">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>157</y>
+        <width>311</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>47</y>
+        <width>311</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;ADD DEADLINE&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>240</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Date&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="save_add_deadline">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>300</y>
+        <width>75</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="cancel_add_deadline">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>300</y>
+        <width>75</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="sched_edit">
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>87</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Name&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>137</y>
+        <width>131</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Details&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="edit_deadline_name">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>107</y>
+        <width>311</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="edit_deadline_details">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>157</y>
+        <width>311</width>
+        <height>71</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>47</y>
+        <width>311</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700;&quot;&gt;EDIT DEADLINE&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="cancel_edit_deadline">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>300</y>
+        <width>75</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="archive_edit_deadline">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>300</y>
+        <width>75</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Archive</string>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="edit_deadline_date">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>257</y>
+        <width>311</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_19">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>240</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline Date&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="save_edit_deadline">
+      <property name="geometry">
+       <rect>
+        <x>249</x>
+        <y>300</y>
+        <width>75</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
      </widget>
     </widget>
    </widget>

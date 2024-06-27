@@ -35,10 +35,8 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
-
+        self.ui.add_deadline_date.setDate(QDate(current_date.year, current_date.month, current_date.day))
         #weekly buttons
-        self.ui.edit_weekly.clicked.connect(self.enable_edit_weekly)
-
 
 
 
@@ -55,6 +53,9 @@ class MainWindow(QMainWindow):
         self.ui.logout_button.clicked.connect(self.logout)
         self.ui.backup_button.clicked.connect(self.backup)
         self.ui.restore_button.clicked.connect(self.restore)
+        self.ui.cancel_add_deadline.clicked.connect(self.cancel_add_dl)
+        self.ui.cancel_edit_deadline.clicked.connect(self.cancel_edit_dl)
+        self.ui.add_deadline_button.clicked.connect(self.add_dl)
 
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
@@ -246,6 +247,14 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+    def cancel_add_dl(self):
+
+        self.ui.stackedWidget.setCurrentIndex(12)
+    def cancel_edit_dl(self):
+        self.ui.stackedWidget.setCurrentIndex(12)
+
+    def add_dl(self):
+        self.ui.stackedWidget.setCurrentIndex(17)
 
     def populate_weekly_table(self):
         # Call the populate_deadline function from database module
@@ -255,7 +264,7 @@ class MainWindow(QMainWindow):
             print(row)
 
         # Define headers for the table
-        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date', 'Edit']
         # Set the number of rows and columns
         self.ui.weekly_table.setRowCount(len(deadline_week))
         self.ui.weekly_table.setColumnCount(len(headers))
@@ -268,17 +277,78 @@ class MainWindow(QMainWindow):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.weekly_table.setItem(row_index, column_index, item)
+
+            # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
+
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_weekly(row))
+            self.ui.weekly_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+            edit_button.clearFocus()
+
         # Set the edit triggers (disable editing)
         self.ui.weekly_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-    def enable_edit_weekly(self):
-        # Enable editing in table_weekly
-        self.ui.weekly_table.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked)
+    def handle_edit_deadline_weekly(self, row):
+        # Get deadline name from table
+        dl_name_item = self.ui.weekly_table.item(row, 0)
+        if dl_name_item:
+            dl_name = dl_name_item.text()
+            self.ui.edit_deadline_name.setText(dl_name)
+        else:
+            print(f"Error: No data found in row {row}")
 
-        # Enable save_weekly button
+        dl_details_item = self.ui.weekly_table.item(row, 1)
+        if dl_details_item:
+            dl_details = dl_details_item.text()
+            self.ui.edit_deadline_details.setText(dl_details)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get deadline date from product_table's fourth column at specified row
+        dl_date_item = self.ui.weekly_table.item(row, 2)  # Assuming deadline date is in the fourth column
+        if dl_date_item:
+            dl_str = dl_date_item.text()
+            dl_date = QDateTime.fromString(dl_str,
+                                                 "yyyy-MM-dd")  # Assuming the deadline format is "yyyy-MM-dd"
+            self.ui.edit_deadline_date.setDate(dl_date.date())
+        else:
+            print(f"Error: No data found in row {row}")
+
+        self.ui.stackedWidget.setCurrentIndex(18)
+
+    def handle_edit_deadline_daily(self, row):
+        # Get deadline name from table
+        dl_name_item = self.ui.daily_table.item(row, 0)
+        if dl_name_item:
+            dl_name = dl_name_item.text()
+            self.ui.edit_deadline_name.setText(dl_name)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        dl_details_item = self.ui.daily_table.item(row, 1)
+        if dl_details_item:
+            dl_details = dl_details_item.text()
+            self.ui.edit_deadline_details.setText(dl_details)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get deadline date from product_table's fourth column at specified row
+        dl_date_item = self.ui.daily_table.item(row, 2)  # Assuming deadline date is in the fourth column
+        if dl_date_item:
+            dl_str = dl_date_item.text()
+            dl_date = QDateTime.fromString(dl_str,
+                                                 "yyyy-MM-dd")  # Assuming the deadline format is "yyyy-MM-dd"
+            self.ui.edit_deadline_date.setDate(dl_date.date())
+        else:
+            print(f"Error: No data found in row {row}")
+
+        self.ui.stackedWidget.setCurrentIndex(18)
+
 
 
     def populate_dashboard_weekly(self):
@@ -1080,7 +1150,7 @@ class MainWindow(QMainWindow):
             print(row)
 
         # Define headers for the table
-        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date']
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date', 'Edit']
         # Set the number of rows and columns
         self.ui.daily_table.setRowCount(len(schedules))
         self.ui.daily_table.setColumnCount(len(headers))
@@ -1093,6 +1163,15 @@ class MainWindow(QMainWindow):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.daily_table.setItem(row_index, column_index, item)
+
+            # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
+
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_daily(row))
+            self.ui.daily_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+            edit_button.clearFocus()
         # Set the edit triggers (disable editing)
         self.ui.daily_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
