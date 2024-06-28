@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QWidget
 from PySide6.QtCore import QDate
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView
+from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView, QMessageBox
 import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
@@ -361,12 +361,28 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def archive_deadline(self):
+        print("Archive deadline function called")
         deadline_name = self.ui.edit_deadline_name.text()
-        self.db_manager.void_deadline(self.data['name'], self.data['details'], self.data['date'])
-        self.db_manager.connection.commit()
-        self.show_scheduling()
-        action = f"Archived {deadline_name} (deadline)."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+        print(f"Deadline name: {deadline_name}")
+
+        reply = QMessageBox.question(self, 'Cancel Deadline',
+                                     f'Are you sure you want to cancel the deadline "{deadline_name}"?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+            print("User confirmed")
+            # Proceed with archiving logic
+            self.db_manager.void_deadline(self.data['name'], self.data['details'], self.data['date'])
+            self.db_manager.connection.commit()
+            self.show_scheduling()
+            action = f"Archived {deadline_name} (deadline)."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+
+        print("End of archive_deadline function")
 
     def cancel_add_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
