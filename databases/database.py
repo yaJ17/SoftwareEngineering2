@@ -759,13 +759,24 @@ class DatabaseManager:
 
         return decrypted_rows
 
+    def get_deadline_detail(self, deadline_name, deadline_details):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_name = %s AND deadline_details = %s",
+                       (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details)))
+        result = cursor.fetchall()
+        decrypted_rows = []
+        for row in result:
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+            print(decrypted_row)
+
+        return decrypted_rows
     def get_deadline_id(self, deadline_name, deadline_details):
         cursor = self.connection.cursor()
         cursor.execute("SELECT deadline_id FROM DEADLINE WHERE deadline_name = %s AND deadline_details = %s",
                        (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details)))
         result = cursor.fetchone()[0]
         return result
-
     def set_deadline(self,deadline_name, deadline_details, deadline_date, olddeadline_name, olddeadline_details, olddeadline_date):
         if self.connection is None:
             print("No connection to the database.")
