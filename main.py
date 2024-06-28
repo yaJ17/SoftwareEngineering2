@@ -143,6 +143,21 @@ class MainWindow(QMainWindow):
         # Open the PDF file with the default PDF viewer
         url = QUrl.fromLocalFile(pdf_path)
         QDesktopServices.openUrl(url)
+    def open_report(self, filename):
+         # Directory of the current script
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+
+        # Path to the User Manual PDF
+        pdf_path = os.path.join(current_dir, filename)
+
+        # Check if the PDF file exists
+        if not os.path.exists(pdf_path):
+            QMessageBox.warning(self, "File Not Found", "User Manual.pdf not found in the application directory.")
+            return
+
+        # Open the PDF file with the default PDF viewer
+        url = QUrl.fromLocalFile(pdf_path)
+        QDesktopServices.openUrl(url)
     def show_register_window(self):
         self.register_window = RegisterWindow()
         self.register_window.show()
@@ -1083,7 +1098,7 @@ class MainWindow(QMainWindow):
             y_position -= (table_height + 50)  # Space between tables
 
         c.save()
-    
+        self.open_report(full_file_name)
     def generate_product_pdf_clicked(self):
         sql_script = """
         SELECT  
