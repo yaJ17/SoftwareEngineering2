@@ -36,7 +36,6 @@ class MainWindow(QMainWindow):
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.add_deadline_date.setDate(QDate(current_date.year, current_date.month, current_date.day))
-
         self.ui.dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.dateEdit_2.setDate(QDate(current_date.year, current_date.month, current_date.day))
         #weekly buttons
@@ -1181,7 +1180,6 @@ class MainWindow(QMainWindow):
 
         c.save()
         self.open_report(full_file_name)
-
     def generate_product_pdf_clicked(self):
         sql_script = """
         SELECT  
