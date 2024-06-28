@@ -59,6 +59,8 @@ class MainWindow(QMainWindow):
         self.ui.save_add_deadline.clicked.connect(self.save_added_deadline)
         self.ui.save_edit_deadline.clicked.connect(self.save_edited_deadline)
         self.ui.archive_edit_deadline.clicked.connect(self.archive_deadline)
+        self.ui.user_logs_button.clicked.connect(self.show_user_logs)
+        self.ui.generate_user_logs.clicked.connect(self.generate_user_logs)
 
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
@@ -230,6 +232,40 @@ class MainWindow(QMainWindow):
         from login import LoginWindow
         self.login_window = LoginWindow()
         self.login_window.show()
+
+    def show_user_logs(self):
+        self.ui.stackedWidget.setCurrentIndex(19)
+        self.populate_user_logs()
+
+
+
+    def generate_user_logs(self):
+        print("User logs Generated")
+
+    def populate_user_logs(self):
+        transac = self.db_manager.populate_user_logs()
+        print("hello")
+        for row in transac:
+            print(row)
+
+        # Define headers for the table
+        headers = ['USER ID', 'USERNAME', 'ACTION', 'TIMESTAMP']
+        self.ui.user_logs_table.setRowCount(len(transac))
+        self.ui.user_logs_table.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.user_logs_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(transac):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.user_logs_table.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.user_logs_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.user_logs_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def backup(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
@@ -439,13 +475,13 @@ class MainWindow(QMainWindow):
 
     def populate_table_transac(self):
         # Call the populate_deadline function from database module
-        transac = self.db_manager.populate_transaction()
+        transac = self.db_manager.populate_orders_transaction()
         print("hello")
         for row in transac:
             print(row)
 
         # Define headers for the table
-        headers = ['Username', 'Action', 'TimeStamp']
+        headers = ['Client', 'Order', 'Quantity', 'Order Created', 'Deadline']
         self.ui.table_transac.setRowCount(len(transac))
         self.ui.table_transac.setColumnCount(len(headers))
 

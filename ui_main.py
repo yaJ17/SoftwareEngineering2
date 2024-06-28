@@ -636,6 +636,9 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addLayout(self.verticalLayout_4)
 
+        self.user_logs_button = QPushButton(self.reports)
+        self.user_logs_button.setObjectName(u"user_logs_button")
+        self.user_logs_button.setGeometry(QRect(173, 224, 171, 24))
         self.stackedWidget.addWidget(self.reports)
         self.sched_add = QWidget()
         self.sched_add.setObjectName(u"sched_add")
@@ -700,6 +703,18 @@ class Ui_MainWindow(object):
         self.save_edit_deadline.setObjectName(u"save_edit_deadline")
         self.save_edit_deadline.setGeometry(QRect(249, 300, 75, 24))
         self.stackedWidget.addWidget(self.sched_edit)
+        self.reports_user_logs = QWidget()
+        self.reports_user_logs.setObjectName(u"reports_user_logs")
+        self.label_76 = QLabel(self.reports_user_logs)
+        self.label_76.setObjectName(u"label_76")
+        self.label_76.setGeometry(QRect(10, 30, 631, 31))
+        self.user_logs_table = QTableWidget(self.reports_user_logs)
+        self.user_logs_table.setObjectName(u"user_logs_table")
+        self.user_logs_table.setGeometry(QRect(10, 80, 641, 192))
+        self.generate_user_logs = QPushButton(self.reports_user_logs)
+        self.generate_user_logs.setObjectName(u"generate_user_logs")
+        self.generate_user_logs.setGeometry(QRect(504, 300, 141, 24))
+        self.stackedWidget.addWidget(self.reports_user_logs)
         self.line_2 = QFrame(self.centralwidget)
         self.line_2.setObjectName(u"line_2")
         self.line_2.setGeometry(QRect(240, 70, 651, 20))
@@ -776,7 +791,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(10)
+        self.stackedWidget.setCurrentIndex(16)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -958,6 +973,7 @@ class Ui_MainWindow(object):
         self.sales_report_btn.setToolTip(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><br/></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.sales_report_btn.setText(QCoreApplication.translate("MainWindow", u"Generate Sales Report", None))
+        self.user_logs_button.setText(QCoreApplication.translate("MainWindow", u"User Logs", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Deadline Name</span></p></body></html>", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Deadline Details</span></p></body></html>", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">ADD DEADLINE</span></p><p align=\"center\"><br/></p></body></html>", None))
@@ -971,6 +987,8 @@ class Ui_MainWindow(object):
         self.archive_edit_deadline.setText(QCoreApplication.translate("MainWindow", u"Archive", None))
         self.label_19.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Deadline Date</span></p><p><br/></p></body></html>", None))
         self.save_edit_deadline.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.label_76.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">User Logs</span></p></body></html>", None))
+        self.generate_user_logs.setText(QCoreApplication.translate("MainWindow", u"Generate User Logs", None))
         self.dash_button.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
         self.prod_button.setText(QCoreApplication.translate("MainWindow", u"Production Tracking", None))
         self.sched_button.setText(QCoreApplication.translate("MainWindow", u"Scheduling", None))
