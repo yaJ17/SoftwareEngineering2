@@ -531,6 +531,52 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
+    def populate_orders_transaction(self) -> tuple:
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                '''
+                SELECT 
+                    c.client_name, 
+                    o.bag_type, 
+                    o.order_quantity, 
+                    o.created_at,
+                    d.deadline_date 
+                 
+                FROM 
+                    CLIENT c
+
+                JOIN 
+                    ORDERS o ON c.client_id = o.client_id
+                JOIN 
+                    DEADLINE d ON c.deadline_id = d.deadline_id
+                WHERE 
+                    c.client_active = 1
+                ORDER BY 
+          
+                    o.created_at DESC;
+                '''
+            )
+            rows = cursor.fetchall()
+
+            decrypted_rows = []
+            for row in rows:
+                decrypted_row = []
+                for value in row:
+                    if isinstance(value, str):  # Decrypt only if the value is a string
+                        decrypted_value = self.cipher.decrypt(value)
+                    else:
+                        decrypted_value = value
+                    decrypted_row.append(decrypted_value)
+                decrypted_rows.append(tuple(decrypted_row))
+
+            return decrypted_rows
+        except Error as e:
+            print(f"Error: {e}")
+
     def get_order_id(self, name):
         cursor = self.connection.cursor()
         cursor.execute("SELECT order_id FROM ORDERS WHERE client_id = (SELECT client_id FROM client WHERE client_name= %s)", (self.cipher.encrypt(name),))
@@ -1664,7 +1710,16 @@ class DatabaseManager:
             return
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT a.username, u.action, u.timestamp FROM USER_LOGS u JOIN accounts a ON u.account_id = a.account_id;")
+            cursor.execute('''
+            SELECT 
+                u.account_id,
+                a.username,
+                u.action,
+                u.timestamp 
+            FROM 
+                USER_LOGS u JOIN accounts a ON u.account_id = a.account_id
+            ORDER BY u.timestamp DESC;
+            ''')
             result = cursor.fetchall()
             decrypted_rows = []
             for row in result:
