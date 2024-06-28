@@ -711,6 +711,7 @@ class MainWindow(QMainWindow):
         data_details = self.data['deadline_details']
         id = self.db_manager.get_order_id(data_name)
         deadline_id = self.db_manager.get_deadline_id(data_name, data_details)
+        deadline = self.db_manager.get_deadline_detail(data_name, data_details)
         name = self.ui.edit_client_name.text()
         bag_type = self.ui.edit_bag_type.text()
         order_quantity = self.ui.edit_order_quantity.value()
@@ -718,10 +719,10 @@ class MainWindow(QMainWindow):
         priority = self.ui.edit_order_priority.value() 
         print(f"id {id}")
         deadline_details = self.ui.edit_order_notes.toPlainText()
-        print(deadline_date)
+
 
         self.db_manager.set_order(id, order_quantity, bag_type)
-        self.db_manager.set_deadline(deadline_id, name, deadline_details, deadline_date)
+        self.db_manager.set_deadline(name, deadline_details, deadline_date, deadline[0][0], deadline[0][1], deadline[0][2])
         self.db_manager.set_client_detail(deadline_id, priority, name)
         # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
         self.ui.client_name_entry.setText("")
