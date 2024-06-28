@@ -10,7 +10,7 @@ if __name__ == "__main__":
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
     #db_manager.add_raw_material('bobo', 'asdasd',12,1,1,'asdasd')
-    db_manager.add_user_log("username1", "user1", "BOBOO")
+    #db_manager.add_user_log("username1", "user1", "BOBOO")
     # data = db_manager.populate_user_logs()
     #db_manager.add_dummy_data()
     # print(data)
