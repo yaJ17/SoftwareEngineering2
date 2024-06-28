@@ -57,6 +57,7 @@ class LoginWindow(QMainWindow):
                 # Reset failed attempts on successful login
                 self.failed_attempts = 0
 
+
                 # Pass username and username_id to the main window
 
                 self.main_window = MainWindow(username=userName, username_id=username)

@@ -95,7 +95,9 @@ class MainWindow(QMainWindow):
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
-        #self.db_manager.add_dummy_data()
+
+
+
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
         self.ui.edit_save_button.clicked.connect(self.save_edit_order)
@@ -129,6 +131,7 @@ class MainWindow(QMainWindow):
         self.ui.add_account.clicked.connect(self.show_register_window)
 
     def open_user_manual(self):
+
         # Directory of the current script
         current_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -140,9 +143,16 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "File Not Found", "User Manual.pdf not found in the application directory.")
             return
 
+
+
         # Open the PDF file with the default PDF viewer
         url = QUrl.fromLocalFile(pdf_path)
         QDesktopServices.openUrl(url)
+
+        #User log
+        action = f"Opened the user manual."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
     def open_report(self, filename):
          # Directory of the current script
         current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -227,6 +237,8 @@ class MainWindow(QMainWindow):
         self.username_id = None
         self.close()
         self.show_login_window()
+        action = f"{self.username} logged out."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def show_login_window(self):
         from login import LoginWindow
@@ -238,9 +250,10 @@ class MainWindow(QMainWindow):
         self.populate_user_logs()
 
 
-
     def generate_user_logs(self):
         print("User logs Generated")
+        action = f"Generated user logs report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def populate_user_logs(self):
         transac = self.db_manager.populate_user_logs()
@@ -270,10 +283,15 @@ class MainWindow(QMainWindow):
     def backup(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.db_manager.backup_database_to_excel("data_backup.xlsx")
+        action = f"Created system backup."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def restore(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.db_manager.restore_database_from_excel("data_backup.xlsx")
+
+        action = f"Restored the system data."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def populate_deadline_table(self):
         # Call the populate_deadline function from database module
@@ -317,6 +335,10 @@ class MainWindow(QMainWindow):
         # self.ui.stackedWidget.setCurrentIndex(14)
         self.db_manager.connection.commit()
         self.show_scheduling()
+
+        action = f"Added a new deadline on {deadline_date}."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
     def save_edited_deadline(self):
         print("pinindot mo ako edit")
         # Call save_add_production_action from DatabasecManager to fetch orders data
@@ -328,10 +350,16 @@ class MainWindow(QMainWindow):
         self.db_manager.connection.commit()
         self.show_scheduling()
 
+        action = f"Edited {deadline_name} (deadline)."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
     def archive_deadline(self):
+        deadline_name = self.ui.edit_deadline_name.text()
         self.db_manager.void_deadline(self.data['name'], self.data['details'], self.data['date'])
         self.db_manager.connection.commit()
         self.show_scheduling()
+        action = f"Archived {deadline_name} (deadline)."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def cancel_add_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
@@ -651,12 +679,18 @@ class MainWindow(QMainWindow):
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
 
+        action = f"Added an order."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
     def void_production(self):
+        client_name = self.ui.edit_client_name.text()
         client_id = self.db_manager.get_client_id(self.data["name"])
         self.db_manager.void_client(client_id)
         self.db_manager.connection.commit()
         self.populate_orders()
         self.ui.stackedWidget.setCurrentIndex(9)
+        action = f"Archived {client_name}'s order."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
         
     def save_add_finish_product_invent(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
@@ -669,7 +703,11 @@ class MainWindow(QMainWindow):
         print(bag_type, quantity, defective, cost, price)
         self.db_manager.add_product(bag_type, quantity, defective, cost, price)
         self.db_manager.connection.commit()
-       
+
+       #User logs
+        action = f"Added {quantity} {bag_type} (bag type) with {defective} defectives in the finished product inventory."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
         self.ui.inventory_bag_type.setText("")
         self.ui.add_inventory_product.setValue(0)
         self.ui.add_inventory_defective.setValue(0)
@@ -699,10 +737,19 @@ class MainWindow(QMainWindow):
 
         self.show_inventory()
 
+        action = f"Added {stock} {name} (material) in the raw materials inventory."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
+
     def void_material(self):
+        name = self.ui.add_inventory_Materiel.text()
+
         self.db_manager.void_raw_material(self.data['name'], self.data['supplier'])
         self.db_manager.connection.commit()
         self.show_inventory()
+
+        action = f"Archived {name} (material) from the raw materials inventory."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -766,6 +813,9 @@ class MainWindow(QMainWindow):
         self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
         self.db_manager.connection.commit()
         self.show_production()
+
+        action = f"Edited {name}'s order."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def populate_raw_invent(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -878,6 +928,8 @@ class MainWindow(QMainWindow):
         self.ui.add_material_supplier.setText("")
         self.db_manager.connection.commit()
         self.show_inventory()
+        action = f"Edited {name} (material) in the raw materials inventory."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
         
 
 
@@ -957,14 +1009,24 @@ class MainWindow(QMainWindow):
         defective= self.ui.edit_inventory_defective_2.value()
         cost =self.ui.edit_product_cost_2.value()
         price = self.ui.edit_inventory_active_product_2.value()
+
+        # User logs
+        action = f"Edited {bag_type} (bag type) information in the finished product"
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
         self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
         self.db_manager.connection.commit()
         self.show_inventory()
 
     def void_product(self):
+        bag_type = self.ui.Edit_inventory_bag_type.text()
         self.db_manager.void_product(self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
         self.db_manager.connection.commit()
         self.show_inventory()
+
+        # User logs
+        action = f"Voided  {bag_type} from the finished product inventory."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def ratcliff_obershelp_similarity(self, str1, str2):
        return difflib.SequenceMatcher(None, str1, str2).ratio()
@@ -1129,7 +1191,8 @@ class MainWindow(QMainWindow):
                 (df, "Product Report")
             ]
         self.generate_pdf(reports, "production_report.pdf")
-
+        action = f"Generated production report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_stock_pdf_clicked(self):
         sql_script = """
@@ -1157,7 +1220,8 @@ class MainWindow(QMainWindow):
                 (df, "Stock Report")
             ]
         self.generate_pdf(reports, "stock_report.pdf")
-
+        action = f"Generated stocks report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_inventory_pdf_clicked(self):
         sql = """
@@ -1188,7 +1252,8 @@ class MainWindow(QMainWindow):
                 (df, "Inventory Report")
             ]
         self.generate_pdf(reports, "inventory_report.pdf")
-
+        action = f"Generated a inventory report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_sales_pdf_clicked(self):
         total_bag_sql = """
@@ -1236,8 +1301,8 @@ class MainWindow(QMainWindow):
         for i in range(len(reports)):
             reports[i] = (reports[i][0].applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x), reports[i][1])
         self.generate_pdf(reports,"sales_report.pdf")
-
-
+        action = f"Generated sales report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
 
     #calendar
     def date_clicked(self, date):

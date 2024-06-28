@@ -40,14 +40,14 @@ class RegisterWindow(QMainWindow):
         )
 
     def handle_register(self):
-        username = self.ui.username_register.text()
+        Username = self.ui.username_register.text()
         password = self.ui.password_register.text()
         confirm_password = self.ui.confirm_password.text()
         special_question = self.ui.special_question.currentText()
         answer = self.ui.textEdit.toPlainText()
 
         # Validate input fields
-        if not username or not password or not confirm_password or not answer or special_question == "Select a question":
+        if not Username or not password or not confirm_password or not answer or special_question == "Select a question":
             QMessageBox.warning(self, "Invalid Input", "All fields must be filled out and a question selected.")
             return
 
@@ -61,9 +61,10 @@ class RegisterWindow(QMainWindow):
             return
 
         # Add account to the database
-        self.db_manager.add_account(username, password, special_question, answer)
+        self.db_manager.add_account(Username, password, special_question, answer)
         QMessageBox.information(self, "Registration Successful", "Account has been successfully created.")
         self.close()
+
 
     def handle_cancel(self):
         self.close()
