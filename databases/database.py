@@ -1439,11 +1439,11 @@ class DatabaseManager:
 
         return decrypted_rows
 
-
     def populate_deadline_daily(self, date) -> tuple:
         cursor = self.connection.cursor()
         cursor.execute(
-            "SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s and deadline_active = 1 ORDER BY deadline_date ASC, deadline_id DESC")
+            "SELECT deadline_name, deadline_details, deadline_date FROM DEADLINE WHERE deadline_date =%s  and deadline_active = 1 ORDER BY deadline_date ASC,deadline_id DESC",
+            (date,))
         rows = cursor.fetchall()
 
         decrypted_rows = []
@@ -1453,6 +1453,8 @@ class DatabaseManager:
             print(decrypted_row)
 
         return decrypted_rows
+
+
 
     def get_username_id(self, input_value):
         cursor = self.connection.cursor()

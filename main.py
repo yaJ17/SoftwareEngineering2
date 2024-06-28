@@ -36,9 +36,13 @@ class MainWindow(QMainWindow):
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.add_deadline_date.setDate(QDate(current_date.year, current_date.month, current_date.day))
+
+        self.ui.dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
+        self.ui.dateEdit_2.setDate(QDate(current_date.year, current_date.month, current_date.day))
         #weekly buttons
 
 
+        #close
 
         # Connect button clicks to their respective functions
         self.ui.dash_button.clicked.connect(self.show_dashboard)
@@ -61,9 +65,10 @@ class MainWindow(QMainWindow):
         self.ui.archive_edit_deadline.clicked.connect(self.archive_deadline)
         self.ui.user_logs_button.clicked.connect(self.show_user_logs)
         self.ui.generate_user_logs.clicked.connect(self.generate_user_logs_pdf_clicked)
-
+        self.ui.back_user_logs.clicked.connect(self.show_reports)
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
+        self.ui.daily_calendar.clicked.connect(self.populate_today)
         self.ui.return_calendar.clicked.connect(self.show_scheduling)
         self.ui.return_calendar_2.clicked.connect(self.show_scheduling)
         self.ui.quick_raw.clicked.connect(self.show_add_raw_material)
@@ -232,13 +237,18 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(8)
 
     def logout(self):
-
+        action = f"Logged out."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
         self.username = None
         self.username_id = None
+
         self.close()
         self.show_login_window()
-        action = f"{self.username} logged out."
+
+    def closeEvent(self, event):
+        action = f"Logged out."
         self.db_manager.add_user_log(self.username, self.username_id, action)
+        event.accept()  # Close the window if user confirms
 
     def show_login_window(self):
         from login import LoginWindow
@@ -1114,6 +1124,8 @@ class MainWindow(QMainWindow):
         return pd.read_sql(query, self.db_manager.connection)
 
     def generate_pdf(self, report_data_list, file_name):
+
+
         file_name = file_name.replace(" ", "_").replace(":", "-")
         full_file_name = f"{file_name}_{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
         c = canvas.Canvas(full_file_name, pagesize=letter)
@@ -1169,6 +1181,7 @@ class MainWindow(QMainWindow):
 
         c.save()
         self.open_report(full_file_name)
+
     def generate_product_pdf_clicked(self):
         sql_script = """
         SELECT  
@@ -1383,6 +1396,47 @@ class MainWindow(QMainWindow):
         # Navigate to index 14 in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(14)
 
+
+    def populate_today(self):
+        print("Today populated")
+        # Assuming current_date is a QDate object
+        current_date = QDate.currentDate()
+
+        # Converting QDate to string
+        now = current_date.toString("yyyy-MM-dd")
+        schedules = self.db_manager.populate_deadline_daily(now)
+        print("hello")
+        for row in schedules:
+            print(row)
+
+        # Define headers for the table
+        headers = ['Deadline Name', 'Deadline Details', 'Deadline Date', 'Edit']
+        # Set the number of rows and columns
+        self.ui.daily_table.setRowCount(len(schedules))
+        self.ui.daily_table.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.daily_table.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(schedules):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.daily_table.setItem(row_index, column_index, item)
+
+            # Add edit button in the last column
+            edit_button = QPushButton('Edit')
+            edit_button.setProperty("row", row_index)
+
+            edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_daily(row))
+            self.ui.daily_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+
+            edit_button.clearFocus()
+        # Set the edit triggers (disable editing)
+        self.ui.daily_table.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.daily_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
 '''
     def display_schedules(self, schedules):

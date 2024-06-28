@@ -4,6 +4,7 @@ from databases.database import DatabaseManager  # Adjust the import path as nece
 import sys
 from main import MainWindow  # Import MainWindow from main.py
 from PySide6.QtCore import QTimer
+from ui_main import Ui_MainWindow
 class LoginWindow(QMainWindow):
     def __init__(self):
         super(LoginWindow, self).__init__()
@@ -38,11 +39,14 @@ class LoginWindow(QMainWindow):
                 # Reset failed attempts on successful login
                 self.failed_attempts = 0
 
-
+                action = f"Logged in"
+                self.db_manager.add_user_log(username, username_id, action)
                 # Pass username and username_id to the main window
                 self.main_window = MainWindow(username=username, username_id=username_id)
                 self.main_window.show()
+
                 self.close()  # Close the login window
+
             else:
                 QMessageBox.warning(self, "Login Failed", "Invalid username or password")
                 self.failed_attempts += 1
@@ -59,10 +63,13 @@ class LoginWindow(QMainWindow):
 
 
                 # Pass username and username_id to the main window
-
+                action = f"Logged in"
+                self.db_manager.add_user_log(userName, username, action)
                 self.main_window = MainWindow(username=userName, username_id=username)
                 self.main_window.show()
+
                 self.close()  # Close the login window
+
             else:
                 QMessageBox.warning(self, "Login Failed", "Invalid username or password")
                 self.failed_attempts += 1
