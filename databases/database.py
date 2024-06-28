@@ -619,7 +619,7 @@ class DatabaseManager:
             deadline_name = client_name
             encrypted_deadline_name = self.cipher.encrypt(deadline_name)
             encrypted_deadline_details = self.cipher.encrypt(deadline_details)
-            self.add_deadline(encrypted_deadline_name, encrypted_deadline_details, deadline_date)
+            self.add_deadline(deadline_name, deadline_details, deadline_date)
             print(f"deadline details: {deadline_details}")
             print(self.cipher.decrypt(encrypted_deadline_name))
             # Fetch the deadline_id
@@ -651,6 +651,7 @@ class DatabaseManager:
             print(f"Client ID: {client_id}")
 
             # Insert into ORDERS table
+            bag_type = self.cipher.encrypt(bag_type)
             cursor.execute('''
                 INSERT INTO ORDERS(
                     client_id,
@@ -659,7 +660,7 @@ class DatabaseManager:
                     bag_type
                 )
                 VALUES (%s, %s, %s, %s)
-            ''', (client_id, order_quantity, 0, self.cipher.encrypt(bag_type)))
+            ''', (client_id, order_quantity, 0, bag_type))
 
             # Commit the transaction
             self.connection.commit()

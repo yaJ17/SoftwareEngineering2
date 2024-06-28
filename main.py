@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.ui.save_edit_deadline.clicked.connect(self.save_edited_deadline)
         self.ui.archive_edit_deadline.clicked.connect(self.archive_deadline)
         self.ui.user_logs_button.clicked.connect(self.show_user_logs)
-        self.ui.generate_user_logs.clicked.connect(self.generate_user_logs)
+        self.ui.generate_user_logs.clicked.connect(self.generate_user_logs_pdf_clicked)
 
         self.ui.weekly_calendar.clicked.connect(self.show_weekly_scheduling)
         self.ui.daily_calendar.clicked.connect(self.show_daily_scheduling)
@@ -250,10 +250,7 @@ class MainWindow(QMainWindow):
         self.populate_user_logs()
 
 
-    def generate_user_logs(self):
-        print("User logs Generated")
-        action = f"Generated user logs report."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+
 
     def populate_user_logs(self):
         transac = self.db_manager.populate_user_logs()
@@ -279,7 +276,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.user_logs_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     def backup(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.db_manager.backup_database_to_excel("data_backup.xlsx")
@@ -319,6 +316,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def save_added_deadline(self):
         print("pinindot mo ako")
@@ -405,6 +403,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def handle_edit_deadline_weekly(self, row):
         # Get deadline name from table
@@ -498,7 +497,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.dashboard_weekly.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
 
     def populate_table_transac(self):
@@ -526,6 +525,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.table_transac.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -559,6 +559,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def handle_edit_order(self, row):
         # Implement your edit logic here
@@ -667,8 +668,14 @@ class MainWindow(QMainWindow):
 
     def save_add_production_action(self):
         # Call save_add_production_action from DatabasecManager to fetch orders data
+        client_name = self.ui.client_name_entry.text()
+        order_quantity = self.ui.order_quantity_spinBox.value()
+        bag_type = self.ui.bag_type_entry.text()
         deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
-        self.db_manager.add_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
+        order_priority = self.ui.order_priority_spinBox.value()
+        order_notes = self.ui.add_order_notes.toPlainText()
+
+        self.db_manager.add_order(client_name, order_quantity, bag_type, deadline_date, order_priority, order_notes)
         print(self.ui.add_order_notes.toPlainText())
         self.ui.client_name_entry.setText("")
         self.ui.bag_type_entry.setText("")
@@ -783,7 +790,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         # Clear the selection
         self.ui.product_table.clearSelection()
     
@@ -803,15 +810,14 @@ class MainWindow(QMainWindow):
         print(f"id {id}")
         deadline_details = self.ui.edit_order_notes.toPlainText()
 
-
         self.db_manager.set_order(id, order_quantity, bag_type)
         self.db_manager.set_deadline(name, deadline_details, deadline_date, deadline[0][0], deadline[0][1], deadline[0][2])
         self.db_manager.set_client_detail(deadline_id, priority, name)
         # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
         self.ui.client_name_entry.setText("")
-        self.ui.bag_type_entry.setText("")
-        self.ui.order_quantity_spinBox.setValue(0)
-        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+        self.ui.edit_bag_type.setText("")
+        self.ui.edit_order_quantity.setValue(0)
+        self.ui.edit_order_deadline.setDate(QDate.currentDate())
         self.db_manager.connection.commit()
         self.show_production()
 
@@ -964,7 +970,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
@@ -1143,13 +1149,14 @@ class MainWindow(QMainWindow):
 
             table = Table(table_data)
             table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Times-Roman'),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTNAME', (0, 1), (-1, -1), 'Times-Roman'),
             ]))
 
             table_width, table_height = table.wrapOn(c, width, height)
@@ -1222,6 +1229,33 @@ class MainWindow(QMainWindow):
             ]
         self.generate_pdf(reports, "stock_report.pdf")
         action = f"Generated stocks report."
+        self.db_manager.add_user_log(self.username, self.username_id, action)
+
+    def generate_user_logs_pdf_clicked(self):
+        sql_script = """
+        SELECT 
+                a.username_id "ID", 
+                a.username "Username",  
+                u.action "Action",
+                u.timestamp "Date"
+            FROM 
+                user_logs u
+            JOIN accounts a ON u.account_id = a.account_id
+             
+            ORDER BY 
+                timestamp DESC;
+        """
+        # Fetch data
+        df = self.fetch_data(sql_script)
+
+        # Decrypt string columns
+        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+
+        reports = [
+                (df, "User Logs Report")
+            ]
+        self.generate_pdf(reports, "user_logs_report.pdf")
+        action = f"Generated user logs report."
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_inventory_pdf_clicked(self):
