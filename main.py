@@ -35,8 +35,8 @@ class MainWindow(QMainWindow):
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.add_deadline_date.setDate(QDate(current_date.year, current_date.month, current_date.day))
-        self.ui.dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
-        self.ui.dateEdit_2.setDate(QDate(current_date.year, current_date.month, current_date.day))
+        self.ui.report_start.setDate(QDate(current_date.year, current_date.month, current_date.day))
+        self.ui.report_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
         #weekly buttons
 
 
@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
 
-
+        #self.ui.specify_report_date
 
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)

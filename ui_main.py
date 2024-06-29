@@ -1,3 +1,4 @@
+
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -5,11 +6,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCalendarWidget, QDateEdit, QFrame,
-    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
-    QMainWindow, QPushButton, QSizePolicy, QSpinBox,
-    QStackedWidget, QStatusBar, QTableWidget, QTableWidgetItem,
-    QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCalendarWidget, QCheckBox, QDateEdit,
+    QFrame, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
+    QSpinBox, QStackedWidget, QStatusBar, QTableWidget,
+    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -639,18 +640,21 @@ class Ui_MainWindow(object):
         self.user_logs_button = QPushButton(self.reports)
         self.user_logs_button.setObjectName(u"user_logs_button")
         self.user_logs_button.setGeometry(QRect(173, 224, 171, 24))
-        self.dateEdit = QDateEdit(self.reports)
-        self.dateEdit.setObjectName(u"dateEdit")
-        self.dateEdit.setGeometry(QRect(90, 290, 161, 22))
-        self.dateEdit_2 = QDateEdit(self.reports)
-        self.dateEdit_2.setObjectName(u"dateEdit_2")
-        self.dateEdit_2.setGeometry(QRect(280, 290, 151, 22))
+        self.report_start = QDateEdit(self.reports)
+        self.report_start.setObjectName(u"report_start")
+        self.report_start.setGeometry(QRect(90, 290, 161, 22))
+        self.report_end = QDateEdit(self.reports)
+        self.report_end.setObjectName(u"report_end")
+        self.report_end.setGeometry(QRect(280, 290, 151, 22))
         self.label_7 = QLabel(self.reports)
         self.label_7.setObjectName(u"label_7")
         self.label_7.setGeometry(QRect(100, 266, 81, 20))
         self.label_8 = QLabel(self.reports)
         self.label_8.setObjectName(u"label_8")
         self.label_8.setGeometry(QRect(290, 266, 81, 20))
+        self.specify_report_date = QCheckBox(self.reports)
+        self.specify_report_date.setObjectName(u"specify_report_date")
+        self.specify_report_date.setGeometry(QRect(93, 325, 191, 20))
         self.stackedWidget.addWidget(self.reports)
         self.sched_add = QWidget()
         self.sched_add.setObjectName(u"sched_add")
@@ -991,6 +995,7 @@ class Ui_MainWindow(object):
         self.user_logs_button.setText(QCoreApplication.translate("MainWindow", u"User Logs", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Start Date", None))
         self.label_8.setText(QCoreApplication.translate("MainWindow", u"End Date", None))
+        self.specify_report_date.setText(QCoreApplication.translate("MainWindow", u"Specify report date", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Deadline Name</span></p></body></html>", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Deadline Details</span></p></body></html>", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:700;\">ADD DEADLINE</span></p><p align=\"center\"><br/></p></body></html>", None))
