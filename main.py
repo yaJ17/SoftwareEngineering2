@@ -1134,7 +1134,8 @@ class MainWindow(QMainWindow):
 
 
     def fetch_data(self, query):
-        return pd.read_sql(query, self.db_manager.connection)
+        connection = self.db_manager.connection
+        return pd.read_sql(query, connection)
 
     def specific_date(self, state):
         if state == 2:  # 2 corresponds to Qt.Checked
@@ -1203,31 +1204,57 @@ class MainWindow(QMainWindow):
 
         c.save()
         self.open_report(full_file_name)
+
     def generate_product_pdf_clicked(self):
-        sql_script = """
-        SELECT  
-                C.client_name "Name", 
-                P.product_quantity "Quantity", 
-                P.product_defectives "Defectives", 
-                P.product_cost "Cost", 
-                P.product_price "Price", 
-                P.created_at "Date"
+        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
+        print(not self.ui.specify_report_date.isChecked())
+        #not checked
+        if not self.ui.specify_report_date.isChecked():
+            sql_script = """
+            
+            SELECT 
+                c.client_name, 
+                c.client_priority, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                d.deadline_details 
             FROM 
-                PRODUCT P
+                ORDERS o 
             JOIN 
-                ORDERS O ON P.order_id = O.order_id
+                CLIENT c ON o.client_id = c.client_id 
             JOIN 
-                CLIENT C ON O.client_id = C.client_id
-            WHERE 
-                P.product_active = 1
-            ORDER BY 
-                P.created_at DESC;
-        """
+                DEADLINE d ON c.deadline_id = d.deadline_id
+            ORDER BY
+                order_id DESC;
+            """
+        else:
+            sql_script = """
+            
+            SELECT 
+                c.client_name "Client Name", 
+                o.bag_type "Bag Type", 
+                o.order_quantity "Quantity", 
+                d.deadline_date "Date", 
+                d.deadline_details "Details", 
+                c.client_priority "Priority" 
+            FROM 
+                ORDERS o 
+            JOIN 
+                CLIENT c ON o.client_id = c.client_id 
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+            WHERE
+                DATE(o.created_at) BETWEEN '{}' AND '{}'
+            ORDER BY
+                o.order_id DESC;
+            """.format(start_date, end_date)
         # Fetch data
         df = self.fetch_data(sql_script)
-
+        
         # Decrypt string columns
-        df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
+        df = df.map(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
 
         reports = [
                 (df, "Product Report")
@@ -1237,21 +1264,40 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_stock_pdf_clicked(self):
-        sql_script = """
-        SELECT 
-                material_name "Name", 
-                material_type "Type",  
-                material_cost "Cost", 
-                material_stock "Stock", 
-                material_safety_stock "Safety Stock", 
-                created_at "Date"
-            FROM 
-                RAW_MATERIAL
-            WHERE 
-                raw_material_active = 1
-            ORDER BY 
-                created_at DESC;
-        """
+        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
+        if not self.ui.specify_report_date.isChecked():
+            sql_script = """
+                SELECT 
+                    material_name "Name", 
+                    material_type "Type",  
+                    material_cost "Cost", 
+                    material_stock "Stock", 
+                    material_safety_stock "Safety Stock", 
+                    created_at "Date"
+                FROM 
+                    RAW_MATERIAL
+                WHERE 
+                    raw_material_active = 1
+                ORDER BY 
+                    created_at DESC;
+            """
+        else:
+            sql_script = """
+           SELECT 
+                    material_name "Name", 
+                    material_type "Type",  
+                    material_cost "Cost", 
+                    material_stock "Stock", 
+                    material_safety_stock "Safety Stock", 
+                    created_at "Date"
+                FROM 
+                    RAW_MATERIAL
+                WHERE 
+                    raw_material_active = 1 and DATE(created_at) BETWEEN '{}' and '{}' 
+                ORDER BY 
+                    created_at DESC;
+            """.format(start_date, end_date)
         # Fetch data
         df = self.fetch_data(sql_script)
 
@@ -1266,19 +1312,36 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_user_logs_pdf_clicked(self):
-        sql_script = """
-        SELECT 
-                a.username_id "ID", 
-                a.username "Username",  
-                u.action "Action",
-                u.timestamp "Date"
-            FROM 
-                user_logs u
-            JOIN accounts a ON u.account_id = a.account_id
-             
-            ORDER BY 
-                timestamp DESC;
-        """
+        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
+        if not self.ui.specify_report_date.isChecked():
+            sql_script = """
+            SELECT 
+                    a.username_id "ID", 
+                    a.username "Username",  
+                    u.action "Action",
+                    u.timestamp "Date"
+                FROM 
+                    user_logs u
+                JOIN accounts a ON u.account_id = a.account_id
+                
+                ORDER BY 
+                    timestamp DESC;
+            """
+        else:
+             sql_script = """
+            SELECT 
+                    a.username_id "ID", 
+                    a.username "Username",  
+                    u.action "Action",
+                    u.timestamp "Date"
+                FROM 
+                    user_logs u
+                JOIN accounts a ON u.account_id = a.account_id
+                WHERE DATE(u.timestamp) BETWEEN '{}' AND '{}'
+                ORDER BY 
+                    timestamp DESC;
+            """.format(start_date,end_date)
         # Fetch data
         df = self.fetch_data(sql_script)
 
@@ -1293,26 +1356,40 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_inventory_pdf_clicked(self):
-        sql = """
+        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
+        if not self.ui.specify_report_date.isChecked():
+            sql_script = """
             SELECT 
-                RM.material_name "Name", 
-                RM.material_type "Type" ,  
-                RM.material_cost "Cost", 
-                RM.material_stock "Stock", 
-                RM.material_safety_stock "Safety Stock", 
-                S.supplier_name "Supplier",  
-                RM.created_at "Date"
-            FROM 
-                RAW_MATERIAL RM
-            JOIN 
-                SUPPLIER S ON RM.supplier_id = S.supplier_id
-            WHERE 
-                RM.raw_material_active = 1
-            ORDER BY 
-                RM.created_at DESC;
-        """
+                    material_name "Name", 
+                    material_type "Type",  
+                    material_cost "Cost", 
+                    material_stock "Stock", 
+                    material_safety_stock "Safety Stock", 
+                    created_at "Date"
+                FROM 
+                    RAW_MATERIAL
+                ORDER BY 
+                    created_at DESC;
+            """
+        else:
+            sql_script = """
+           SELECT 
+                    material_name "Name", 
+                    material_type "Type",  
+                    material_cost "Cost", 
+                    material_stock "Stock", 
+                    material_safety_stock "Safety Stock", 
+                    created_at "Date"
+                FROM 
+                    RAW_MATERIAL
+                WHERE 
+                    DATE(created_at) BETWEEN '{}' and '{}' 
+                ORDER BY 
+                    created_at DESC;
+            """.format(start_date, end_date)
         # Fetch data
-        df = self.fetch_data(sql)
+        df = self.fetch_data(sql_script)
 
         # Decrypt string columns
         df = df.applymap(lambda x: self.db_manager.cipher.decrypt(x) if isinstance(x, str) else x)
@@ -1325,43 +1402,63 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_sales_pdf_clicked(self):
-        total_bag_sql = """
-            SELECT
-                p.bag_type,
-                SUM(p.product_quantity * p.product_price) AS total_earnings
-            FROM
-                PRODUCT p
-            GROUP BY
-                p.bag_type;
-        """
-        total_client_sql = '''
-            SELECT
-                c.client_name,
-                SUM(p.product_quantity * p.product_price) AS total_sales
-            FROM
-                CLIENT c
-            JOIN
-                ORDERS o ON c.client_id = o.client_id
-            JOIN
-                PRODUCT p ON o.order_id = p.order_id
-            GROUP BY
-                c.client_name;
-        '''
-        financial_summary = '''
-            SELECT
-                SUM(p.product_quantity * p.product_price) AS total_revenue,
-                SUM(rm.material_cost * p.product_quantity) AS total_cost,
-                SUM(p.product_quantity * p.product_price) - SUM(rm.material_cost * p.product_quantity) AS net_profit
-            FROM
-                PRODUCT p
-            JOIN
-                ORDERS o ON p.order_id = o.order_id
-            JOIN
-                RAW_MATERIAL rm ON o.material_id = rm.material_id;
+        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
+        if not self.ui.specify_report_date.isChecked():
+            total_bag_sql = """
+            SELECT 
+                    o.bag_type,
+                    SUM(o.order_quantity) AS total_order_quantity
+                FROM 
+                    orders o
+                JOIN 
+                    client c ON o.client_id = c.client_id
+                GROUP BY 
+                    o.bag_type;
 
+            """
+            total_client_sql = '''
+                SELECT
+                    c.client_name,
+                    SUM(p.product_quantity * p.product_price) AS total_sales
+                FROM
+                    CLIENT c
+                JOIN
+                    ORDERS o ON c.client_id = o.client_id
+                JOIN
+                    PRODUCT p ON o.order_id = p.order_id
+                GROUP BY
+                    c.client_name;
+            '''
+        else:
+            total_bag_sql = """
+                SELECT 
+                    o.bag_type,
+                    SUM(o.order_quantity) AS total_order_quantity
+                FROM 
+                    orders o
+                JOIN 
+                    client c ON o.client_id = c.client_id
+                WHERE DATE(o.created_at) BETWEEN '{}' and '{}'
+                GROUP BY 
+                    o.bag_type;
 
-        '''
-
+            """.format(start_date, end_date)
+             
+            total_client_sql = '''
+                SELECT
+                    c.client_name,
+                    SUM(p.product_quantity * p.product_price) AS total_sales
+                FROM
+                    CLIENT c
+                JOIN
+                    ORDERS o ON c.client_id = o.client_id
+                JOIN
+                    PRODUCT p ON o.order_id = p.order_id
+                WHERE DATE(o.created_at) BETWEEN '{}' and '{}'
+                GROUP BY
+                    c.client_name;
+            '''.format(start_date, end_date)
         reports = [
             (self.fetch_data(total_bag_sql), "Total Sales by Bag Type"),
             (self.fetch_data(total_client_sql), "Total Sales by Client")
