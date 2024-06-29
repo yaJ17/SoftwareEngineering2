@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
 
-        #self.ui.specify_report_date
+        self.ui.specify_report_date.stateChanged.connect(self.specific_date)
 
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
@@ -1136,6 +1136,15 @@ class MainWindow(QMainWindow):
 
     def fetch_data(self, query):
         return pd.read_sql(query, self.db_manager.connection)
+
+    def specific_date(self, state):
+        if state == 2:  # 2 corresponds to Qt.Checked
+            self.ui.report_start.setEnabled(True)
+            self.ui.report_end.setEnabled(True)
+        elif state == 0:  # 0 corresponds to Qt.Unchecked
+            self.ui.report_start.setEnabled(False)
+            self.ui.report_end.setEnabled(False)
+
 
     def generate_pdf(self, report_data_list, file_name):
 
