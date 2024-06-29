@@ -147,9 +147,8 @@ class MainWindow(QMainWindow):
                         <br>
                     </div>
                 """)
+
         self.show()
-
-
 
     def open_user_manual(self):
 
