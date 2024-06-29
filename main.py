@@ -35,10 +35,9 @@ class MainWindow(QMainWindow):
         self.current_date = datetime.date.today()
         self.ui.order_deadline_dateEdit.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.add_deadline_date.setDate(QDate(current_date.year, current_date.month, current_date.day))
+
         self.ui.report_start.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.report_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
-        #weekly buttons
-
 
         #close
 
