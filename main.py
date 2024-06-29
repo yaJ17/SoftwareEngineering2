@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QWidget
 from PySide6.QtCore import QDate
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QToolTip
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView, QMessageBox
 import pandas as pd
@@ -38,7 +38,8 @@ class MainWindow(QMainWindow):
 
         self.ui.report_start.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.report_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
-
+        self.ui.user_logs_start.setDate(QDate(current_date.year, current_date.month, current_date.day))
+        self.ui.user_logs_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
         #close
 
         # Connect button clicks to their respective functions
@@ -82,8 +83,6 @@ class MainWindow(QMainWindow):
         self.ui.cancel_update_product.clicked.connect(self.show_inventory)
         self.ui.cancel_edit_raw.clicked.connect(self.show_inventory)
 
-
-
         self.ui.prod_report_btn.clicked.connect(self.generate_product_pdf_clicked)
         self.ui.stocks_report_btn.clicked.connect(self.generate_stock_pdf_clicked)
         self.ui.inventory_report_btn.clicked.connect(self.generate_inventory_pdf_clicked)
@@ -99,6 +98,7 @@ class MainWindow(QMainWindow):
         self.db_manager.create_schema_and_tables()
 
         self.ui.specify_report_date.stateChanged.connect(self.specific_date)
+        self.ui.specify_user_logs_date.stateChanged.connect(self.specific_user_logs)
 
         self.ui.prod_button.clicked.connect(self.show_production)
         self.ui.search_bar.returnPressed.connect(self.perform_search)
@@ -126,11 +126,30 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setText(username_id)
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
+        self.ui.add_account.clicked.connect(self.show_register_window)
+
         self.username = username
         self.username_id = username_id
         # Show the window after populating the table
+        self.ui.toolButton.setToolTip("""
+                    <div style="
+                        width: 200px; 
+                        height: 200px; 
+                        word-wrap: break-word; 
+                        white-space: normal; 
+                        padding: 50px; 
+                        text-align: left;
+                        ">
+                        <br>
+                        <b>Deadline setting parameters</b><br>
+                        <b>Production Report:</b> deadline date.<br>
+                        <b>Inventory, Stocks, Sales Reports:</b> entry creation date.
+                        <br>
+                    </div>
+                """)
         self.show()
-        self.ui.add_account.clicked.connect(self.show_register_window)
+
+
 
     def open_user_manual(self):
 
@@ -1145,6 +1164,13 @@ class MainWindow(QMainWindow):
             self.ui.report_start.setEnabled(False)
             self.ui.report_end.setEnabled(False)
 
+    def specific_user_logs(self, state):
+        if state == 2:  # 2 corresponds to Qt.Checked
+            self.ui.user_logs_start.setEnabled(True)
+            self.ui.user_logs_end.setEnabled(True)
+        elif state == 0:  # 0 corresponds to Qt.Unchecked
+            self.ui.user_logs_start.setEnabled(False)
+            self.ui.user_logs_end.setEnabled(False)
 
     def generate_pdf(self, report_data_list, file_name):
 
@@ -1246,7 +1272,7 @@ class MainWindow(QMainWindow):
             JOIN 
                 DEADLINE d ON c.deadline_id = d.deadline_id
             WHERE
-                DATE(o.created_at) BETWEEN '{}' AND '{}'
+                DATE(d.deadline_date) BETWEEN '{}' AND '{}'
             ORDER BY
                 o.order_id DESC;
             """.format(start_date, end_date)
@@ -1312,9 +1338,9 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def generate_user_logs_pdf_clicked(self):
-        start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
-        end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
-        if not self.ui.specify_report_date.isChecked():
+        start_date = self.ui.user_logs_start.date().toString('yyyy-MM-dd')
+        end_date = self.ui.user_logs_end.date().toString('yyyy-MM-dd')
+        if not self.ui.specify_user_logs_date.isChecked():
             sql_script = """
             SELECT 
                     a.username_id "ID", 
