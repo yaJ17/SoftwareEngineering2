@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>16</number>
+     <number>19</number>
     </property>
     <widget class="QWidget" name="dashBoard">
      <widget class="QLabel" name="welcome_label">
