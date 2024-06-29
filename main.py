@@ -27,7 +27,6 @@ import os
 from mysql.connector import Error  # Import the Error class
 class MainWindow(QMainWindow):
     def __init__(self, username, username_id):
-
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)

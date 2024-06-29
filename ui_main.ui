@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>11</number>
+     <number>16</number>
     </property>
     <widget class="QWidget" name="dashBoard">
      <widget class="QLabel" name="welcome_label">
@@ -2217,6 +2217,52 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <string>User Logs</string>
       </property>
      </widget>
+     <widget class="QDateEdit" name="dateEdit">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>290</y>
+        <width>161</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="dateEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>290</y>
+        <width>151</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>266</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start Date</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>266</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>End Date</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="sched_add">
      <widget class="QDateEdit" name="add_deadline_date">
@@ -2478,14 +2524,27 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <widget class="QPushButton" name="generate_user_logs">
       <property name="geometry">
        <rect>
-        <x>504</x>
-        <y>300</y>
+        <x>427</x>
+        <y>290</y>
         <width>141</width>
         <height>24</height>
        </rect>
       </property>
       <property name="text">
        <string>Generate User Logs</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="back_user_logs">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>290</y>
+        <width>81</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Back</string>
       </property>
      </widget>
     </widget>
