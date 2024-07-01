@@ -116,9 +116,6 @@ class Ui_MainWindow(object):
         self.label_23.setFont(font)
         self.label_23.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
         self.label_23.setTextFormat(Qt.TextFormat.AutoText)
-        self.label = QLabel(self.dashBoard)
-        self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(530, 40, 131, 16))
         self.logout_button = QPushButton(self.dashBoard)
         self.logout_button.setObjectName(u"logout_button")
         self.logout_button.setGeometry(QRect(543, 329, 111, 24))
@@ -137,6 +134,9 @@ class Ui_MainWindow(object):
         self.dashboard_weekly = QTableWidget(self.dashBoard)
         self.dashboard_weekly.setObjectName(u"dashboard_weekly")
         self.dashboard_weekly.setGeometry(QRect(10, 130, 499, 79))
+        self.history_DB = QTableWidget(self.dashBoard)
+        self.history_DB.setObjectName(u"history_DB")
+        self.history_DB.setGeometry(QRect(530, 40, 131, 251))
         self.stackedWidget.addWidget(self.dashBoard)
         self.Inventory = QWidget()
         self.Inventory.setObjectName(u"Inventory")
@@ -833,7 +833,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(16)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -853,7 +853,6 @@ class Ui_MainWindow(object):
         self.task_abel.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Tasks</span></p></body></html>", None))
         self.label_22.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">Upcoming Deadlines</span></p></body></html>", None))
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:8pt; font-weight:400; color:#ffffff;\">History</span></p></body></html>", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:6pt;\">Maris Pascual Added a raw material</span></p></body></html>", None))
         self.logout_button.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.dashboard_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:9pt; font-weight:400; color:#ffffff;\">Dashboard</span></p></body></html>", None))
         self.add_account.setText(QCoreApplication.translate("MainWindow", u"Add an Account", None))

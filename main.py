@@ -344,37 +344,52 @@ class MainWindow(QMainWindow):
         self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def save_added_deadline(self):
-        print("pinindot mo ako")
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        deadline_date = self.ui.add_deadline_date.date().toString("yyyy-MM-dd")
-        deadline_name = self.ui.add_deadline_name.text()
-        deadline_details = self.ui.add_deadline_details.toPlainText()
-        print(deadline_name, deadline_details, deadline_date)
-        self.db_manager.add_deadline(deadline_name, deadline_details, deadline_date)
 
-        self.ui.add_deadline_date.setDate(QDate.currentDate())
-        self.ui.add_deadline_name.setText("")
-        self.ui.add_deadline_details.setText("")
-        # self.ui.stackedWidget.setCurrentIndex(14)
-        self.db_manager.connection.commit()
-        self.show_scheduling()
+        reply = QMessageBox.question(self, 'Add Deadline',
+                                     f'Are you sure you want to add this deadline?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            # Call save_add_production_action from DatabasecManager to fetch orders data
+            deadline_date = self.ui.add_deadline_date.date().toString("yyyy-MM-dd")
+            deadline_name = self.ui.add_deadline_name.text()
+            deadline_details = self.ui.add_deadline_details.toPlainText()
+            print(deadline_name, deadline_details, deadline_date)
+            self.db_manager.add_deadline(deadline_name, deadline_details, deadline_date)
 
-        action = f"Added a new deadline on {deadline_date}."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.ui.add_deadline_date.setDate(QDate.currentDate())
+            self.ui.add_deadline_name.setText("")
+            self.ui.add_deadline_details.setText("")
+            # self.ui.stackedWidget.setCurrentIndex(14)
+            self.db_manager.connection.commit()
+            self.show_scheduling()
+
+            action = f"Added a new deadline on {deadline_date}."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def save_edited_deadline(self):
-        print("pinindot mo ako edit")
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        deadline_date = self.ui.edit_deadline_date.date().toString("yyyy-MM-dd")
-        deadline_name = self.ui.edit_deadline_name.text()
-        deadline_details = self.ui.edit_deadline_details.toPlainText()
-        print(deadline_name, deadline_details, deadline_date)
-        self.db_manager.set_deadline(deadline_name, deadline_details, deadline_date, self.data['name'], self.data['details'], self.data['date'])
-        self.db_manager.connection.commit()
-        self.show_scheduling()
+        reply = QMessageBox.question(self, 'Edit Deadline',
+                                     f'Are you sure you want to edit this deadline?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            # Call save_add_production_action from DatabasecManager to fetch orders data
+            deadline_date = self.ui.edit_deadline_date.date().toString("yyyy-MM-dd")
+            deadline_name = self.ui.edit_deadline_name.text()
+            deadline_details = self.ui.edit_deadline_details.toPlainText()
+            print(deadline_name, deadline_details, deadline_date)
+            self.db_manager.set_deadline(deadline_name, deadline_details, deadline_date, self.data['name'], self.data['details'], self.data['date'])
+            self.db_manager.connection.commit()
+            self.show_scheduling()
 
-        action = f"Edited {deadline_name} (deadline)."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            action = f"Edited {deadline_name} (deadline)."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def archive_deadline(self):
         print("Archive deadline function called")
@@ -708,39 +723,59 @@ class MainWindow(QMainWindow):
 
 
     def save_add_production_action(self):
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        client_name = self.ui.client_name_entry.text()
-        order_quantity = self.ui.order_quantity_spinBox.value()
-        bag_type = self.ui.bag_type_entry.text()
-        deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
-        order_priority = self.ui.order_priority_spinBox.value()
-        order_notes = self.ui.add_order_notes.toPlainText()
 
-        self.db_manager.add_order(client_name, order_quantity, bag_type, deadline_date, order_priority, order_notes)
-        print(self.ui.add_order_notes.toPlainText())
-        self.ui.client_name_entry.setText("")
-        self.ui.bag_type_entry.setText("")
-        self.ui.order_quantity_spinBox.setValue(0)
-        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
-        self.ui.order_priority_spinBox.setValue(0)
-        self.db_manager.connection.commit()
-        self.populate_orders()
-        self.ui.stackedWidget.setCurrentIndex(9)
+        reply = QMessageBox.question(self, 'Add Order',
+                                     f'Are you sure you want to add this order?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            # Call save_add_production_action from DatabasecManager to fetch orders data
+            client_name = self.ui.client_name_entry.text()
+            order_quantity = self.ui.order_quantity_spinBox.value()
+            bag_type = self.ui.bag_type_entry.text()
+            deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
+            order_priority = self.ui.order_priority_spinBox.value()
+            order_notes = self.ui.add_order_notes.toPlainText()
 
-        action = f"Added an order."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.db_manager.add_order(client_name, order_quantity, bag_type, deadline_date, order_priority, order_notes)
+            print(self.ui.add_order_notes.toPlainText())
+            self.ui.client_name_entry.setText("")
+            self.ui.bag_type_entry.setText("")
+            self.ui.order_quantity_spinBox.setValue(0)
+            self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+            self.ui.order_priority_spinBox.setValue(0)
+            self.db_manager.connection.commit()
+            self.populate_orders()
+            self.ui.stackedWidget.setCurrentIndex(9)
+
+            action = f"Added an order."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def void_production(self):
-        client_name = self.ui.edit_client_name.text()
-        client_id = self.db_manager.get_client_id(self.data["name"])
-        self.db_manager.void_client(client_id)
-        self.db_manager.connection.commit()
-        self.populate_orders()
-        self.ui.stackedWidget.setCurrentIndex(9)
-        action = f"Archived {client_name}'s order."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
-        
+        reply = QMessageBox.question(self, 'Void Order',
+                                     f'Are you sure you want to void this order?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+
+            client_name = self.ui.edit_client_name.text()
+            client_id = self.db_manager.get_client_id(self.data["name"])
+            self.db_manager.void_client(client_id)
+            self.db_manager.connection.commit()
+            self.populate_orders()
+            self.ui.stackedWidget.setCurrentIndex(9)
+            action = f"Archived {client_name}'s order."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+
     def save_add_finish_product_invent(self):
+
         # Call save_add_production_action from DatabasecManager to fetch orders data
         # data include bag type, quantity, no. of defectives, product cost, and product price
         bag_type = self.ui.inventory_bag_type.text()
@@ -749,55 +784,83 @@ class MainWindow(QMainWindow):
         cost = self.ui.inventory_product_cost.value()
         price = self.ui.inventory_active_product.value()
         print(bag_type, quantity, defective, cost, price)
-        self.db_manager.add_product(bag_type, quantity, defective, cost, price)
-        self.db_manager.connection.commit()
 
-       #User logs
-        action = f"Added {quantity} {bag_type} (bag type) with {defective} defectives in the finished product inventory."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+        reply = QMessageBox.question(self, 'Add Finished Product',
+                                     f'Are you sure you want to add product to your inventory?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
 
-        self.ui.inventory_bag_type.setText("")
-        self.ui.add_inventory_product.setValue(0)
-        self.ui.add_inventory_defective.setValue(0)
-        self.ui.inventory_product_cost.setValue(0)
-        self.ui.inventory_active_product.setValue(0)
-        self.show_inventory()
+        if reply == QMessageBox.Yes:
+            self.db_manager.add_product(bag_type, quantity, defective, cost, price)
+            self.db_manager.connection.commit()
 
+           #User logs
+            action = f"Added {quantity} {bag_type} (bag type) with {defective} defectives in the finished product inventory."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+
+            self.ui.inventory_bag_type.setText("")
+            self.ui.add_inventory_product.setValue(0)
+            self.ui.add_inventory_defective.setValue(0)
+            self.ui.inventory_product_cost.setValue(0)
+            self.ui.inventory_active_product.setValue(0)
+            self.show_inventory()
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+
+        print("End of Add Finished Product to inventory function")
 
     def save_add_material_invent(self):
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
-        name = self.ui.add_inventory_Materiel.text()
-        mat_type = self.ui.add_material_type.text()
-        stock = self.ui.add_material_stock.value()
-        cost = self.ui.add_material_cost.value()
-        safety = self.ui.add_safety_stock.value()
-        supplier = self.ui.add_material_supplier.text()
-        print(name, mat_type, stock, cost, safety, supplier)
-        self.db_manager.add_raw_material(name,mat_type, stock, cost, safety, supplier)
-        self.db_manager.connection.commit()
-        self.ui.add_inventory_Materiel.setText("")
-        self.ui.add_material_type.setText("")
-        self.ui.add_material_stock.setValue(0)
-        self.ui.add_material_cost.setValue(0)
-        self.ui.add_safety_stock.setValue(0)
-        self.ui.add_material_supplier.setText("")
+        reply = QMessageBox.question(self, 'Add Raw Material',
+                                     f'Are you sure you want to add this raw material to the inventory?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
 
-        self.show_inventory()
+        if reply == QMessageBox.Yes:
+            # Call save_add_production_action from DatabasecManager to fetch orders data
+            # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
+            name = self.ui.add_inventory_Materiel.text()
+            mat_type = self.ui.add_material_type.text()
+            stock = self.ui.add_material_stock.value()
+            cost = self.ui.add_material_cost.value()
+            safety = self.ui.add_safety_stock.value()
+            supplier = self.ui.add_material_supplier.text()
+            print(name, mat_type, stock, cost, safety, supplier)
+            self.db_manager.add_raw_material(name,mat_type, stock, cost, safety, supplier)
+            self.db_manager.connection.commit()
+            self.ui.add_inventory_Materiel.setText("")
+            self.ui.add_material_type.setText("")
+            self.ui.add_material_stock.setValue(0)
+            self.ui.add_material_cost.setValue(0)
+            self.ui.add_safety_stock.setValue(0)
+            self.ui.add_material_supplier.setText("")
 
-        action = f"Added {stock} {name} (material) in the raw materials inventory."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.show_inventory()
 
+            action = f"Added {stock} {name} (material) in the raw materials inventory."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def void_material(self):
-        name = self.ui.add_inventory_Materiel.text()
+        reply = QMessageBox.question(self, 'Void Raw Material',
+                                     f'Are you sure you want to void this raw material?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
 
-        self.db_manager.void_raw_material(self.data['name'], self.data['supplier'])
-        self.db_manager.connection.commit()
-        self.show_inventory()
+        if reply == QMessageBox.Yes:
+            name = self.ui.add_inventory_Materiel.text()
 
-        action = f"Archived {name} (material) from the raw materials inventory."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.db_manager.void_raw_material(self.data['name'], self.data['supplier'])
+            self.db_manager.connection.commit()
+            self.show_inventory()
+
+            action = f"Archived {name} (material) from the raw materials inventory."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -836,34 +899,43 @@ class MainWindow(QMainWindow):
         self.ui.product_table.clearSelection()
     
     def save_edit_order(self):
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        print(self.data)
-        data_name = self.data['name']
-        data_details = self.data['deadline_details']
-        id = self.db_manager.get_order_id(data_name)
-        deadline_id = self.db_manager.get_deadline_id(data_name, data_details)
-        deadline = self.db_manager.get_deadline_detail(data_name, data_details)
-        name = self.ui.edit_client_name.text()
-        bag_type = self.ui.edit_bag_type.text()
-        order_quantity = self.ui.edit_order_quantity.value()
-        deadline_date = self.ui.edit_order_deadline.date().toString("yyyy-MM-dd")
-        priority = self.ui.edit_order_priority.value() 
-        print(f"id {id}")
-        deadline_details = self.ui.edit_order_notes.toPlainText()
 
-        self.db_manager.set_order(id, order_quantity, bag_type)
-        self.db_manager.set_deadline(name, deadline_details, deadline_date, deadline[0][0], deadline[0][1], deadline[0][2])
-        self.db_manager.set_client_detail(deadline_id, priority, name)
-        # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
-        self.ui.client_name_entry.setText("")
-        self.ui.edit_bag_type.setText("")
-        self.ui.edit_order_quantity.setValue(0)
-        self.ui.edit_order_deadline.setDate(QDate.currentDate())
-        self.db_manager.connection.commit()
-        self.show_production()
+        reply = QMessageBox.question(self, 'Edit Order',
+                                     f'Are you sure you want to edit this order?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            # Call save_add_production_action from DatabasecManager to fetch orders data
+            print(self.data)
+            data_name = self.data['name']
+            data_details = self.data['deadline_details']
+            id = self.db_manager.get_order_id(data_name)
+            deadline_id = self.db_manager.get_deadline_id(data_name, data_details)
+            deadline = self.db_manager.get_deadline_detail(data_name, data_details)
+            name = self.ui.edit_client_name.text()
+            bag_type = self.ui.edit_bag_type.text()
+            order_quantity = self.ui.edit_order_quantity.value()
+            deadline_date = self.ui.edit_order_deadline.date().toString("yyyy-MM-dd")
+            priority = self.ui.edit_order_priority.value()
+            print(f"id {id}")
+            deadline_details = self.ui.edit_order_notes.toPlainText()
 
-        action = f"Edited {name}'s order."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.db_manager.set_order(id, order_quantity, bag_type)
+            self.db_manager.set_deadline(name, deadline_details, deadline_date, deadline[0][0], deadline[0][1], deadline[0][2])
+            self.db_manager.set_client_detail(deadline_id, priority, name)
+            # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
+            self.ui.client_name_entry.setText("")
+            self.ui.edit_bag_type.setText("")
+            self.ui.edit_order_quantity.setValue(0)
+            self.ui.edit_order_deadline.setDate(QDate.currentDate())
+            self.db_manager.connection.commit()
+            self.show_production()
+
+            action = f"Edited {name}'s order."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def populate_raw_invent(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -960,26 +1032,35 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(5)
 
     def save_edit_material(self):
-        print(self.data)
-        name = self.ui.Edit_inventory_Materiel.text()
-        mat_type = self.ui.Edit_material_type.text()
-        stock = self.ui.edit_material_stock.value()
-        cost = self.ui.edit_material_cost.value()
-        safety = self.ui.edit_safety_stock.value()
-        supplier = self.ui.edit_material_supplier.text()
-        print(name, mat_type, stock, cost, safety, supplier,  self.data['name'], self.data['material_type'], self.data['stock'])
-        self.db_manager.set_raw_material(name, stock, mat_type,safety, cost, supplier, self.data['name'], self.data['material_type'], self.data['stock'])
-        self.ui.add_material_type.setText("")
-        self.ui.add_material_stock.setValue(0)
-        self.ui.add_material_cost.setValue(0)
-        self.ui.add_safety_stock.setValue(0)
-        self.ui.add_material_supplier.setText("")
-        self.db_manager.connection.commit()
-        self.show_inventory()
-        action = f"Edited {name} (material) in the raw materials inventory."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
-        
 
+        reply = QMessageBox.question(self, 'Edit Raw Material',
+                                     f'Are you sure you want to edit the material information?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+
+            print(self.data)
+            name = self.ui.Edit_inventory_Materiel.text()
+            mat_type = self.ui.Edit_material_type.text()
+            stock = self.ui.edit_material_stock.value()
+            cost = self.ui.edit_material_cost.value()
+            safety = self.ui.edit_safety_stock.value()
+            supplier = self.ui.edit_material_supplier.text()
+            print(name, mat_type, stock, cost, safety, supplier,  self.data['name'], self.data['material_type'], self.data['stock'])
+            self.db_manager.set_raw_material(name, stock, mat_type,safety, cost, supplier, self.data['name'], self.data['material_type'], self.data['stock'])
+            self.ui.add_material_type.setText("")
+            self.ui.add_material_stock.setValue(0)
+            self.ui.add_material_cost.setValue(0)
+            self.ui.add_safety_stock.setValue(0)
+            self.ui.add_material_supplier.setText("")
+            self.db_manager.connection.commit()
+            self.show_inventory()
+            action = f"Edited {name} (material) in the raw materials inventory."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def populate_product_invent(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -1058,23 +1139,44 @@ class MainWindow(QMainWindow):
         cost =self.ui.edit_product_cost_2.value()
         price = self.ui.edit_inventory_active_product_2.value()
 
-        # User logs
-        action = f"Edited {bag_type} (bag type) information in the finished product"
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+        reply = QMessageBox.question(self, 'Save Edit Finished Product',
+                                     f'Are you sure you want to edit this product in the inventory?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
 
-        self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
-        self.db_manager.connection.commit()
-        self.show_inventory()
+        if reply == QMessageBox.Yes:
+            self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+            self.db_manager.connection.commit()
+
+            # User logs
+            action = f"Edited {bag_type} (bag type) information in the finished product"
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+
+            self.show_inventory()
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+
 
     def void_product(self):
-        bag_type = self.ui.Edit_inventory_bag_type.text()
-        self.db_manager.void_product(self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
-        self.db_manager.connection.commit()
-        self.show_inventory()
 
-        # User logs
-        action = f"Voided  {bag_type} from the finished product inventory."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+        reply = QMessageBox.question(self, 'Void Finished Product',
+                                     f'Are you sure you want to void this finished product?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+            bag_type = self.ui.Edit_inventory_bag_type.text()
+            self.db_manager.void_product(self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+            self.db_manager.connection.commit()
+            self.show_inventory()
+
+            # User logs
+            action = f"Voided  {bag_type} from the finished product inventory."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
 
     def ratcliff_obershelp_similarity(self, str1, str2):
        return difflib.SequenceMatcher(None, str1, str2).ratio()
@@ -1136,6 +1238,8 @@ class MainWindow(QMainWindow):
 
         if current_index == 0:
             self.search_in_table(search_term, self.ui.prod_table)
+            self.search_in_table(search_term, self.ui.dashboard_weekly)
+            self.search_in_table(search_term, self.ui.history_DB)
         elif current_index == 1:
             self.search_in_table(search_term, self.ui.product_inventory_table)
             self.search_in_table(search_term, self.ui.raw_inventory_table)
