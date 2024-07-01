@@ -188,7 +188,7 @@ class MainWindow(QMainWindow):
                 self.db_manager.add_user_log(self.username, self.username_id, action)
 
                 # Wait for 10 seconds before the next backup
-                time.sleep(10)
+                time.sleep(2400)
 
         backup_thread = threading.Thread(target=automatic_backup)
         backup_thread.daemon = True
