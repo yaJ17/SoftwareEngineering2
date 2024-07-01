@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
         self.ui.Archive_finished_product.clicked.connect(self.void_product)
         # Populate the product table before showing the window
         self.populate_deadline_table()
+        self.populate_history_DB()
         self.populate_dashboard_weekly()
         self.data = {}
 
@@ -301,7 +302,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.user_logs_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.user_logs_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     def backup(self):
         # Perform logout actions (e.g., closing the window or redirecting to login screen)
         self.db_manager.backup_database_to_excel("data_backup.xlsx")
@@ -341,7 +342,34 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.prod_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.prod_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+    def populate_history_DB(self):
+        # Call the populate_deadline function from database module
+        transacs = self.db_manager.populate_history_DB()
+        print("hello")
+        for row in transacs:
+            print(row)
+
+        # Define headers for the table
+        headers = ['Client', 'Order']
+        self.ui.history_DB.setRowCount(len(transacs))
+        self.ui.history_DB.setColumnCount(len(headers))
+
+        # Set the headers for the table
+        self.ui.history_DB.setHorizontalHeaderLabels(headers)
+
+        # Populate the table with fetched data
+        for row_index, row_data in enumerate(transacs):
+            for column_index, data in enumerate(row_data):
+                item = QTableWidgetItem(str(data))
+                self.ui.history_DB.setItem(row_index, column_index, item)
+        # Set the edit triggers (disable editing)
+        self.ui.history_DB.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        # Resize columns to fit content
+        self.ui.history_DB.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.history_DB.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def save_added_deadline(self):
 
@@ -459,7 +487,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.weekly_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def handle_edit_deadline_weekly(self, row):
         # Get deadline name from table
@@ -553,7 +581,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.dashboard_weekly.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.dashboard_weekly.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
 
     def populate_table_transac(self):
@@ -581,7 +609,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.table_transac.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.table_transac.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -615,7 +643,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.product_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def handle_edit_order(self, row):
         # Implement your edit logic here
@@ -894,7 +922,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.product_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         # Clear the selection
         self.ui.product_table.clearSelection()
     
@@ -1092,7 +1120,7 @@ class MainWindow(QMainWindow):
 
         # Resize columns to fit content
         self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.product_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
@@ -1251,6 +1279,8 @@ class MainWindow(QMainWindow):
             self.search_in_table(search_term, self.ui.weekly_table)
         elif current_index == 14:
             self.search_in_table(search_term, self.ui.daily_table)
+        elif current_index == 19:
+            self.search_in_table(search_term, self.ui.user_logs_table)
         # Add more conditions if there are more tables to search in
 
 
