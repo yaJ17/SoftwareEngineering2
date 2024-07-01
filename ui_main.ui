@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>19</number>
+     <number>8</number>
     </property>
     <widget class="QWidget" name="dashBoard">
      <widget class="QLabel" name="welcome_label">
@@ -328,19 +328,6 @@
        <enum>Qt::TextFormat::AutoText</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>40</y>
-        <width>131</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:6pt;&quot;&gt;Maris Pascual Added a raw material&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="logout_button">
       <property name="geometry">
        <rect>
@@ -410,6 +397,16 @@
         <y>130</y>
         <width>499</width>
         <height>79</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="history_DB">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>40</y>
+        <width>131</width>
+        <height>251</height>
        </rect>
       </property>
      </widget>

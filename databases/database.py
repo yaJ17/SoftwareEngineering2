@@ -587,7 +587,7 @@ class DatabaseManager:
                 '''
                 SELECT 
                     c.client_name, 
-                    o.bag_type 
+                    o.created_at
                 FROM 
                     CLIENT c
 
@@ -1802,6 +1802,21 @@ class DatabaseManager:
             print("User log added successfully.")
         except Error as e:
             print(f"Error: {e}")
+
+    def has_schemas(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return False
+
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SHOW TABLES")
+            tables = cursor.fetchall()
+            cursor.close()
+            return len(tables) > 0
+        except Error as e:
+            print(f"Error checking schemas: {e}")
+            return False
 
     def close_connection(self):
         if self.connection and self.connection.is_connected():

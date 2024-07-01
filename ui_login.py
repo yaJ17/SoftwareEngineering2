@@ -41,6 +41,9 @@ class Ui_Login(object):
         self.login_button = QPushButton(self.centralwidget)
         self.login_button.setObjectName(u"login_button")
         self.login_button.setGeometry(QRect(140, 240, 111, 24))
+        self.restore_button_login = QPushButton(self.centralwidget)
+        self.restore_button_login.setObjectName(u"restore_button_login")
+        self.restore_button_login.setGeometry(QRect(140, 330, 111, 24))
         Login.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(Login)
         self.statusbar.setObjectName(u"statusbar")
@@ -59,5 +62,6 @@ class Ui_Login(object):
         self.forgot_pass_button.setText(QCoreApplication.translate("Login", u"Forgot Password", None))
         self.login_exit_button.setText(QCoreApplication.translate("Login", u"Exit", None))
         self.login_button.setText(QCoreApplication.translate("Login", u"Login", None))
+        self.restore_button_login.setText(QCoreApplication.translate("Login", u"Restore", None))
     # retranslateUi
 

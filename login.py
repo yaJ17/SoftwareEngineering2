@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
 from ui_login import Ui_Login
 from databases.database import DatabaseManager  # Adjust the import path as necessary
 import sys
@@ -15,7 +15,7 @@ class LoginWindow(QMainWindow):
         self.ui.login_button.clicked.connect(self.handle_login)
         self.ui.forgot_pass_button.clicked.connect(self.handle_forgot_password)
         self.ui.login_exit_button.clicked.connect(self.handle_exit)
-
+        self.ui.restore_button_login.clicked.connect(self.restore)
         # Initialize DatabaseManager instance
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
         self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
@@ -25,6 +25,27 @@ class LoginWindow(QMainWindow):
         self.failed_attempts = 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.enable_login)
+        self.check_schemas()
+
+
+    def check_schemas(self):
+        if self.db_manager.has_schemas():
+            self.ui.restore_button_login.setEnabled(False)
+        else:
+            self.ui.restore_button_login.setEnabled(True)
+
+    def restore(self):
+        # Open file dialog to select the backup file
+        file_dialog = QFileDialog()
+        file_dialog.setNameFilter("Excel files (*.xlsx)")
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+
+        if file_dialog.exec_():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                input_file = selected_files[0]
+                self.db_manager.restore_database_from_excel(input_file)
+
 
     def handle_login(self):
         username = self.ui.username_login.text()

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QWidget
 from PySide6.QtCore import QDate
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QToolTip
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView, QMessageBox
+from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView, QMessageBox, QFileDialog
 import pandas as pd
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
@@ -23,8 +23,18 @@ from PySide6.QtCore import QDate, QDateTime, QUrl
 from register import RegisterWindow
 
 current_date = datetime.date.today()
-import os
 from mysql.connector import Error  # Import the Error class
+
+
+
+import os
+import threading
+import time
+
+
+
+
+
 class MainWindow(QMainWindow):
     def __init__(self, username, username_id):
         super(MainWindow, self).__init__()
@@ -128,7 +138,7 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.ui.add_account.clicked.connect(self.show_register_window)
-
+        self.start_automatic_backup()
         self.username = username
         self.username_id = username_id
         # Show the window after populating the table
@@ -150,6 +160,39 @@ class MainWindow(QMainWindow):
                 """)
 
         self.show()
+
+    def start_automatic_backup(self):
+        backup_dir = os.path.join(os.getcwd(), "Backup", "Automatic")
+        os.makedirs(backup_dir, exist_ok=True)
+
+        def automatic_backup():
+            while True:
+                # List all existing backup files
+                backup_files = sorted(
+                    [f for f in os.listdir(backup_dir) if f.startswith("auto_backup_")],
+                    key=lambda x: os.path.getmtime(os.path.join(backup_dir, x))
+                )
+
+                # If there are already 5 backup files, delete the oldest one
+                if len(backup_files) >= 5:
+                    os.remove(os.path.join(backup_dir, backup_files[0]))
+
+                # Create the new backup file path
+                timestamp = time.strftime("%Y%m%d_%H%M%S")
+                backup_file = os.path.join(backup_dir, f"auto_backup_{timestamp}.xlsx")
+
+                # Perform the backup
+                self.db_manager.backup_database_to_excel(backup_file)
+
+                action = f"Created automatic backup at {backup_file}."
+                self.db_manager.add_user_log(self.username, self.username_id, action)
+
+                # Wait for 10 seconds before the next backup
+                time.sleep(10)
+
+        backup_thread = threading.Thread(target=automatic_backup)
+        backup_thread.daemon = True
+        backup_thread.start()
 
     def open_user_manual(self):
 
@@ -303,18 +346,35 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.user_logs_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.user_logs_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
     def backup(self):
-        # Perform logout actions (e.g., closing the window or redirecting to login screen)
-        self.db_manager.backup_database_to_excel("data_backup.xlsx")
-        action = f"Created system backup."
+        # Create the backup directory if it doesn't exist
+        backup_dir = os.path.join(os.getcwd(), "Backup", "Manual")
+        os.makedirs(backup_dir, exist_ok=True)
+
+        # Specify the backup file path
+        backup_file = os.path.join(backup_dir, "data_backup.xlsx")
+
+        # Perform the backup
+        self.db_manager.backup_database_to_excel(backup_file)
+
+        action = f"Created system backup at {backup_file}."
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def restore(self):
-        # Perform logout actions (e.g., closing the window or redirecting to login screen)
-        self.db_manager.restore_database_from_excel("data_backup.xlsx")
+        # Open file dialog to select the backup file
+        file_dialog = QFileDialog()
+        file_dialog.setNameFilter("Excel files (*.xlsx)")
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
 
-        action = f"Restored the system data."
-        self.db_manager.add_user_log(self.username, self.username_id, action)
+        if file_dialog.exec_():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                input_file = selected_files[0]
+                self.db_manager.restore_database_from_excel(input_file)
+
+                action = f"Restored the system data from {input_file}."
+                self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def populate_deadline_table(self):
         # Call the populate_deadline function from database module
