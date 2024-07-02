@@ -138,7 +138,6 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.ui.add_account.clicked.connect(self.show_register_window)
-        self.start_automatic_backup()
         self.username = username
         self.username_id = username_id
         # Show the window after populating the table
@@ -158,6 +157,8 @@ class MainWindow(QMainWindow):
                         <br>
                     </div>
                 """)
+
+        self.start_automatic_backup()
 
         self.show()
 
@@ -185,7 +186,7 @@ class MainWindow(QMainWindow):
                 self.db_manager.backup_database_to_excel(backup_file)
 
                 # Wait for 10 seconds before the next backup
-                time.sleep(2400)
+                time.sleep(3600)
 
         backup_thread = threading.Thread(target=automatic_backup)
         backup_thread.daemon = True
@@ -203,9 +204,6 @@ class MainWindow(QMainWindow):
         if not os.path.exists(pdf_path):
             QMessageBox.warning(self, "File Not Found", "User Manual.pdf not found in the application directory.")
             return
-
-
-
         # Open the PDF file with the default PDF viewer
         url = QUrl.fromLocalFile(pdf_path)
         QDesktopServices.openUrl(url)
