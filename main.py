@@ -184,9 +184,6 @@ class MainWindow(QMainWindow):
                 # Perform the backup
                 self.db_manager.backup_database_to_excel(backup_file)
 
-                action = f"Created automatic backup at {backup_file}."
-                self.db_manager.add_user_log(self.username, self.username_id, action)
-
                 # Wait for 10 seconds before the next backup
                 time.sleep(2400)
 
