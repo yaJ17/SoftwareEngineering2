@@ -1773,7 +1773,8 @@ class DatabaseManager:
                 u.timestamp 
             FROM 
                 USER_LOGS u JOIN accounts a ON u.account_id = a.account_id
-            ORDER BY u.timestamp DESC;
+            ORDER BY u.timestamp DESC
+            LIMIT 50;;
             ''')
             result = cursor.fetchall()
             decrypted_rows = []
