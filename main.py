@@ -161,7 +161,7 @@ class MainWindow(QMainWindow):
         def automatic_backup():
             while True:
                 # Wait for 10 seconds before the next backup
-                time.sleep(10)
+                time.sleep(3600)
                 # List all existing backup files
                 backup_files = sorted(
                     [f for f in os.listdir(backup_dir) if f.startswith("auto_backup_")],
