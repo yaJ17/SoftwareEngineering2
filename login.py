@@ -134,7 +134,8 @@ class LoginWindow(QMainWindow):
         self.failed_attempts = 0
 
     def handle_forgot_password(self):
-        from forgot_password import ForgotPasswordWindow  # Adjust the import path as necessary
+        from forgot_password import ForgotPasswordWindow# Adjust the import path as necessary
+        self.db_manager.close_connection()
         self.FP_window = ForgotPasswordWindow()
         self.FP_window.show()
         self.close()
