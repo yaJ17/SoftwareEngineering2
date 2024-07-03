@@ -9,6 +9,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QLabel, QLineEdit, QMainWindow,
     QPushButton, QSizePolicy, QStatusBar, QWidget)
 
+
 class Ui_Login(object):
     def setupUi(self, Login):
         if not Login.objectName():

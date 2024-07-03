@@ -11,6 +11,8 @@ class LoginWindow(QMainWindow):
         self.ui = Ui_Login()
         self.ui.setupUi(self)
 
+
+
         # Connect buttons to their respective methods
         self.ui.login_button.clicked.connect(self.handle_login)
         self.ui.forgot_pass_button.clicked.connect(self.handle_forgot_password)
@@ -26,7 +28,8 @@ class LoginWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.enable_login)
         self.check_schemas()
-
+        self.FP_window = None
+        self.main_window = None
 
     def check_schemas(self):
         if self.db_manager.has_schemas():
@@ -45,7 +48,6 @@ class LoginWindow(QMainWindow):
             if selected_files:
                 input_file = selected_files[0]
                 self.db_manager.restore_database_from_excel(input_file)
-
 
     def handle_login(self):
         username = self.ui.username_login.text()
@@ -82,7 +84,6 @@ class LoginWindow(QMainWindow):
                 # Reset failed attempts on successful login
                 self.failed_attempts = 0
 
-
                 # Pass username and username_id to the main window
                 action = f"Logged in"
                 self.db_manager.add_user_log(userName, username, action)
@@ -103,7 +104,6 @@ class LoginWindow(QMainWindow):
             if self.failed_attempts >= 5:
                 self.disable_login()
 
-
     def disable_login(self):
         # Disable textboxes and login button
         self.ui.username_login.setEnabled(False)
@@ -116,7 +116,6 @@ class LoginWindow(QMainWindow):
         msg_box.setText("Too many failed login attempts! You cannot attempt to login for 3 minutes.")
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.exec()
-
 
         # Start a timer to enable login after 3 minutes (180000 ms)
         self.timer.start(180000)
@@ -134,7 +133,7 @@ class LoginWindow(QMainWindow):
         self.failed_attempts = 0
 
     def handle_forgot_password(self):
-        from forgot_password import ForgotPasswordWindow# Adjust the import path as necessary
+        from forgot_password import ForgotPasswordWindow  # Adjust the import path as necessary
         self.db_manager.close_connection()
         self.FP_window = ForgotPasswordWindow()
         self.FP_window.show()
@@ -142,6 +141,7 @@ class LoginWindow(QMainWindow):
 
     def handle_exit(self):
         self.close()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

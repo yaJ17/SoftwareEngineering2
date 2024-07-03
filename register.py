@@ -5,6 +5,7 @@ from databases.database import DatabaseManager  # Adjust the import path as nece
 import sys
 import re
 
+
 class RegisterWindow(QMainWindow):
     def __init__(self):
         super(RegisterWindow, self).__init__()
@@ -17,15 +18,12 @@ class RegisterWindow(QMainWindow):
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
 
-
         # Connect buttons to their respective methods
         self.ui.submit_register.clicked.connect(self.handle_register)
         self.ui.cancel_register.clicked.connect(self.handle_cancel)
 
         # Show password requirements upon loading
         self.show_password_requirements()
-
-
 
     def show_password_requirements(self):
         QMessageBox.information(
@@ -64,10 +62,11 @@ class RegisterWindow(QMainWindow):
         self.db_manager.add_account(Username, password, special_question, answer)
         QMessageBox.information(self, "Registration Successful", "Account has been successfully created.")
         self.close()
-
+        self.db_manager.close_connection()
 
     def handle_cancel(self):
         self.close()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -5,6 +5,9 @@ from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHeaderView, QMessageBox, QFileDialog
 import pandas as pd
 import sys
+import os
+import threading
+import time
 from PySide6.QtWidgets import QApplication, QMainWindow, QTableView
 from PySide6 import QtWidgets
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QBrush, QDesktopServices
@@ -21,18 +24,8 @@ from reportlab.platypus import Table, TableStyle
 import datetime
 from PySide6.QtCore import QDate, QDateTime, QUrl
 from register import RegisterWindow
-
-current_date = datetime.date.today()
 from mysql.connector import Error  # Import the Error class
-
-
-
-import os
-import threading
-import time
-
-
-
+current_date = datetime.date.today()
 
 
 class MainWindow(QMainWindow):
@@ -50,7 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.report_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.user_logs_start.setDate(QDate(current_date.year, current_date.month, current_date.day))
         self.ui.user_logs_end.setDate(QDate(current_date.year, current_date.month, current_date.day))
-        #close
+        # close
 
         # Connect button clicks to their respective functions
         self.ui.dash_button.clicked.connect(self.show_dashboard)
@@ -84,7 +77,6 @@ class MainWindow(QMainWindow):
         self.ui.add_order_button.clicked.connect(self.show_add_order)
         self.ui.cancel_add_order.clicked.connect(self.show_production)
         self.ui.edit_cancel_button.clicked.connect(self.show_production)
-
 
         self.ui.add_product_button.clicked.connect(self.show_add_finished_product)
         self.ui.add_inventory_button.clicked.connect(self.show_add_raw_material)
@@ -123,8 +115,8 @@ class MainWindow(QMainWindow):
         self.populate_history_DB()
         self.populate_dashboard_weekly()
         self.data = {}
-
-        #calendar
+        self.register_window = None
+        # calendar
         self.ui.calendarWidget.clicked.connect(self.date_clicked)
         self.schedules_table = QTableWidget(self)
         self.clicked_date = None
@@ -168,6 +160,8 @@ class MainWindow(QMainWindow):
 
         def automatic_backup():
             while True:
+                # Wait for 10 seconds before the next backup
+                time.sleep(10)
                 # List all existing backup files
                 backup_files = sorted(
                     [f for f in os.listdir(backup_dir) if f.startswith("auto_backup_")],
@@ -184,9 +178,6 @@ class MainWindow(QMainWindow):
 
                 # Perform the backup
                 self.db_manager.backup_database_to_excel(backup_file)
-
-                # Wait for 10 seconds before the next backup
-                time.sleep(3600)
 
         backup_thread = threading.Thread(target=automatic_backup)
         backup_thread.daemon = True
@@ -208,12 +199,12 @@ class MainWindow(QMainWindow):
         url = QUrl.fromLocalFile(pdf_path)
         QDesktopServices.openUrl(url)
 
-        #User log
+        # User log
         action = f"Opened the user manual."
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def open_report(self, filename):
-         # Directory of the current script
+        # Directory of the current script
         current_dir = os.path.dirname(os.path.realpath(__file__))
 
         # Path to the User Manual PDF
@@ -227,21 +218,23 @@ class MainWindow(QMainWindow):
         # Open the PDF file with the default PDF viewer
         url = QUrl.fromLocalFile(pdf_path)
         QDesktopServices.openUrl(url)
+
     def show_register_window(self):
         self.db_manager.close_connection()
         self.register_window = RegisterWindow()
         self.register_window.show()
+
     def show_dashboard(self):
         self.ui.stackedWidget.setCurrentIndex(0)
         self.populate_deadline_table()
         self.populate_dashboard_weekly()
+
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
 
     def show_add_order(self):
         self.ui.stackedWidget.setCurrentIndex(10)
-
 
     def show_edit_order(self):
         self.ui.stackedWidget.setCurrentIndex(11)
@@ -255,7 +248,6 @@ class MainWindow(QMainWindow):
 
     def show_daily_scheduling(self):
         self.ui.stackedWidget.setCurrentIndex(14)
-
 
     def show_inventory(self):
         self.ui.stackedWidget.setCurrentIndex(1)
@@ -283,7 +275,6 @@ class MainWindow(QMainWindow):
 
     def show_help(self):
         self.ui.stackedWidget.setCurrentIndex(7)
-
 
     def show_about(self):
         self.ui.stackedWidget.setCurrentIndex(15)
@@ -313,9 +304,6 @@ class MainWindow(QMainWindow):
     def show_user_logs(self):
         self.ui.stackedWidget.setCurrentIndex(19)
         self.populate_user_logs()
-
-
-
 
     def populate_user_logs(self):
         transac = self.db_manager.populate_user_logs()
@@ -501,6 +489,7 @@ class MainWindow(QMainWindow):
 
     def cancel_add_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
+
     def cancel_edit_dl(self):
         self.ui.stackedWidget.setCurrentIndex(12)
 
@@ -609,7 +598,6 @@ class MainWindow(QMainWindow):
         }
         self.ui.stackedWidget.setCurrentIndex(18)
 
-
     def populate_dashboard_weekly(self):
         # Call the populate_deadline function from database module
         dead_week = self.db_manager.populate_deadline()
@@ -638,7 +626,6 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.dashboard_weekly.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.dashboard_weekly.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
 
     def populate_table_transac(self):
         # Call the populate_deadline function from database module
@@ -705,7 +692,6 @@ class MainWindow(QMainWindow):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
 
-     
         # Get client name from product_table's first column at specified row
         client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
         if client_name_item:
@@ -746,12 +732,10 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
-
-        #NOTES
+        # NOTES
         # Get client name and bag type from product_table
         client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
         bag_type_item = self.ui.product_table.item(row, 1)  # Assuming bag type is in the second column
-
 
         client_name = client_name_item.text()
         bag_type = bag_type_item.text()
@@ -759,7 +743,6 @@ class MainWindow(QMainWindow):
         try:
             # Assuming db_manager is an instance of DatabaseManager
             # Initialize or get db_manager instance
-
 
             # Query the CLIENT table to get client_id
             cursor = self.db_manager.connection.cursor()
@@ -804,7 +787,6 @@ class MainWindow(QMainWindow):
         }
         print(self.data)
         self.ui.stackedWidget.setCurrentIndex(11)
-
 
     def save_add_production_action(self):
 
@@ -860,8 +842,8 @@ class MainWindow(QMainWindow):
 
     def save_add_finish_product_invent(self):
 
-        # Call save_add_production_action from DatabasecManager to fetch orders data
-        # data include bag type, quantity, no. of defectives, product cost, and product price
+        # Call save_add_production_action from DatabasecManager to fetch orders data.
+        # Data include bag type, quantity, no. of defectives, product cost, and product price
         bag_type = self.ui.inventory_bag_type.text()
         quantity = self.ui.add_inventory_product.value()
         defective = self.ui.add_inventory_defective.value()
@@ -878,7 +860,7 @@ class MainWindow(QMainWindow):
             self.db_manager.add_product(bag_type, quantity, defective, cost, price)
             self.db_manager.connection.commit()
 
-           #User logs
+            # User logs
             action = f"Added {quantity} {bag_type} (bag type) with {defective} defectives in the finished product inventory."
             self.db_manager.add_user_log(self.username, self.username_id, action)
 
@@ -901,8 +883,9 @@ class MainWindow(QMainWindow):
         print(f"User reply: {reply}")
 
         if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data
-            # data include material_name, material_type, materia_stock, material_cost, material_safety_stock, supplier_name
+            # Call save_add_production_action from DatabasecManager to fetch orders data.
+            # data include material_name, material_type, materia_stock, material_cost,
+            # material_safety_stock, supplier_name
             name = self.ui.add_inventory_Materiel.text()
             mat_type = self.ui.add_material_type.text()
             stock = self.ui.add_material_stock.value()
@@ -1007,7 +990,9 @@ class MainWindow(QMainWindow):
             self.db_manager.set_order(id, order_quantity, bag_type)
             self.db_manager.set_deadline(name, deadline_details, deadline_date, deadline[0][0], deadline[0][1], deadline[0][2])
             self.db_manager.set_client_detail(deadline_id, priority, name)
-            # self.db_manager.set_order(self.ui.client_name_entry.text(), self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(), deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
+            # self.db_manager.set_order(self.ui.client_name_entry.text(),
+            # self.ui.order_quantity_spinBox.text(), self.ui.bag_type_entry.text(),
+            # deadline_date, self.ui.order_priority_spinBox.text(), self.ui.add_order_notes.toPlainText())
             self.ui.client_name_entry.setText("")
             self.ui.edit_bag_type.setText("")
             self.ui.edit_order_quantity.setValue(0)
@@ -1052,11 +1037,12 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
         print(f"Tite")
-         # Get client name from product_table's first column at specified row
+        # Get client name from product_table's first column at specified row
         material_name = self.ui.raw_inventory_table.item(row, 0)
         if material_name:
             name = material_name.text()
@@ -1131,8 +1117,13 @@ class MainWindow(QMainWindow):
             cost = self.ui.edit_material_cost.value()
             safety = self.ui.edit_safety_stock.value()
             supplier = self.ui.edit_material_supplier.text()
-            print(name, mat_type, stock, cost, safety, supplier,  self.data['name'], self.data['material_type'], self.data['stock'])
-            self.db_manager.set_raw_material(name, stock, mat_type,safety, cost, supplier, self.data['name'], self.data['material_type'], self.data['stock'])
+
+            print(name, mat_type, stock, cost, safety, supplier,  self.data['name'],
+                  self.data['material_type'], self.data['stock'])
+
+            self.db_manager.set_raw_material(name, stock, mat_type,safety, cost, supplier,
+                                             self.data['name'], self.data['material_type'], self.data['stock'])
+
             self.ui.add_material_type.setText("")
             self.ui.add_material_stock.setValue(0)
             self.ui.add_material_cost.setValue(0)
@@ -1177,6 +1168,7 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.product_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
@@ -1212,15 +1204,14 @@ class MainWindow(QMainWindow):
                 "price": price,
         }
 
-       
         self.ui.stackedWidget.setCurrentIndex(3)
 
     def save_edit_product(self):
         print(self.data)
         bag_type = self.ui.Edit_inventory_bag_type.text()
         quantity = self.ui.Edit_inventory_product_2.value()
-        defective= self.ui.edit_inventory_defective_2.value()
-        cost =self.ui.edit_product_cost_2.value()
+        defective = self.ui.edit_inventory_defective_2.value()
+        cost = self.ui.edit_product_cost_2.value()
         price = self.ui.edit_inventory_active_product_2.value()
 
         reply = QMessageBox.question(self, 'Save Edit Finished Product',
@@ -1229,7 +1220,11 @@ class MainWindow(QMainWindow):
         print(f"User reply: {reply}")
 
         if reply == QMessageBox.Yes:
-            self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],self.data["quantity"], self.data["defective"],self.data["cost"], self.data["price"])
+
+            self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],
+                                        self.data["quantity"], self.data["defective"],
+                                        self.data["cost"], self.data["price"])
+
             self.db_manager.connection.commit()
 
             # User logs
@@ -1240,7 +1235,6 @@ class MainWindow(QMainWindow):
         else:
             print("User cancelled")
             # Handle cancellation logic
-
 
     def void_product(self):
 
@@ -1263,9 +1257,7 @@ class MainWindow(QMainWindow):
             # Handle cancellation logic
 
     def ratcliff_obershelp_similarity(self, str1, str2):
-       return difflib.SequenceMatcher(None, str1, str2).ratio()
-
-
+        return difflib.SequenceMatcher(None, str1, str2).ratio()
 
     def search_in_table(self, search_term, table):
         search_term_lower = search_term.lower()
@@ -1312,10 +1304,6 @@ class MainWindow(QMainWindow):
         if first_exact_match is not None:
             table.scrollTo(first_exact_match, QTableWidget.PositionAtCenter)
 
-
-
-
-
     def perform_search(self):
         search_term = self.ui.search_bar.text()
         current_index = self.ui.stackedWidget.currentIndex()
@@ -1339,8 +1327,6 @@ class MainWindow(QMainWindow):
             self.search_in_table(search_term, self.ui.user_logs_table)
         # Add more conditions if there are more tables to search in
 
-
-
     def fetch_data(self, query):
         connection = self.db_manager.connection
         return pd.read_sql(query, connection)
@@ -1362,7 +1348,6 @@ class MainWindow(QMainWindow):
             self.ui.user_logs_end.setEnabled(False)
 
     def generate_pdf(self, report_data_list, file_name):
-
 
         file_name = file_name.replace(" ", "_").replace(":", "-")
         full_file_name = f"{file_name}_{pd.Timestamp.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
@@ -1424,7 +1409,7 @@ class MainWindow(QMainWindow):
         start_date = self.ui.report_start.date().toString('yyyy-MM-dd')
         end_date = self.ui.report_end.date().toString('yyyy-MM-dd')
         print(not self.ui.specify_report_date.isChecked())
-        #not checked
+        # not checked
         if not self.ui.specify_report_date.isChecked():
             sql_script = """
             
@@ -1685,7 +1670,7 @@ class MainWindow(QMainWindow):
         action = f"Generated sales report."
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
-    #calendar
+    # calendar
     def date_clicked(self, date):
         # Handle the date clicked event
         clicked_date_str = date.toString(Qt.ISODate)  # Convert QDate to ISO date string (YYYY-MM-DD)
@@ -1729,7 +1714,6 @@ class MainWindow(QMainWindow):
         # Navigate to index 14 in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(14)
 
-
     def populate_today(self):
         print("Today populated")
         # Assuming current_date is a QDate object
@@ -1771,6 +1755,7 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.daily_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
+
 '''
     def display_schedules(self, schedules):
         scheds = self.db_manager.populate_deadline_daily()
@@ -1789,7 +1774,6 @@ class MainWindow(QMainWindow):
         self.ui.daily_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
 '''
-
 
 
 '''

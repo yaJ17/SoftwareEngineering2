@@ -5,8 +5,9 @@ from databases.encrypt import DatabaseAES
 import pandas as pd
 import numpy as np
 import openpyxl
-
 from PySide6.QtWidgets import QPushButton
+
+
 class DatabaseManager:
     def __init__(self, host, user, password, encryption_key):
         self.host = host
@@ -179,7 +180,6 @@ class DatabaseManager:
             print("Schema created successfully.")
         except Error as e:
             print(f"Error: {e}")
-
 
     def add_dummy_data(self):
         if self.connection is None:
