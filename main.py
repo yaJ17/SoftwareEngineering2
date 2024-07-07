@@ -995,9 +995,9 @@ class MainWindow(QMainWindow):
             print(self.data)
             data_name = self.data['name']
             data_details = self.data['deadline_details']
-            id = self.db_manager.get_order_id(data_name)
             deadline_id = self.db_manager.get_deadline_id(data_name, data_details)
             deadline = self.db_manager.get_deadline_detail(data_name, data_details)
+            id = self.db_manager.get_order_id(data_name, deadline_id, deadline)
             name = self.ui.edit_client_name.text()
             bag_type = self.ui.edit_bag_type.text()
             order_quantity = self.ui.edit_order_quantity.value()

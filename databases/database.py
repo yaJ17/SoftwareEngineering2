@@ -641,9 +641,9 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def get_order_id(self, name):
+    def get_order_id(self, name, id, detail):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT order_id FROM ORDERS WHERE client_id = (SELECT client_id FROM client WHERE client_name= %s)", (self.cipher.encrypt(name),))
+        cursor.execute("SELECT order_id FROM ORDERS WHERE client_id = (SELECT client_id FROM client WHERE client_name= %s and deadline_id = %s)", (self.cipher.encrypt(name),id))
         result = cursor.fetchone()[0]
         return result
     
