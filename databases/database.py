@@ -271,21 +271,17 @@ class DatabaseManager:
 
             # Insert dummy data for ACCOUNTS
             accounts = [
-                (self.cipher.encrypt("user1"), self.cipher.encrypt("username1"), self.cipher.encrypt("password1"), self.cipher.encrypt("Question 1"), self.cipher.encrypt("Answer 1")),
-                (self.cipher.encrypt("user2"), self.cipher.encrypt("username2"), self.cipher.encrypt("password2"), self.cipher.encrypt("Question 2"), self.cipher.encrypt("Answer 2")),
-                (self.cipher.encrypt("user3"), self.cipher.encrypt("username3"), self.cipher.encrypt("password3"), self.cipher.encrypt("Question 3"), self.cipher.encrypt("Answer 3")),
-                (self.cipher.encrypt("user4"), self.cipher.encrypt("username4"), self.cipher.encrypt("password4"), self.cipher.encrypt("Question 4"), self.cipher.encrypt("Answer 4")),
-                (self.cipher.encrypt("user5"), self.cipher.encrypt("username5"), self.cipher.encrypt("password5"), self.cipher.encrypt("Question 5"), self.cipher.encrypt("Answer 5"))
+                (self.cipher.encrypt("RXAC1"), self.cipher.encrypt("rexiemaris"), self.cipher.encrypt("Rexiemaris1!"), self.cipher.encrypt("What was the name of your first pet?"), self.cipher.encrypt("Mora"))
             ]
             cursor.executemany("INSERT INTO ACCOUNTS (username_id, username, password, secret_question, secret_answer) VALUES (%s, %s, %s, %s, %s)", accounts)
 
             # Insert dummy data for USER_LOGS
             user_logs = [
                 (1, self.cipher.encrypt("Login")),
-                (2, self.cipher.encrypt("Logout")),
-                (3, self.cipher.encrypt("Login")),
-                (4, self.cipher.encrypt("Logout")),
-                (5, self.cipher.encrypt("Login"))
+                (1, self.cipher.encrypt("Logout")),
+                (1, self.cipher.encrypt("Login")),
+                (1, self.cipher.encrypt("Logout")),
+                (1, self.cipher.encrypt("Login"))
             ]
             cursor.executemany("INSERT INTO USER_LOGS (account_id, action) VALUES (%s, %s)", user_logs)
 
@@ -305,8 +301,31 @@ class DatabaseManager:
             print(f"Error: {e}")
 
 
+    def get_account_username(self):
+        if self.connection is None:
+            print("No connection to the database.")
+            return
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT username_id, username FROM ACCOUNTs LIMIT 1;")
+            rows = cursor.fetchall()
+            
+            decrypted_rows = []
+            for row in rows:
+                decrypted_row = []
+                for value in row:
+                    if isinstance(value, str):  # Decrypt only if the value is a string
+                        decrypted_value = self.cipher.decrypt(value)
+                    else:
+                        decrypted_value = value
+                    decrypted_row.append(decrypted_value)
+                decrypted_rows.append(tuple(decrypted_row))
+                
+            return decrypted_rows[0][0], decrypted_rows[0][1]
+        except Error as e:
+            print(f"Error: {e}")
 
-    
+
 
    
 
@@ -1839,6 +1858,17 @@ class DatabaseManager:
             print(f"Error checking schemas: {e}")
             return False
 
+
+    def get_client_id(self, name):
+        cursor = self.connection.cursor()
+        enc_name = self.cipher.encrypt(name)
+        cursor.execute("SELECT client_id FROM client WHERE client_name = %s", (enc_name,))
+        result = cursor.fetchall()
+        decrypted_rows = []
+        for row in result:
+            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
+            decrypted_rows.append(decrypted_row)
+        return decrypted_rows
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()

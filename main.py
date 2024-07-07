@@ -130,8 +130,11 @@ class MainWindow(QMainWindow):
         self.ui.username_id.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.ui.add_account.clicked.connect(self.show_register_window)
+        id, user = self.db_manager.get_account_username()
         self.username = username
         self.username_id = username_id
+        if self.username != user and self.username_id != id:
+            self.ui.add_account.setEnabled(False)
         # Show the window after populating the table
         self.ui.toolButton.setToolTip("""
                     <div style="
@@ -220,6 +223,7 @@ class MainWindow(QMainWindow):
         QDesktopServices.openUrl(url)
 
     def show_register_window(self):
+        print(self.username, self.username_id)
         self.db_manager.close_connection()
         self.register_window = RegisterWindow()
         self.register_window.show()
