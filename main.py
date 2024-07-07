@@ -846,6 +846,13 @@ class MainWindow(QMainWindow):
 
 
     def void_production(self):
+        name = self.ui.edit_client_name.text()
+        bag_type = self.ui.edit_bag_type.text()
+        order_quantity = self.ui.edit_order_quantity.value()
+        deadline_date = self.ui.edit_order_deadline.date().toString("yyyy-MM-dd")
+        priority = self.ui.edit_order_priority.value()
+        print(f"id {id}")
+        deadline_details = self.ui.edit_order_notes.toPlainText()
         reply = QMessageBox.question(self, 'Void Order',
                                      f'Are you sure you want to void this order?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -854,7 +861,7 @@ class MainWindow(QMainWindow):
         if reply == QMessageBox.Yes:
 
             client_name = self.ui.edit_client_name.text()
-            client_id = self.db_manager.get_client_id(self.data["name"])
+            client_id = self.db_manager.get_client_id(self.db_manager.cipher.encrypt(client_name), self.db_manager.cipher.encrypt(bag_type), order_quantity, deadline_date, priority)
             self.db_manager.void_client(client_id)
             self.db_manager.connection.commit()
             self.populate_orders()

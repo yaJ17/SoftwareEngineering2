@@ -1178,9 +1178,27 @@ class DatabaseManager:
         except Error as e:
             print(f"Error: {e}")
 
-    def get_client_id(self, client_name):
+    def get_client_id(self, name, bag_type, quantity, deadline_date, priority):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT client_id FROM client WHERE client_name= %s", (self.cipher.encrypt(client_name),))
+        cursor.execute("""
+            SELECT
+                c.client_id, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                c.client_priority
+            FROM 
+                CLIENT c
+			
+            JOIN 
+                ORDERS o ON c.client_id = o.client_id
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+			WHERE 
+				c.client_name = %s AND o.bag_type = %s
+                AND o.order_quantity = %s AND 
+                d.deadline_date = %s AND c.client_priority = %s AND c.client_active = 1 ;
+        """, (name, bag_type, quantity, deadline_date, priority))
         result = cursor.fetchone()[0]
         return result
     def get_table_creation_order(self):
