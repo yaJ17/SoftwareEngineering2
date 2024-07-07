@@ -748,18 +748,24 @@ class MainWindow(QMainWindow):
             # Query the CLIENT table to get client_id
             cursor = self.db_manager.connection.cursor()
             encrypted_client_name = self.db_manager.cipher.encrypt(client_name)
-            print(client_name, deadline_date.date().toString('yyyy-MM-dd'), order_quantity)
-            print(order_quantity)
-            
-            cursor.execute("""SELECT 
-                c.client_id,
-                o.order_quantity  
-                FROM CLIENT c  
-                JOIN ORDERS o 
-                ON c.client_id = o.client_id 
-                WHERE client_name = %s
-                AND deadline_id = (SELECT deadline_id FROM deadline WHERE deadline_name =%s 
-                AND deadline_date = %s)  AND o.order_quantity =%s;""", (encrypted_client_name, encrypted_client_name,deadline_date.date().toString('yyyy-MM-dd'), order_quantity))
+            encrypted_bag_type = self.db_manager.cipher.encrypt(type_bag)
+            print(encrypted_client_name,  order_quantity,encrypted_bag_type, item_priority )
+            cursor.execute("""
+            SELECT 
+                c.client_id, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                c.client_priority
+            FROM 
+                CLIENT c
+            JOIN 
+                ORDERS o ON c.client_id = o.client_id
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+                WHERE client_name = %s 
+                           AND o.order_quantity = %s AND o.bag_type = %s AND c.client_priority = %s""", 
+                (encrypted_client_name,  order_quantity,encrypted_bag_type, item_priority))
             print("dito ang mali")
             client_id_row = cursor.fetchone()
             client_id = client_id_row[0] if client_id_row else None
