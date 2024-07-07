@@ -426,7 +426,6 @@ class MainWindow(QMainWindow):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         print(f"User reply: {reply}")
         if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data
             deadline_date = self.ui.add_deadline_date.date().toString("yyyy-MM-dd")
             deadline_name = self.ui.add_deadline_name.text()
             deadline_details = self.ui.add_deadline_details.toPlainText()
@@ -452,7 +451,6 @@ class MainWindow(QMainWindow):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         print(f"User reply: {reply}")
         if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data
             deadline_date = self.ui.edit_deadline_date.date().toString("yyyy-MM-dd")
             deadline_name = self.ui.edit_deadline_name.text()
             deadline_details = self.ui.edit_deadline_details.toPlainText()
@@ -793,36 +791,43 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(11)
 
     def save_add_production_action(self):
-
-        reply = QMessageBox.question(self, 'Add Order',
+        # Call save_add_production_action from DatabasecManager to fetch orders data
+        print("add order action")
+        client_name = self.ui.client_name_entry.text()
+        order_quantity = self.ui.order_quantity_spinBox.value()
+        bag_type = self.ui.bag_type_entry.text()
+        deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
+        order_priority = self.ui.order_priority_spinBox.value()
+        order_notes = self.ui.add_order_notes.toPlainText()
+        exist = self.db_manager.get_order_exist(self.db_manager.cipher.encrypt(client_name), self.db_manager.cipher.encrypt(bag_type), order_quantity, deadline_date, order_priority)
+        print(exist)
+        if not exist:
+            reply = QMessageBox.question(self, 'Add Order',
                                      f'Are you sure you want to add this order?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        print(f"User reply: {reply}")
-        if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data
-            client_name = self.ui.client_name_entry.text()
-            order_quantity = self.ui.order_quantity_spinBox.value()
-            bag_type = self.ui.bag_type_entry.text()
-            deadline_date = self.ui.order_deadline_dateEdit.date().toString("yyyy-MM-dd")
-            order_priority = self.ui.order_priority_spinBox.value()
-            order_notes = self.ui.add_order_notes.toPlainText()
+            print(f"User reply: {reply}")
+            if reply == QMessageBox.Yes:
+                
+                self.db_manager.add_order(client_name, order_quantity, bag_type, deadline_date, order_priority, order_notes)
+                print(self.ui.add_order_notes.toPlainText())
+                self.ui.client_name_entry.setText("")
+                self.ui.bag_type_entry.setText("")
+                self.ui.order_quantity_spinBox.setValue(0)
+                self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+                self.ui.order_priority_spinBox.setValue(0)
+                self.db_manager.connection.commit()
+                self.populate_orders()
+                self.ui.stackedWidget.setCurrentIndex(9)
 
-            self.db_manager.add_order(client_name, order_quantity, bag_type, deadline_date, order_priority, order_notes)
-            print(self.ui.add_order_notes.toPlainText())
-            self.ui.client_name_entry.setText("")
-            self.ui.bag_type_entry.setText("")
-            self.ui.order_quantity_spinBox.setValue(0)
-            self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
-            self.ui.order_priority_spinBox.setValue(0)
-            self.db_manager.connection.commit()
-            self.populate_orders()
-            self.ui.stackedWidget.setCurrentIndex(9)
-
-            action = f"Added an order."
-            self.db_manager.add_user_log(self.username, self.username_id, action)
+                action = f"Added an order."
+                self.db_manager.add_user_log(self.username, self.username_id, action)
+            else:
+                print("User cancelled")
+                # Handle cancellation logic
         else:
-            print("User cancelled")
-            # Handle cancellation logic
+            QMessageBox.information(self, "The Order is duplicate", "The Order is duplicate")
+            return
+
 
     def void_production(self):
         reply = QMessageBox.question(self, 'Void Order',
@@ -846,8 +851,6 @@ class MainWindow(QMainWindow):
 
     def save_add_finish_product_invent(self):
 
-        # Call save_add_production_action from DatabasecManager to fetch orders data.
-        # Data include bag type, quantity, no. of defectives, product cost, and product price
         bag_type = self.ui.inventory_bag_type.text()
         quantity = self.ui.add_inventory_product.value()
         defective = self.ui.add_inventory_defective.value()
@@ -887,9 +890,6 @@ class MainWindow(QMainWindow):
         print(f"User reply: {reply}")
 
         if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data.
-            # data include material_name, material_type, materia_stock, material_cost,
-            # material_safety_stock, supplier_name
             name = self.ui.add_inventory_Materiel.text()
             mat_type = self.ui.add_material_type.text()
             stock = self.ui.add_material_stock.value()
@@ -976,7 +976,6 @@ class MainWindow(QMainWindow):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         print(f"User reply: {reply}")
         if reply == QMessageBox.Yes:
-            # Call save_add_production_action from DatabasecManager to fetch orders data
             print(self.data)
             data_name = self.data['name']
             data_details = self.data['deadline_details']

@@ -1859,16 +1859,38 @@ class DatabaseManager:
             return False
 
 
-    def get_client_id(self, name):
-        cursor = self.connection.cursor()
-        enc_name = self.cipher.encrypt(name)
-        cursor.execute("SELECT client_id FROM client WHERE client_name = %s", (enc_name,))
-        result = cursor.fetchall()
-        decrypted_rows = []
-        for row in result:
-            decrypted_row = tuple(self.cipher.decrypt(value) if isinstance(value, str) else value for value in row)
-            decrypted_rows.append(decrypted_row)
-        return decrypted_rows
+    def get_order_exist(self, name, bag_type, quantity, deadline_date, priority):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+            '''
+            SELECT 
+                c.client_name, 
+                o.bag_type, 
+                o.order_quantity, 
+                d.deadline_date, 
+                c.client_priority
+            FROM 
+                CLIENT c
+			
+            JOIN 
+                ORDERS o ON c.client_id = o.client_id
+            JOIN 
+                DEADLINE d ON c.deadline_id = d.deadline_id
+			WHERE 
+				c.client_name = %s AND o.bag_type = %s
+                AND o.order_quantity = %s AND 
+                d.deadline_date = %s AND c.client_priority = %s AND c.client_active = 1 ;
+            '''
+            , (name, bag_type, quantity, deadline_date, priority))
+            result = cursor.fetchall()
+            print(result)
+            if result:
+                return True
+            else:
+                return False
+        except Error as e:
+            print(f"Error: {e}")
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()
