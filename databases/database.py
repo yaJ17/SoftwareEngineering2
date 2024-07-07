@@ -425,11 +425,15 @@ class DatabaseManager:
             cursor.execute('''
                 SELECT client_id FROM client WHERE deadline_id = %s;
             ''',(deadline_id,))
-            result = cursor.fetchone()[0]
+            result = cursor.fetchone()
             print(result)
             if result:
+                result = result[0]
+                remaining_rows = cursor.fetchall()
+                cursor.close()
                 if  result:
                     sql_script = "UPDATE CLIENT SET client_name=%s, client_loc=%s, client_contact=%s, client_priority=%s WHERE client_id = %s"
+                    cursor = self.connection.cursor()
                     cursor.execute(sql_script, (self.cipher.encrypt(name),loc,contact, priority, result))
                     print("Details updated successfully.")
                 else:
@@ -828,8 +832,12 @@ class DatabaseManager:
             cursor.execute('''
                 SELECT deadline_id FROM deadline WHERE deadline_name = %s and deadline_details = %s and deadline_date = %s
             ''', (self.cipher.encrypt(olddeadline_name), self.cipher.encrypt(olddeadline_details), olddeadline_date))
-            deadline_id = cursor.fetchone()[0]
+            deadline_id = cursor.fetchone()
             if deadline_id:
+                deadline_id = deadline_id[0]
+                remaining_rows = cursor.fetchall()
+                cursor.close()
+                cursor = self.connection.cursor()  # Reopen cursor for update
                 cursor.execute("UPDATE deadline SET deadline_name =%s, deadline_details=%s,  deadline_date =%s WHERE deadline_id =%s",
                                     (self.cipher.encrypt(deadline_name), self.cipher.encrypt(deadline_details), deadline_date, deadline_id))
                 print("Details updated successfully.")
@@ -919,10 +927,11 @@ class DatabaseManager:
             cursor.execute('''
                 SELECT material_id FROM raw_material WHERE material_name = %s and material_type = %s and  material_stock=%s
             ''', (self.cipher.encrypt(oldname), self.cipher.encrypt(oldtype), oldstock))
-            result = cursor.fetchone()[0]
+            result = cursor.fetchone()
             print(result)
-            material_id = result
-
+            material_id = result[0]
+            remaining_rows = cursor.fetchall()
+            cursor.close()
             if result:
                 if result:
                     sql_script = '''
@@ -934,6 +943,7 @@ class DatabaseManager:
                         material_cost = %s
                     WHERE material_id = %s;
                     '''
+                    cursor = self.connection.cursor()  # Reopen cursor for update
                     cursor.execute(sql_script, 
                     (self.cipher.encrypt(name),stock,self.cipher.encrypt(mattype),safety_stock,cost,material_id))
                     sql_script = '''
@@ -1076,20 +1086,30 @@ class DatabaseManager:
             cursor.execute('''
                 SELECT product_id FROM product WHERE bag_type = %s and product_quantity = %s and product_defectives = %s and product_cost = %s and product_price = %s
             ''', (self.cipher.encrypt(oldbag_type), oldquantity, olddefective, oldcost, oldprice))
-            product_id = cursor.fetchone()[0]
+            product_id = cursor.fetchone()
+            print(product_id)
             if product_id:
+                product_id = product_id[0]  # Extract the product_id from the tuple
+
+                # Fetch all remaining results and close the cursor
+                remaining_rows = cursor.fetchall()
+                cursor.close()
+                encrypted_bag_type = self.cipher.encrypt(bag_type)
+                old = self.cipher.encrypt(oldbag_type)
+                print(old)
+                print(encrypted_bag_type)
                 sql_script = '''
-                    UPDATE product SET
-                        bag_type = %s,
-                        product_quantity= %s,
-                        product_defectives= %s,
-                        product_cost= %s,
-                        product_price= %s
-                    WHERE 
-                        product_id = %s;
+                    UPDATE product SET 
+                    bag_type = %s,
+                    product_quantity=%s, 
+                    product_defectives = %s,
+                    product_cost= %s,
+                    product_price = %s
+                    WHERE product_id = %s;
 
                     '''
-                cursor.execute(sql_script, (self.cipher.encrypt(bag_type), quantity,defective,cost,price,product_id))
+                cursor = self.connection.cursor()  # Reopen cursor for update
+                cursor.execute(sql_script, (encrypted_bag_type, quantity,defective,cost,price,product_id))
                 print("Details updated successfully.")
             else:
                 print("Invalid order.")
