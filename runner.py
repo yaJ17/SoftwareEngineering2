@@ -6,9 +6,10 @@ from Crypto.Random import get_random_bytes
 # Usage example
 if __name__ == "__main__":
     key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
-    db_manager = DatabaseManager('10.144.91.195', 'root', 'admin', key)
+    db_manager = DatabaseManager('localhost', 'root', 'admin', key)
     db_manager.connect_to_database()
     db_manager.create_schema_and_tables()
+    data = db_manager.populate_orders()
     #db_manager.add_raw_material('bobo', 'asdasd',12,1,1,'asdasd')
     #db_manager.add_user_log("username1", "user1", "BOBOO")
     # data = db_manager.populate_user_logs()

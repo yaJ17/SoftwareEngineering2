@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         self.ui.save_add_invProduct.clicked.connect(self.save_add_finish_product_invent)
 
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
-        self.db_manager = DatabaseManager('10.144.91.195', 'root', 'admin', key)
+        self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
 
@@ -236,7 +236,12 @@ class MainWindow(QMainWindow):
     def show_production(self):
         self.ui.stackedWidget.setCurrentIndex(9)
         self.populate_orders()
-
+        self.ui.client_name_entry.setText("")
+        self.ui.bag_type_entry.setText("")
+        self.ui.order_quantity_spinBox.setValue(0)
+        self.ui.order_deadline_dateEdit.setDate(QDate.currentDate())
+        self.ui.order_priority_spinBox.setValue(0)
+        self.ui.add_order_notes.setText("")
     def show_add_order(self):
         self.ui.stackedWidget.setCurrentIndex(10)
 
@@ -659,7 +664,8 @@ class MainWindow(QMainWindow):
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
         orders = self.db_manager.populate_orders()
-
+        if orders:
+            print(True)
         # Define headers for the table
         headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
 
@@ -692,7 +698,7 @@ class MainWindow(QMainWindow):
 
     def handle_edit_order(self, row):
         # Implement your edit logic here
-        print(f"Editing order at row {row}")
+        print(f"ako ang naclick {row}")
 
         # Get client name from product_table's first column at specified row
         client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
@@ -734,13 +740,6 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
-        # NOTES
-        # Get client name and bag type from product_table
-        client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
-        bag_type_item = self.ui.product_table.item(row, 1)  # Assuming bag type is in the second column
-
-        client_name = client_name_item.text()
-        bag_type = bag_type_item.text()
 
         try:
             # Assuming db_manager is an instance of DatabaseManager
@@ -748,9 +747,20 @@ class MainWindow(QMainWindow):
 
             # Query the CLIENT table to get client_id
             cursor = self.db_manager.connection.cursor()
-            query_client_id = "SELECT client_id FROM CLIENT WHERE client_name = %s;"
             encrypted_client_name = self.db_manager.cipher.encrypt(client_name)
-            cursor.execute(query_client_id, (encrypted_client_name,))
+            print(client_name, deadline_date.date().toString('yyyy-MM-dd'), order_quantity)
+            print(order_quantity)
+            
+            cursor.execute("""SELECT 
+                c.client_id,
+                o.order_quantity  
+                FROM CLIENT c  
+                JOIN ORDERS o 
+                ON c.client_id = o.client_id 
+                WHERE client_name = %s
+                AND deadline_id = (SELECT deadline_id FROM deadline WHERE deadline_name =%s 
+                AND deadline_date = %s)  AND o.order_quantity =%s;""", (encrypted_client_name, encrypted_client_name,deadline_date.date().toString('yyyy-MM-dd'), order_quantity))
+            print("dito ang mali")
             client_id_row = cursor.fetchone()
             client_id = client_id_row[0] if client_id_row else None
             print(client_id)
@@ -768,12 +778,12 @@ class MainWindow(QMainWindow):
                 JOIN 
                     DEADLINE D ON C.deadline_id = D.deadline_id
                 WHERE 
-                    C.client_name= %s;
+                    C.client_name= %s AND o.order_quantity = %s AND o.bag_type = %s;
             """
-            cursor.execute(query, (encrypted_client_name,))
+            cursor.execute(query, (encrypted_client_name, order_quantity, self.db_manager.cipher.encrypt(type_bag)))
             row = self.db_manager.cipher.decrypt(cursor.fetchone()[0])
             print(f"details: {row}")
-        except Exception as e:
+        except Exception as e: 
             print(f"Error executing database query: {e}")
 
         self.ui.edit_order_notes.setPlainText(row)

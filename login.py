@@ -20,7 +20,7 @@ class LoginWindow(QMainWindow):
         self.ui.restore_button_login.clicked.connect(self.restore)
         # Initialize DatabaseManager instance
         key = b'[Xd\xee[\\\x90\x8c\xc8t\xba\xe4\xe0\rR\x87\xe6\xbe\xce\x8a\x02lC6\xf7G\x15O\xca\x182\xd0'
-        self.db_manager = DatabaseManager('10.144.91.195', 'root', 'admin', key)
+        self.db_manager = DatabaseManager('localhost', 'root', 'admin', key)
         self.db_manager.connect_to_database()
         self.db_manager.create_schema_and_tables()
         # Initialize variables
