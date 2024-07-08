@@ -49,21 +49,20 @@ class RegisterWindow(QMainWindow):
             QMessageBox.warning(self, "Invalid Input", "All fields must be filled out and a question selected.")
             return
 
-        elif password != confirm_password:
+        if password != confirm_password:
             QMessageBox.warning(self, "Password Mismatch", "Passwords do not match.")
             return
 
         # Validate password criteria
-        elif not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+        if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
             QMessageBox.warning(self, "Invalid Password", "Password does not meet the required criteria.")
             return
 
-        else:
-            # Add account to the database
-            self.db_manager.add_account(Username, password, special_question, answer)
-            QMessageBox.information(self, "Registration Successful", "Account has been successfully created.")
-            self.close()
-            self.db_manager.close_connection()
+
+        # Add account to the database
+        self.db_manager.add_account(Username, password, special_question, answer)
+        QMessageBox.information(self, "Registration Successful", "Account has been successfully created.")
+        self.close()
 
     def handle_cancel(self):
         self.close()
