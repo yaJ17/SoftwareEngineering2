@@ -58,11 +58,11 @@ class RegisterWindow(QMainWindow):
             QMessageBox.warning(self, "Invalid Password", "Password does not meet the required criteria.")
             return
 
-
         # Add account to the database
         self.db_manager.add_account(Username, password, special_question, answer)
         QMessageBox.information(self, "Registration Successful", "Account has been successfully created.")
         self.close()
+        self.db_manager.close_connection()
 
     def handle_cancel(self):
         self.close()

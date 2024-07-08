@@ -224,7 +224,6 @@ class MainWindow(QMainWindow):
 
     def show_register_window(self):
         print(self.username, self.username_id)
-        self.db_manager.close_connection()
         self.register_window = RegisterWindow()
         self.register_window.show()
 
