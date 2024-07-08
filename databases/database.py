@@ -518,6 +518,7 @@ class DatabaseManager:
             cursor.execute(
             '''
             SELECT 
+                c.client_id,
                 c.client_name, 
                 o.bag_type, 
                 o.order_quantity, 
@@ -687,8 +688,8 @@ class DatabaseManager:
             print(f"deadline details: {deadline_details}")
             print(self.cipher.decrypt(encrypted_deadline_name))
             # Fetch the deadline_id
-            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s",
-                           (encrypted_deadline_name, deadline_date))
+            cursor.execute("SELECT deadline_id FROM deadline WHERE deadline_name = %s AND deadline_date = %s and deadline_details = %s",
+                           (encrypted_deadline_name, deadline_date,encrypted_deadline_details))
             deadline_result = cursor.fetchone()
 
             if deadline_result is None:

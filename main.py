@@ -699,8 +699,10 @@ class MainWindow(QMainWindow):
         # Implement your edit logic here
         print(f"ako ang naclick {row}")
 
+        client_id_item = self.ui.product_table.item(row, 0)
+        client_id = client_id_item.text()
         # Get client name from product_table's first column at specified row
-        client_name_item = self.ui.product_table.item(row, 0)  # Assuming client name is in the first column
+        client_name_item = self.ui.product_table.item(row, 1)  # Assuming client name is in the first column
         if client_name_item:
             client_name = client_name_item.text()
             self.ui.edit_client_name.setText(client_name)
@@ -708,14 +710,14 @@ class MainWindow(QMainWindow):
             print(f"Error: No data found in row {row}")
 
         # Get bagtype name from product_table's first column at specified row
-        bagtype = self.ui.product_table.item(row, 1)  # Assuming client name is in the first column
+        bagtype = self.ui.product_table.item(row,2)  # Assuming client name is in the first column
         if bagtype:
             type_bag = bagtype.text()
             self.ui.edit_bag_type.setText(type_bag)
         else:
             print(f"Error: No data found in row {row}")
 
-        order_quantity_item = self.ui.product_table.item(row, 2)  # Assuming order quantity is in the third column
+        order_quantity_item = self.ui.product_table.item(row, 3)  # Assuming order quantity is in the third column
         if order_quantity_item:
             order_quantity = int(order_quantity_item.text())
             self.ui.edit_order_quantity.setValue(order_quantity)
@@ -723,7 +725,7 @@ class MainWindow(QMainWindow):
             print(f"Error: No data found in row {row}")
 
         # Get deadline date from product_table's fourth column at specified row
-        deadline_item = self.ui.product_table.item(row, 3)  # Assuming deadline date is in the fourth column
+        deadline_item = self.ui.product_table.item(row, 4)  # Assuming deadline date is in the fourth column
         if deadline_item:
             deadline_str = deadline_item.text()
             deadline_date = QDateTime.fromString(deadline_str,
@@ -732,7 +734,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
-        priority_item = self.ui.product_table.item(row, 4)  # Assuming order quantity is in the third column
+        priority_item = self.ui.product_table.item(row, 5)  # Assuming order quantity is in the third column
         if priority_item:
             item_priority = int(priority_item.text())
             self.ui.edit_order_priority.setValue(item_priority)
@@ -749,25 +751,6 @@ class MainWindow(QMainWindow):
             encrypted_client_name = self.db_manager.cipher.encrypt(client_name)
             encrypted_bag_type = self.db_manager.cipher.encrypt(type_bag)
             print(encrypted_client_name,  order_quantity,encrypted_bag_type, item_priority )
-            cursor.execute("""
-            SELECT 
-                c.client_id, 
-                o.bag_type, 
-                o.order_quantity, 
-                d.deadline_date, 
-                c.client_priority
-            FROM 
-                CLIENT c
-            JOIN 
-                ORDERS o ON c.client_id = o.client_id
-            JOIN 
-                DEADLINE d ON c.deadline_id = d.deadline_id
-                WHERE client_name = %s 
-                           AND o.order_quantity = %s AND o.bag_type = %s AND c.client_priority = %s""", 
-                (encrypted_client_name,  order_quantity,encrypted_bag_type, item_priority))
-            print("dito ang mali")
-            client_id_row = cursor.fetchone()
-            client_id = client_id_row[0] if client_id_row else None
             print(client_id)
             if not client_id:
                 print(f"Error: Client '{client_name}' not found in database")
@@ -783,10 +766,11 @@ class MainWindow(QMainWindow):
                 JOIN 
                     DEADLINE D ON C.deadline_id = D.deadline_id
                 WHERE 
-                    C.client_name= %s AND o.order_quantity = %s AND o.bag_type = %s;
+                    c.client_id =%s;
             """
-            cursor.execute(query, (encrypted_client_name, order_quantity, self.db_manager.cipher.encrypt(type_bag)))
-            row = self.db_manager.cipher.decrypt(cursor.fetchone()[0])
+            cursor.execute(query, (client_id,))
+            rows = cursor.fetchone()[0]
+            row = self.db_manager.cipher.decrypt(rows)
             print(f"details: {row}")
         except Exception as e: 
             print(f"Error executing database query: {e}")
@@ -960,7 +944,7 @@ class MainWindow(QMainWindow):
         orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
+        headers = ['ID','Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
 
         # Set the number of rows and columns
         self.ui.product_table.setRowCount(len(orders))
@@ -990,7 +974,7 @@ class MainWindow(QMainWindow):
         self.ui.product_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         # Clear the selection
         self.ui.product_table.clearSelection()
-    
+        self.ui.product_table.verticalHeader().setVisible(False)
     def save_edit_order(self):
 
         reply = QMessageBox.question(self, 'Edit Order',
