@@ -1877,7 +1877,7 @@ class DatabaseManager:
             cursor = self.connection.cursor()
             cursor.execute('''
             SELECT 
-                u.account_id,
+                a.username_id,
                 a.username,
                 u.action,
                 u.timestamp 

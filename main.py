@@ -160,6 +160,8 @@ class MainWindow(QMainWindow):
         self.ui.cancel_raw_plus.clicked.connect(self.show_inventory)
         self.ui.cancel_product_plus.clicked.connect(self.show_inventory)
         self.ui.save_order_plus.clicked.connect(self.save_order_plus_action)
+        self.ui.save_raw_plus.clicked.connect(self.save_plus_raw_inv_action)
+        self.ui.save_product_plus.clicked.connect(self.save_prod_plus_action)
 
         self.show()
 
@@ -1263,14 +1265,11 @@ class MainWindow(QMainWindow):
             "supplier": supplier
         }
         self.ui.stackedWidget.setCurrentIndex(21)
-    def save_plus_raw_inv(self):
-        print(self.data)
-        bag_type = self.ui.Edit_inventory_bag_type.text()
-        quantity = self.ui.Edit_inventory_product_2.value()
-        defective = self.ui.edit_inventory_defective_2.value()
-        cost = self.ui.edit_product_cost_2.value()
-        price = self.ui.edit_inventory_active_product_2.value()
 
+    def save_plus_raw_inv_action(self):
+        print(f"abra {self.data}")
+        stock = self.ui.raw_stock_plus.value()
+        print(stock)
         reply = QMessageBox.question(self, 'Save Edit Finished Product',
                                      f'Are you sure you want to edit this product in the inventory?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -1278,21 +1277,29 @@ class MainWindow(QMainWindow):
 
         if reply == QMessageBox.Yes:
 
-            self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],
-                                        self.data["quantity"] + quantity, self.data["defective"],
-                                        self.data["cost"], self.data["price"])
 
+            cursor = self.db_manager.connection.cursor()
+            cursor.execute("""
+                SELECT material_id FROM raw_material
+                WHERE material_name = %s AND material_type =%s
+                AND material_cost = %s AND material_stock = %s
+                AND material_safety_stock = %s;
+            """, (self.db_manager.cipher.encrypt(self.data['name']), self.db_manager.cipher.encrypt(self.data['material_type']),self.data['cost'], self.data['stock'], self.data['safety_stock']))
+            id = cursor.fetchone()
+            id = id[0]
+            cursor.execute("UPDATE raw_material SET material_stock = material_stock + %s WHERE material_id = %s"
+                           ,(stock, id))
             self.db_manager.connection.commit()
 
             # User logs
-            action = f"Added on {bag_type} (bag type) information in the finished product"
+            action = f"Edited {self.data['name']} (material) in the raw materials inventory."
             self.db_manager.add_user_log(self.username, self.username_id, action)
 
             self.show_inventory()
         else:
             print("User cancelled")
             # Handle cancellation logic
-            
+
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
@@ -1453,8 +1460,47 @@ class MainWindow(QMainWindow):
             self.ui.defect_plus.setValue(defective)
             self.ui.prod_cost_plus.setValue(cost)
             self.ui.price_plus.setValue(price)
+
+        self.data = {
+            "bag_type": bag_type,
+            "quantity": quantity,
+            "defective": defective,
+                "cost": cost,
+                "price": price,
+        }
         self.ui.stackedWidget.setCurrentIndex(20)
 
+    def save_prod_plus_action(self):
+        print(self.data)
+        quantity = self.ui.quantity_product_plus.value()
+
+        reply = QMessageBox.question(self, 'Save Edit Finished Product',
+                                     f'Are you sure you want to edit this product in the inventory?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+            cursor = self.db_manager.connection.cursor()
+            cursor.execute("""
+                SELECT product_id FROM product
+                WHERE bag_type = %s AND product_quantity =%s
+                AND product_defectives = %s AND product_cost = %s
+                AND product_price = %s;
+            """, (self.db_manager.cipher.encrypt(self.data['bag_type']),self.data['quantity'], self.data['defective'], self.data['cost'], self.data['price'] ))
+            id = cursor.fetchone()
+            id = id[0]
+            cursor.execute("UPDATE product SET product_quantity = product_quantity + %s WHERE product_id = %s"
+                           ,(quantity, id))
+            self.db_manager.connection.commit()
+
+            # User logs
+            action = f"Edited {self.data['bag_type']} (bag type) information in the finished product"
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+
+            self.show_inventory()
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
