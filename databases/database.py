@@ -1325,7 +1325,59 @@ class DatabaseManager:
         except Error as e:
             print(f"Error during database restore: {e}")
 
+    def overwrite_restore(self, input_file):
+        try:
+            xls = pd.ExcelFile(input_file)
+            cursor = self.connection.cursor()
 
+            # Define table names to drop
+            table_names = [
+                'user_logs', 'transaction_history', 'orders', 'product',
+                'raw_material', 'bag_component', 'supplier', 'subcontractor',
+                'client', 'deadline', 'accounts'
+            ]
+
+            # Drop all tables in reverse order
+            for table_name in reversed(table_names):
+                # Disable foreign key checks temporarily for this session
+                cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+                cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+                print(f"Dropped table: {table_name}")
+
+            # Re-enable foreign key checks
+            cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+
+            # Get table creation order from Excel file
+            table_creation_order = xls.sheet_names
+
+            # Create tables in the correct order
+            for table_name in table_creation_order:
+                df = pd.read_excel(xls, sheet_name=table_name)
+                print(df)
+
+                # Convert timestamps to strings if needed
+                for col in df.columns:
+                    if np.issubdtype(df[col].dtype, np.datetime64):
+                        df[col] = df[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+                create_table_query = self.generate_create_table_query(table_name, df)
+                cursor.execute(create_table_query)
+                print(f"Created table: {table_name}")
+
+                # Insert data into the table
+                for row in df.itertuples(index=False, name=None):
+                    placeholders = ', '.join(['%s'] * len(row))
+                    insert_query = f"INSERT INTO {table_name} VALUES ({placeholders})"
+                    cursor.execute(insert_query, row)
+                print(f"Inserted data into table: {table_name}")
+
+            # Commit the changes
+            self.connection.commit()
+
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            self.connection.rollback()
 
     def generate_create_table_query(self, table_name, df):
         columns = []
