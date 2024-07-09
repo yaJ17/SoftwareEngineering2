@@ -155,7 +155,14 @@ class MainWindow(QMainWindow):
 
         self.start_automatic_backup()
 
+        #buttons for add quantity
+        self.ui.cancel_order_plus.clicked.connect(self.show_production)
+        self.ui.cancel_raw_plus.clicked.connect(self.show_inventory)
+        self.ui.cancel_product_plus.clicked.connect(self.show_inventory)
+
+
         self.show()
+
 
     def start_automatic_backup(self):
         backup_dir = os.path.join(os.getcwd(), "Backup", "Automatic")
@@ -289,6 +296,8 @@ class MainWindow(QMainWindow):
 
     def show_maintenance(self):
         self.ui.stackedWidget.setCurrentIndex(8)
+
+
 
     def logout(self):
         action = f"Logged out."
@@ -704,8 +713,7 @@ class MainWindow(QMainWindow):
         self.ui.product_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     '''
 
-    def handle_plus_order_inv(self, row):
-        print(f"Adding order at row {row}")
+
 
     def handle_edit_order(self, row):
         # Implement your edit logic here
@@ -996,6 +1004,46 @@ class MainWindow(QMainWindow):
         self.ui.product_table.clearSelection()
         self.ui.product_table.verticalHeader().setVisible(False)
 
+    def handle_plus_order_inv(self, row):
+        client_id_item = self.ui.product_table.item(row, 0)
+        # client_id = client_id_item.text()
+        # Get client name from product_table's first column at specified row
+        client_name_item = self.ui.product_table.item(row, 1)  # Assuming client name is in the first column
+        if client_name_item:
+            client_name = client_name_item.text()
+            self.ui.client_order_plus.setText(client_name)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get bagtype name from product_table's first column at specified row
+        bagtype = self.ui.product_table.item(row, 2)  # Assuming client name is in the first column
+        if bagtype:
+            type_bag = bagtype.text()
+            self.ui.typer_order_plus.setText(type_bag)
+        else:
+            print(f"Error: No data found in row {row}")
+
+
+
+        # Get deadline date from product_table's fourth column at specified row
+        deadline_item = self.ui.product_table.item(row, 4)  # Assuming deadline date is in the fourth column
+        if deadline_item:
+            deadline_str = deadline_item.text()
+            deadline_date = QDateTime.fromString(deadline_str,
+                                                 "yyyy-MM-dd")  # Assuming the deadline format is "yyyy-MM-dd"
+            self.ui.deadline_order_plus.setDate(deadline_date.date())
+        else:
+            print(f"Error: No data found in row {row}")
+
+        priority_item = self.ui.product_table.item(row, 5)  # Assuming order quantity is in the third column
+        if priority_item:
+            item_priority = int(priority_item.text())
+            self.ui.priority_order_plus.setValue(item_priority)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        self.ui.stackedWidget.setCurrentIndex(22)
+
     def save_edit_order(self):
 
         reply = QMessageBox.question(self, 'Edit Order',
@@ -1078,7 +1126,46 @@ class MainWindow(QMainWindow):
         self.ui.raw_inventory_table.clearSelection()
 
     def handle_plus_raw_inv(self, row):
-        print(f"Adding raw material at row {row}")
+        material_name = self.ui.raw_inventory_table.item(row, 0)
+        if material_name:
+            name = material_name.text()
+            print(name)
+            self.ui.raw_name_plus.setText(name)
+        else:
+            print(f"Error: No data found in row {row}")
+
+        # Get bagtype name from product_table's first column at specified row
+        material_type = self.ui.raw_inventory_table.item(row, 4)  # Assuming client name is in the first column
+        if material_type:
+            type_bag = material_type.text()
+            self.ui.raw_type_plus.setText(type_bag)
+        else:
+            print(f"Error: No data found in row {row}")
+
+
+        # Get deadline date from product_table's fourth column at specified row
+        safety_item = self.ui.raw_inventory_table.item(row, 2)  # Assuming deadline date is in the fourth column
+        if safety_item:
+            safety = int(safety_item.text())
+            self.ui.raw_safety_plus.setValue(safety)
+        else:
+            print(f"Error: No safety found in row {row}")
+
+        cost_item = self.ui.raw_inventory_table.item(row, 3)  # Assuming order quantity is in the third column
+        if cost_item:
+            cost = int(cost_item.text())
+            print(cost)
+            self.ui.raw_cost_plus.setValue(cost)
+        else:
+            print(f"Error: No cost found in row {row}")
+
+        supplier_item = self.ui.raw_inventory_table.item(row, 5)  # Assuming order quantity is in the third column
+        if supplier_item:
+            supplier = supplier_item.text()
+            self.ui.raw_supplier_plus.setText(supplier)
+        else:
+            print(f"Error: No data found in row {row}")
+        self.ui.stackedWidget.setCurrentIndex(21)
 
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
@@ -1222,7 +1309,25 @@ class MainWindow(QMainWindow):
         
 
     def handle_plus_prod_inv(self, row):
-        print(f"Adding finished product at row {row}")
+        bag_type_item = self.ui.product_inventory_table.item(row, 0)  # Assuming client name is in the first column
+        quantity_item = self.ui.product_inventory_table.item(row, 1)
+        defective_item = self.ui.product_inventory_table.item(row, 2)
+        cost_item = self.ui.product_inventory_table.item(row, 3)
+        price_item = self.ui.product_inventory_table.item(row, 4)
+
+        if bag_type_item and quantity_item and defective_item and cost_item and price_item:
+            bag_type = bag_type_item.text()
+            quantity = int(quantity_item.text())
+            defective = int(defective_item.text())
+            cost = int(cost_item.text())
+            price = int(price_item.text())
+
+            self.ui.bag_type_plus.setText(bag_type)
+
+            self.ui.defect_plus.setValue(defective)
+            self.ui.prod_cost_plus.setValue(cost)
+            self.ui.price_plus.setValue(price)
+        self.ui.stackedWidget.setCurrentIndex(20)
 
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
