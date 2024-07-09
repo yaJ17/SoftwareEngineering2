@@ -3126,7 +3126,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Deadline&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="cance_order_plus">
+     <widget class="QPushButton" name="cancel_order_plus">
       <property name="geometry">
        <rect>
         <x>540</x>
