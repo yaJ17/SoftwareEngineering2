@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         self.ui.cancel_order_plus.clicked.connect(self.show_production)
         self.ui.cancel_raw_plus.clicked.connect(self.show_inventory)
         self.ui.cancel_product_plus.clicked.connect(self.show_inventory)
-
+        self.ui.save_order_plus.clicked.connect(self.save_order_plus_action)
 
         self.show()
 
@@ -670,6 +670,25 @@ class MainWindow(QMainWindow):
         self.ui.table_transac.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.table_transac.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
+    def save_plus_order(self):
+        reply = QMessageBox.question(self, 'Edit Deadline',
+                                     f'Save this addition to orders?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            deadline_date = self.ui.edit_deadline_date.date().toString("yyyy-MM-dd")
+            deadline_name = self.ui.edit_deadline_name.text()
+            deadline_details = self.ui.edit_deadline_details.toPlainText()
+            print(deadline_name, deadline_details, deadline_date)
+            self.db_manager.set_deadline(deadline_name, deadline_details, deadline_date, self.data['name'], self.data['details'], self.data['date'])
+            self.db_manager.connection.commit()
+            self.show_scheduling()
+
+            action = f"Edited {deadline_name} (deadline)."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
     '''
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
@@ -1005,7 +1024,8 @@ class MainWindow(QMainWindow):
         self.ui.product_table.verticalHeader().setVisible(False)
 
     def handle_plus_order_inv(self, row):
-        client_id_item = self.ui.product_table.item(row, 0)
+        rows = 0
+        client_id_item = int(self.ui.product_table.item(row, 0).text())
         # client_id = client_id_item.text()
         # Get client name from product_table's first column at specified row
         client_name_item = self.ui.product_table.item(row, 1)  # Assuming client name is in the first column
@@ -1024,7 +1044,7 @@ class MainWindow(QMainWindow):
             print(f"Error: No data found in row {row}")
 
 
-
+        
         # Get deadline date from product_table's fourth column at specified row
         deadline_item = self.ui.product_table.item(row, 4)  # Assuming deadline date is in the fourth column
         if deadline_item:
@@ -1042,8 +1062,62 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
+
+        try:
+            # Assuming db_manager is an instance of DatabaseManager
+            # Initialize or get db_manager instance
+
+            # Query the CLIENT table to get client_id
+            cursor = self.db_manager.connection.cursor()
+            if not client_id_item:
+                print(f"Error: Client '{client_name}' not found in database")
+                return
+
+            query = """
+                SELECT 
+                    order_quantity
+                FROM 
+                    orders
+                WHERE 
+                    client_id =%s;
+            """
+            cursor.execute(query, (client_id_item,))
+            rows = cursor.fetchone()[0]
+        except Exception as e: 
+            print(f"Error executing database query: {e}")
+
+        # Switch to the desired index in stackedWidget
+
+        self.data = {
+            'client_id': client_id_item,
+            "order_quantity": rows
+        }
+        print(self.data)
         self.ui.stackedWidget.setCurrentIndex(22)
 
+    def save_order_plus_action(self):
+        reply = QMessageBox.question(self, 'Edit Order',
+                                     f'Are you sure you want to add on this order?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+        if reply == QMessageBox.Yes:
+            print(self.data)
+            id = self.data['client_id']
+            quantity = self.ui.quantity_order_plus.value()
+            cursor = self.db_manager.connection.cursor()
+            cursor.execute("""
+
+            UPDATE orders SET order_quantity = order_quantity + %s WHERE client_id = %s;
+            """,(quantity, id))
+            self.show_production()
+
+            action = f"Edited {id}'s order."
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+            self.ui.quantity_order_plus.setValue(0)
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+    
     def save_edit_order(self):
 
         reply = QMessageBox.question(self, 'Edit Order',
@@ -1151,6 +1225,12 @@ class MainWindow(QMainWindow):
         else:
             print(f"Error: No data found in row {row}")
 
+        stock_item = self.ui.raw_inventory_table.item(row, 1)  # Assuming order quantity is in the third column
+        if stock_item:
+            stock = int(stock_item.text())
+            self.ui.edit_material_stock.setValue(stock)
+        else:
+            print(f"Error: No stock found in row {row}")
 
         # Get deadline date from product_table's fourth column at specified row
         safety_item = self.ui.raw_inventory_table.item(row, 2)  # Assuming deadline date is in the fourth column
@@ -1174,8 +1254,45 @@ class MainWindow(QMainWindow):
             self.ui.raw_supplier_plus.setText(supplier)
         else:
             print(f"Error: No data found in row {row}")
+        self.data = {
+            "name": name,
+            "material_type": type_bag,
+            "cost": cost,
+            "stock": stock,
+            "safety_stock": safety,
+            "supplier": supplier
+        }
         self.ui.stackedWidget.setCurrentIndex(21)
+    def save_plus_raw_inv(self):
+        print(self.data)
+        bag_type = self.ui.Edit_inventory_bag_type.text()
+        quantity = self.ui.Edit_inventory_product_2.value()
+        defective = self.ui.edit_inventory_defective_2.value()
+        cost = self.ui.edit_product_cost_2.value()
+        price = self.ui.edit_inventory_active_product_2.value()
 
+        reply = QMessageBox.question(self, 'Save Edit Finished Product',
+                                     f'Are you sure you want to edit this product in the inventory?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        print(f"User reply: {reply}")
+
+        if reply == QMessageBox.Yes:
+
+            self.db_manager.set_product(bag_type, quantity, defective, cost, price, self.data["bag_type"],
+                                        self.data["quantity"] + quantity, self.data["defective"],
+                                        self.data["cost"], self.data["price"])
+
+            self.db_manager.connection.commit()
+
+            # User logs
+            action = f"Added on {bag_type} (bag type) information in the finished product"
+            self.db_manager.add_user_log(self.username, self.username_id, action)
+
+            self.show_inventory()
+        else:
+            print("User cancelled")
+            # Handle cancellation logic
+            
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
         print(f"Editing order at row {row}")
