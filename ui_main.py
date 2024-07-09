@@ -790,10 +790,10 @@ class Ui_MainWindow(object):
         self.label_62 = QLabel(self.page)
         self.label_62.setObjectName(u"label_62")
         self.label_62.setGeometry(QRect(150, 173, 91, 21))
-        self.add_inventory_product_2 = QSpinBox(self.page)
-        self.add_inventory_product_2.setObjectName(u"add_inventory_product_2")
-        self.add_inventory_product_2.setGeometry(QRect(270, 129, 211, 22))
-        self.add_inventory_product_2.setMaximum(999999)
+        self.quantity_product_plus = QSpinBox(self.page)
+        self.quantity_product_plus.setObjectName(u"quantity_product_plus")
+        self.quantity_product_plus.setGeometry(QRect(270, 129, 211, 22))
+        self.quantity_product_plus.setMaximum(999999)
         self.save_product_plus = QPushButton(self.page)
         self.save_product_plus.setObjectName(u"save_product_plus")
         self.save_product_plus.setGeometry(QRect(340, 302, 70, 24))
@@ -994,7 +994,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(22)
+        self.stackedWidget.setCurrentIndex(21)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
