@@ -1102,7 +1102,16 @@ class MainWindow(QMainWindow):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.raw_inventory_table.setItem(row_index, column_index, item)
-
+            stocks = int(row_data[1]) 
+            safety_stock = int(row_data[2]) 
+            if (stocks - safety_stock) <= 20:
+                # Change the background color of the row to indicate critical stock level
+                for column_index in range(len(headers)):
+                    item = self.ui.raw_inventory_table.item(row_index, column_index)
+                    if item:
+                        color = QColor('red')
+                        color.setAlpha(128)  # Set the alpha value (128 for 50% opacity)
+                        item.setBackground(color)
             # Add edit button in the last column
             edit_button = QPushButton('Edit')
             edit_button.setProperty("row", row_index)
