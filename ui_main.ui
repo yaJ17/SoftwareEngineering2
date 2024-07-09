@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Rexie Production</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="logo_wannabe">
@@ -159,7 +159,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="dashBoard">
      <widget class="QLabel" name="welcome_label">
