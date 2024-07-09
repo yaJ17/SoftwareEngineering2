@@ -531,7 +531,7 @@ class MainWindow(QMainWindow):
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_weekly(row))
             self.ui.weekly_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
-            edit_button.clearFocus()
+            #edit_button.clearFocus()
 
         # Set the edit triggers (disable editing)
         self.ui.weekly_table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -539,6 +539,7 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.weekly_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.weekly_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.weekly_table.clearSelection()
 
     def handle_edit_deadline_weekly(self, row):
         # Get deadline name from table
@@ -660,13 +661,14 @@ class MainWindow(QMainWindow):
         self.ui.table_transac.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.table_transac.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
+    '''
     def populate_orders(self):
         # Call populate_orders from DatabaseManager to fetch orders data
         orders = self.db_manager.populate_orders()
         if orders:
             print(True)
         # Define headers for the table
-        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
+        headers = ['Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit", "Add"]
 
         # Set the number of rows and columns
         self.ui.product_table.setRowCount(len(orders))
@@ -683,17 +685,27 @@ class MainWindow(QMainWindow):
                 # Add edit button in the last column
             edit_button = QPushButton('Edit')
             edit_button.setProperty("row", row_index)
-
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_order(row))
-            self.ui.product_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+            self.ui.product_table.setCellWidget(row_index, len(headers) - 2, edit_button)
+            #edit_button.clearFocus()
 
-            edit_button.clearFocus()
+            # Add add button in the last column
+            plus_button = QPushButton('Add')
+            plus_button.setProperty("row", row_index)
+            plus_button.clicked.connect(lambda checked, row=row_index: self.handle_plus_order_inv(row))
+            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, plus_button)
+            #plus_button.clearFocus()
+
         # Set the edit triggers (disable editing)
         self.ui.product_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # Resize columns to fit content
         self.ui.product_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.product_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    '''
+
+    def handle_plus_order_inv(self, row):
+        print(f"Adding order at row {row}")
 
     def handle_edit_order(self, row):
         # Implement your edit logic here
@@ -944,7 +956,7 @@ class MainWindow(QMainWindow):
         orders = self.db_manager.populate_orders()
 
         # Define headers for the table
-        headers = ['ID','Client Name', "Bag Type", "Order Quantity", "Deadline", 'Priority', "Edit"]
+        headers = ['ID','Client Name', "Bag Type", "Quantity", "Deadline", 'Priority', "Edit", "Add"]
 
         # Set the number of rows and columns
         self.ui.product_table.setRowCount(len(orders))
@@ -964,7 +976,15 @@ class MainWindow(QMainWindow):
 
             # Properly connect the button click event
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_order(row))
-            self.ui.product_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+            self.ui.product_table.setCellWidget(row_index, len(headers) - 2, edit_button)
+            #edit_button.clearFocus()
+
+            # Add add button in the last column
+            plus_button = QPushButton('Add')
+            plus_button.setProperty("row", row_index)
+            plus_button.clicked.connect(lambda checked, row=row_index: self.handle_plus_order_inv(row))
+            self.ui.product_table.setCellWidget(row_index, len(headers) - 1, plus_button)
+            #plus_button.clearFocus()
 
         # Set the edit triggers (disable editing)
         self.ui.product_table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -975,6 +995,7 @@ class MainWindow(QMainWindow):
         # Clear the selection
         self.ui.product_table.clearSelection()
         self.ui.product_table.verticalHeader().setVisible(False)
+
     def save_edit_order(self):
 
         reply = QMessageBox.question(self, 'Edit Order',
@@ -1020,7 +1041,7 @@ class MainWindow(QMainWindow):
         raw = self.db_manager.populate_raw_materials()
 
         # Define headers for the table
-        headers = [ 'Name', 'Stocks', 'Safety Stock', 'Cost','Type','Supplier','Edit']
+        headers = [ 'Name', 'Stocks', 'Safety Stock', 'Cost','Type','Supplier','Edit', 'Add']
         # Set the number of rows and columns
         self.ui.raw_inventory_table.setRowCount(len(raw))
         self.ui.raw_inventory_table.setColumnCount(len(headers))
@@ -1033,12 +1054,20 @@ class MainWindow(QMainWindow):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.raw_inventory_table.setItem(row_index, column_index, item)
-                # Add edit button in the last column
+
+            # Add edit button in the last column
             edit_button = QPushButton('Edit')
             edit_button.setProperty("row", row_index)
-
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_raw(row))
-            self.ui.raw_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+            self.ui.raw_inventory_table.setCellWidget(row_index, len(headers) - 2, edit_button)
+            #edit_button.clearFocus()
+
+            # Add add button in the last column
+            plus_button = QPushButton('Add')
+            plus_button.setProperty("row", row_index)
+            plus_button.clicked.connect(lambda checked, row=row_index: self.handle_plus_raw_inv(row))
+            self.ui.raw_inventory_table.setCellWidget(row_index, len(headers) - 1, plus_button)
+            #plus_button.clearFocus()
 
         # Set the edit triggers (disable editing)
         self.ui.raw_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -1046,6 +1075,10 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.raw_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.raw_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.raw_inventory_table.clearSelection()
+
+    def handle_plus_raw_inv(self, row):
+        print(f"Adding raw material at row {row}")
 
     def handle_edit_prod_raw(self, row):
         # Implement your edit logic here
@@ -1151,7 +1184,7 @@ class MainWindow(QMainWindow):
         prod = self.db_manager.populate_product()
 
         # Define headers for the table
-        headers = [ 'Bag Type', 'Quantity', 'Defective', 'Cost', 'Price' ,'Profit','Edit']
+        headers = ['Bag Type', 'Quantity', 'Defective', 'Cost', 'Price', 'Profit', 'Edit', 'Add']
         # Set the number of rows and columns
         self.ui.product_inventory_table.setRowCount(len(prod))
         self.ui.product_inventory_table.setColumnCount(len(headers))
@@ -1164,12 +1197,20 @@ class MainWindow(QMainWindow):
             for column_index, data in enumerate(row_data):
                 item = QTableWidgetItem(str(data))
                 self.ui.product_inventory_table.setItem(row_index, column_index, item)
-                # Add edit button in the last column
+
+            # Add edit button in the second-to-last column
             edit_button = QPushButton('Edit')
             edit_button.setProperty("row", row_index)
-
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_prod_inv(row))
-            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, edit_button)
+            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 2, edit_button)
+            #edit_button.clearFocus()
+
+            # Add add button in the last column
+            plus_button = QPushButton('Add')
+            plus_button.setProperty("row", row_index)
+            plus_button.clicked.connect(lambda checked, row=row_index: self.handle_plus_prod_inv(row))
+            self.ui.product_inventory_table.setCellWidget(row_index, len(headers) - 1, plus_button)
+            #plus_button.clearFocus()
 
         # Set the edit triggers (disable editing)
         self.ui.product_inventory_table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -1177,6 +1218,11 @@ class MainWindow(QMainWindow):
         # Resize columns to fit content
         self.ui.product_inventory_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.ui.product_inventory_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.product_inventory_table.clearSelection()
+        
+
+    def handle_plus_prod_inv(self, row):
+        print(f"Adding finished product at row {row}")
 
     def handle_edit_prod_inv(self, row):
         # Implement your edit logic here
@@ -1214,6 +1260,9 @@ class MainWindow(QMainWindow):
         }
 
         self.ui.stackedWidget.setCurrentIndex(3)
+
+
+
 
     def save_edit_product(self):
         print(self.data)
@@ -1755,12 +1804,13 @@ class MainWindow(QMainWindow):
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_daily(row))
             self.ui.daily_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
-            edit_button.clearFocus()
+            #edit_button.clearFocus()
         # Set the edit triggers (disable editing)
         self.ui.daily_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # Resize columns to fit content
         self.ui.daily_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.daily_table.clearSelection()
 
         # Navigate to index 14 in stackedWidget
         self.ui.stackedWidget.setCurrentIndex(14)
@@ -1799,12 +1849,13 @@ class MainWindow(QMainWindow):
             edit_button.clicked.connect(lambda checked, row=row_index: self.handle_edit_deadline_daily(row))
             self.ui.daily_table.setCellWidget(row_index, len(headers) - 1, edit_button)
 
-            edit_button.clearFocus()
+            #edit_button.clearFocus()
         # Set the edit triggers (disable editing)
         self.ui.daily_table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # Resize columns to fit content
         self.ui.daily_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.daily_table.clearSelection()
 
 
 '''
