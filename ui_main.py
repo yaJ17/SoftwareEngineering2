@@ -419,12 +419,6 @@ class Ui_MainWindow(object):
         self.restore_button = QPushButton(self.maintenance)
         self.restore_button.setObjectName(u"restore_button")
         self.restore_button.setGeometry(QRect(90, 180, 75, 24))
-        self.textEdit = QTextEdit(self.maintenance)
-        self.textEdit.setObjectName(u"textEdit")
-        self.textEdit.setGeometry(QRect(230, 171, 171, 141))
-        self.label_128 = QLabel(self.maintenance)
-        self.label_128.setObjectName(u"label_128")
-        self.label_128.setGeometry(QRect(230, 142, 131, 21))
         self.stackedWidget.addWidget(self.maintenance)
         self.prod = QWidget()
         self.prod.setObjectName(u"prod")
@@ -1003,7 +997,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(8)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1097,15 +1091,6 @@ class Ui_MainWindow(object):
         self.maintenance_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Maintenance</p></body></html>", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
         self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
-        self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"hr { height: 1px; border-width: 0; }\n"
-"li.unchecked::marker { content: \"\\2610\"; }\n"
-"li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Input details here</p></body></html>", None))
-        self.label_128.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-weight:700;\">Report a Bug</span></p></body></html>", None))
         self.welcome_label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Production</span></p></body></html>", None))
         self.add_order_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Client Name</span></p></body></html>", None))
