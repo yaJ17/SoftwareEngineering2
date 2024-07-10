@@ -410,16 +410,12 @@ class Ui_MainWindow(object):
         self.maintenance_label.setObjectName(u"maintenance_label")
         self.maintenance_label.setGeometry(QRect(90, 50, 361, 61))
         self.maintenance_label.setFont(font3)
-        self.update_button = QPushButton(self.maintenance)
-        self.update_button.setObjectName(u"update_button")
-        self.update_button.setEnabled(False)
-        self.update_button.setGeometry(QRect(90, 148, 75, 24))
         self.backup_button = QPushButton(self.maintenance)
         self.backup_button.setObjectName(u"backup_button")
-        self.backup_button.setGeometry(QRect(90, 250, 75, 24))
+        self.backup_button.setGeometry(QRect(90, 150, 75, 24))
         self.restore_button = QPushButton(self.maintenance)
         self.restore_button.setObjectName(u"restore_button")
-        self.restore_button.setGeometry(QRect(90, 280, 75, 24))
+        self.restore_button.setGeometry(QRect(90, 180, 75, 24))
         self.textEdit = QTextEdit(self.maintenance)
         self.textEdit.setObjectName(u"textEdit")
         self.textEdit.setGeometry(QRect(230, 171, 171, 141))
@@ -1004,7 +1000,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(8)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1095,7 +1091,6 @@ class Ui_MainWindow(object):
         self.label_31.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Help</p></body></html>", None))
         self.instruct_button.setText(QCoreApplication.translate("MainWindow", u"Instructions", None))
         self.maintenance_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Maintenance</p></body></html>", None))
-        self.update_button.setText(QCoreApplication.translate("MainWindow", u"Update", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
         self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
