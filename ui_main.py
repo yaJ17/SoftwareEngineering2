@@ -162,6 +162,16 @@ class Ui_MainWindow(object):
         self.add_inventory_button = QPushButton(self.Inventory)
         self.add_inventory_button.setObjectName(u"add_inventory_button")
         self.add_inventory_button.setGeometry(QRect(254, 195, 71, 24))
+        self.frame = QFrame(self.Inventory)
+        self.frame.setObjectName(u"frame")
+        self.frame.setEnabled(False)
+        self.frame.setGeometry(QRect(420, 203, 20, 16))
+        self.frame.setStyleSheet(u"background-color: rgb(170, 0, 0);")
+        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.label = QLabel(self.Inventory)
+        self.label.setObjectName(u"label")
+        self.label.setGeometry(QRect(450, 200, 161, 20))
         self.stackedWidget.addWidget(self.Inventory)
         self.inventory_add_product = QWidget()
         self.inventory_add_product.setObjectName(u"inventory_add_product")
@@ -994,7 +1004,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(21)
+        self.stackedWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1021,6 +1031,7 @@ class Ui_MainWindow(object):
         self.welcome_label_4.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Raw Material Inventory</span></p></body></html>", None))
         self.add_product_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.add_inventory_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Material stock at critical value", None))
         self.cancel_add_invProduct.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
         self.save_add_invProduct.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Product Cost</span></p><p align=\"right\"><br/></p></body></html>", None))
