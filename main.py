@@ -375,6 +375,7 @@ class MainWindow(QMainWindow):
             if selected_files:
                 input_file = selected_files[0]
                 self.db_manager.overwrite_restore(input_file)
+                self.db_manager.restore_database_from_excel(input_file)
 
                 action = f"Restored the system data from {input_file}."
                 self.db_manager.add_user_log(self.username, self.username_id, action)

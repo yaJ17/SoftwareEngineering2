@@ -33,9 +33,9 @@ class LoginWindow(QMainWindow):
 
     def check_schemas(self):
         if self.db_manager.has_schemas():
-            self.ui.restore_button_login.setEnabled(False)
-        else:
             self.ui.restore_button_login.setEnabled(True)
+        else:
+            self.ui.restore_button_login.setEnabled(False)
 
     def restore(self):
         # Open file dialog to select the backup file
