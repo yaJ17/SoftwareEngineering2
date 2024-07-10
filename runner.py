@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # print(data)
     #db_manager.populate_deadline()
     # db_manager.populate_client()
-    #db_manager.add_dummy_data()
+    db_manager.add_dummy_data()
     # print("===============================")
     # db_manager.generate_production_report()
     # print("===============================")
