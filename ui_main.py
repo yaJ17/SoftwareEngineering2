@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainZOxtFC.ui'
+## Form generated from reading UI file 'ui_mainSSkWIf.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -661,8 +661,11 @@ class Ui_MainWindow(object):
         self.sched.setObjectName(u"sched")
         self.calendarWidget = QCalendarWidget(self.sched)
         self.calendarWidget.setObjectName(u"calendarWidget")
-        self.calendarWidget.setGeometry(QRect(0, 20, 651, 301))
-        self.calendarWidget.setStyleSheet(u"")
+        self.calendarWidget.setGeometry(QRect(0, 40, 651, 281))
+        self.calendarWidget.setStyleSheet(u"background-color: rgb(229, 229, 229);\n"
+"alternate-background-color: rgb(0, 158, 237);\n"
+"border-top-color: rgb(0, 158, 237);\n"
+"color: rgb(0, 0, 0);")
         self.daily_calendar = QPushButton(self.sched)
         self.daily_calendar.setObjectName(u"daily_calendar")
         self.daily_calendar.setGeometry(QRect(570, 330, 75, 24))
@@ -672,6 +675,19 @@ class Ui_MainWindow(object):
         self.add_deadline_button = QPushButton(self.sched)
         self.add_deadline_button.setObjectName(u"add_deadline_button")
         self.add_deadline_button.setGeometry(QRect(410, 330, 75, 24))
+        self.label_36 = QLabel(self.sched)
+        self.label_36.setObjectName(u"label_36")
+        self.label_36.setGeometry(QRect(370, 10, 51, 20))
+        self.label_35 = QLabel(self.sched)
+        self.label_35.setObjectName(u"label_35")
+        self.label_35.setGeometry(QRect(453, 10, 161, 20))
+        self.frame_2 = QFrame(self.sched)
+        self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setEnabled(False)
+        self.frame_2.setGeometry(QRect(423, 13, 20, 16))
+        self.frame_2.setStyleSheet(u"background-color: rgb(173, 216, 230);")
+        self.frame_2.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame_2.setFrameShadow(QFrame.Shadow.Raised)
         self.stackedWidget.addWidget(self.sched)
         self.sched_week = QWidget()
         self.sched_week.setObjectName(u"sched_week")
@@ -1120,7 +1136,7 @@ class Ui_MainWindow(object):
         self.username_label.raise_()
         self.stackedWidget.raise_()
         self.line_2.raise_()
-        self.layoutWidget1.raise_()
+        self.layoutWidget.raise_()
         self.username_id.raise_()
         self.logo_wannabe.raise_()
         self.statusbar = QStatusBar(MainWindow)
@@ -1254,6 +1270,8 @@ class Ui_MainWindow(object):
         self.daily_calendar.setText(QCoreApplication.translate("MainWindow", u"Daily", None))
         self.weekly_calendar.setText(QCoreApplication.translate("MainWindow", u"Weekly", None))
         self.add_deadline_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
+        self.label_36.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Legend:</span></p></body></html>", None))
+        self.label_35.setText(QCoreApplication.translate("MainWindow", u"Present active job order", None))
         self.label_73.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">This week's Job Order</span></p></body></html>", None))
         self.return_calendar.setText(QCoreApplication.translate("MainWindow", u"Back", None))
         self.label_74.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:14pt; font-weight:700;\">This day's Job Order</span></p></body></html>", None))
