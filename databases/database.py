@@ -1962,6 +1962,50 @@ class DatabaseManager:
                 return False
         except Error as e:
             print(f"Error: {e}")
+
+    def get_order_details(self, client_name, bag_type, deadline_date, client_priority):
+        if self.connection is None:
+            print("No connection to the database.")
+            return None
+
+        try:
+            cursor = self.connection.cursor()
+
+            # Encrypt necessary fields
+            encrypted_client_name = self.cipher.encrypt(client_name)
+            encrypted_bag_type = self.cipher.encrypt(bag_type)
+
+            # Fetch deadline details using a join with the deadline table
+            query = """
+                   SELECT d.deadline_details
+                   FROM ORDERS o
+                   JOIN CLIENT c ON o.client_id = c.client_id
+                   JOIN DEADLINE d ON c.deadline_id = d.deadline_id
+                   WHERE c.client_name = %s 
+                     AND o.bag_type = %s
+                     AND d.deadline_date = %s
+                     AND c.client_priority = %s
+               """
+            cursor.execute(query, (encrypted_client_name, encrypted_bag_type, deadline_date, client_priority))
+
+            deadline_details_result = cursor.fetchone()
+
+            if deadline_details_result is None:
+                print(f"Order not found for: {client_name}, {bag_type}, {deadline_date}, {client_priority}")
+                return None
+
+            encrypted_deadline_details = deadline_details_result[0]
+
+            # Decrypt deadline details
+            deadline_details = self.cipher.decrypt(encrypted_deadline_details)
+
+            # Return deadline details
+            return deadline_details
+
+        except Exception as e:
+            print(f"An error occurred while fetching order details: {e}")
+            return None
+
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.commit()

@@ -1046,7 +1046,6 @@ class MainWindow(QMainWindow):
             print(f"Error: No data found in row {row}")
 
 
-        
         # Get deadline date from product_table's fourth column at specified row
         deadline_item = self.ui.product_table.item(row, 4)  # Assuming deadline date is in the fourth column
         if deadline_item:
@@ -1063,6 +1062,17 @@ class MainWindow(QMainWindow):
             self.ui.priority_order_plus.setValue(item_priority)
         else:
             print(f"Error: No data found in row {row}")
+
+        deadline_details = self.db_manager.get_order_details(client_name, type_bag,
+                                                             deadline_date.toString("yyyy-MM-dd"), item_priority)
+
+        if deadline_details:
+            # Set the retrieved deadline details to UI element
+            self.ui.notes_order_plus.setText(deadline_details)
+        else:
+            print(
+                f"Error: Failed to retrieve deadline details for {client_name}, {type_bag}, {deadline_str}, {item_priority}")
+
 
 
         try:
@@ -1095,6 +1105,8 @@ class MainWindow(QMainWindow):
             "order_quantity": rows
         }
         print(self.data)
+
+
         self.ui.stackedWidget.setCurrentIndex(22)
 
     def save_order_plus_action(self):
