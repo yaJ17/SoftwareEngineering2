@@ -135,6 +135,7 @@ class MainWindow(QMainWindow):
         self.username_id = username_id
         if self.username != user and self.username_id != id:
             self.ui.add_account.setEnabled(False)
+            self.ui.restore_button.setEnabled(False)
         # Show the window after populating the table
         self.ui.toolButton.setToolTip("""
                     <div style="
@@ -365,6 +366,7 @@ class MainWindow(QMainWindow):
         self.db_manager.add_user_log(self.username, self.username_id, action)
 
     def restore(self):
+
         # Open file dialog to select the backup file
         file_dialog = QFileDialog()
         file_dialog.setNameFilter("Excel files (*.xlsx)")

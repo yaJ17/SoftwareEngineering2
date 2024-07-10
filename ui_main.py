@@ -165,13 +165,16 @@ class Ui_MainWindow(object):
         self.frame = QFrame(self.Inventory)
         self.frame.setObjectName(u"frame")
         self.frame.setEnabled(False)
-        self.frame.setGeometry(QRect(420, 203, 20, 16))
+        self.frame.setGeometry(QRect(420, 200, 20, 16))
         self.frame.setStyleSheet(u"background-color: rgb(170, 0, 0);")
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.label = QLabel(self.Inventory)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(450, 200, 161, 20))
+        self.label.setGeometry(QRect(450, 197, 161, 20))
+        self.label_34 = QLabel(self.Inventory)
+        self.label_34.setObjectName(u"label_34")
+        self.label_34.setGeometry(QRect(367, 197, 51, 20))
         self.stackedWidget.addWidget(self.Inventory)
         self.inventory_add_product = QWidget()
         self.inventory_add_product.setObjectName(u"inventory_add_product")
@@ -1000,7 +1003,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(8)
+        self.stackedWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1028,6 +1031,7 @@ class Ui_MainWindow(object):
         self.add_product_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.add_inventory_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Material stock at critical value", None))
+        self.label_34.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Legend:</span></p></body></html>", None))
         self.cancel_add_invProduct.setText(QCoreApplication.translate("MainWindow", u"Cancel", None))
         self.save_add_invProduct.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.label_45.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"right\"><span style=\" font-weight:700;\">Product Cost</span></p><p align=\"right\"><br/></p></body></html>", None))
