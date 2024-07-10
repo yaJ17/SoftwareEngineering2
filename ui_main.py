@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_mainUKfMhd.ui'
+## Form generated from reading UI file 'ui_maingFoeFG.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -1114,7 +1114,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(21)
+        self.stackedWidget.setCurrentIndex(8)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1214,7 +1214,7 @@ class Ui_MainWindow(object):
         self.instruct_button.setText(QCoreApplication.translate("MainWindow", u"Instructions", None))
         self.maintenance_label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Maintenance</p></body></html>", None))
         self.backup_button.setText(QCoreApplication.translate("MainWindow", u"Backup", None))
-        self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Restore", None))
+        self.restore_button.setText(QCoreApplication.translate("MainWindow", u"Recovery", None))
         self.welcome_label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:11pt; font-style:italic;\">Production</span></p></body></html>", None))
         self.add_order_button.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Client Name</span></p></body></html>", None))

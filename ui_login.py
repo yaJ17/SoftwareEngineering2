@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'ui_loginHjodsM.ui'
+## Form generated from reading UI file 'ui_loginMeaDKq.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -118,6 +118,6 @@ class Ui_Login(object):
         self.forgot_pass_button.setText(QCoreApplication.translate("Login", u"Forgot Password", None))
         self.login_exit_button.setText(QCoreApplication.translate("Login", u"Exit", None))
         self.login_button.setText(QCoreApplication.translate("Login", u"Login", None))
-        self.restore_button_login.setText(QCoreApplication.translate("Login", u"Restore", None))
+        self.restore_button_login.setText(QCoreApplication.translate("Login", u"Recovery", None))
     # retranslateUi
 
